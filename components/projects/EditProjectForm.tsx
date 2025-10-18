@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { updateProject } from '@/lib/supabase/queries/projects'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -59,34 +60,33 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
       
       if (!user) throw new Error('Not authenticated')
   
-      const { data, error } = await supabase
-        .from('projects')
-        .insert({
-          user_id: user.id,
-          title,
-          description: description || null,
-          color,
-          status: 'active',
-        })
-        .select()
-        .single()
-  
-      if (error) throw error
+      const updatedProject = await updateProject(project.id, {
+        title,
+        description: description || null,
+        color,
+        status,
+      })
   
       // Activity log ekle
       await supabase
         .from('activity_logs')
         .insert({
           user_id: user.id,
-          project_id: data.id,
+          project_id: updatedProject.id,
           task_id: null,
-          action_type: 'project_created',
+          action_type: 'project_updated',
           metadata: {
-            project_title: title
+            project_title: title,
+            changes: {
+              title: project.title !== title,
+              description: project.description !== description,
+              color: project.color !== color,
+              status: project.status !== status,
+            }
           }
         })
   
-      router.push(`/dashboard/projects/${data.id}`)
+      router.push(`/dashboard/projects/${updatedProject.id}`)
       router.refresh()
     } catch (err: any) {
       setError(err.message)
