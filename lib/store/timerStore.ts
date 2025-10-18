@@ -1,5 +1,6 @@
 import { create } from 'zustand'
-import { createClient } from '@/lib/supabase/client'
+import { startTimeEntry, stopTimeEntry } from '@/lib/supabase/queries/time_entries'
+import { logTimeActivity } from '@/lib/supabase/queries/activities'
 
 export interface TimerState {
   taskId: string | null
@@ -56,22 +57,10 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
   },
 
   startTimer: async (taskId: string, taskTitle: string, userId: string) => {
-    const supabase = createClient()
     const startTime = new Date()
 
     // Time entry oluştur
-    const { data, error } = await supabase
-      .from('time_entries')
-      .insert({
-        task_id: taskId,
-        user_id: userId,
-        started_at: startTime.toISOString(),
-        is_manual: false,
-      })
-      .select()
-      .single()
-
-    if (error) throw error
+    await startTimeEntry(taskId, userId)
 
     // State'i güncelle
     set({
@@ -94,55 +83,27 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
   stopTimer: async (userId: string, note?: string) => {
     const state = get()
     if (!state.taskId || !state.startTime) return
-  
-    const supabase = createClient()
-    const endTime = new Date()
+
     const durationMinutes = Math.floor(state.elapsed / 60)
-  
-    // Time entry'yi güncelle
-    const { error } = await supabase
-      .from('time_entries')
-      .update({
-        ended_at: endTime.toISOString(),
-        duration: durationMinutes,
-        note: note || null,
-      })
-      .eq('task_id', state.taskId)
-      .eq('user_id', userId)
-      .is('ended_at', null)
-  
-    if (error) throw error
-  
-    // Task'ın actual_duration'ını güncelle
-    const { data: task } = await supabase
-      .from('tasks')
-      .select('actual_duration, project_id')
-      .eq('id', state.taskId)
-      .single()
-  
-    if (task) {
-      await supabase
-        .from('tasks')
-        .update({
-          actual_duration: task.actual_duration + durationMinutes
-        })
-        .eq('id', state.taskId)
-      
-      // Activity log ekle
-      await supabase
-        .from('activity_logs')
-        .insert({
-          user_id: userId,
-          project_id: task.project_id,
-          task_id: state.taskId,
-          action_type: 'time_logged',
-          metadata: {
-            duration: durationMinutes,
-            task_title: state.taskTitle
-          }
-        })
-    }
-  
+
+    // Time entry'yi güncelle ve task duration'ı güncelle
+    const { projectId } = await stopTimeEntry(
+      state.taskId,
+      userId,
+      durationMinutes,
+      note
+    )
+
+    // Activity log ekle
+    await logTimeActivity(
+      userId,
+      projectId,
+      state.taskId,
+      durationMinutes,
+      state.taskTitle || '',
+      false
+    )
+
     // State'i sıfırla
     set({
       taskId: null,
@@ -151,7 +112,7 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
       elapsed: 0,
       isRunning: false,
     })
-  
+
     localStorage.removeItem(TIMER_KEY)
   },
 

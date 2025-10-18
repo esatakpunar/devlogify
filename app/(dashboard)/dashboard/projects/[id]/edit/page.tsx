@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getProject } from '@/lib/supabase/queries/projects'
 import { notFound } from 'next/navigation'
 import { EditProjectForm } from '@/components/projects/EditProjectForm'
 
@@ -12,20 +13,24 @@ export default async function EditProjectPage({ params }: EditProjectPageProps) 
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const { data: project, error } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('id', params.id)
-    .eq('user_id', user?.id)
-    .single()
-
-  if (error || !project) {
+  if (!user) {
     notFound()
   }
 
-  return (
-    <div className="max-w-2xl mx-auto">
-      <EditProjectForm project={project} />
-    </div>
-  )
+  try {
+    const project = await getProject(params.id, supabase)
+
+    // Verify ownership
+    if (project.user_id !== user.id) {
+      notFound()
+    }
+
+    return (
+      <div className="max-w-2xl mx-auto">
+        <EditProjectForm project={project} />
+      </div>
+    )
+  } catch (error) {
+    notFound()
+  }
 }

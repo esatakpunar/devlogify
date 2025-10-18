@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getProjects } from '@/lib/supabase/queries/projects'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Plus, FolderKanban } from 'lucide-react'
@@ -16,17 +17,13 @@ async function ProjectsList({ status }: { status: string }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  let query = supabase
-    .from('projects')
-    .select('*')
-    .eq('user_id', user?.id)
-    .order('created_at', { ascending: false })
+  if (!user) return null
 
-  if (status !== 'all') {
-    query = query.eq('status', status)
-  }
-
-  const { data: projects } = await query
+  const projects = await getProjects(
+    user.id,
+    status !== 'all' ? status : undefined,
+    supabase
+  )
 
   if (!projects || projects.length === 0) {
     return (
@@ -35,7 +32,7 @@ async function ProjectsList({ status }: { status: string }) {
         title={status !== 'all' ? `No ${status} projects yet` : 'No projects yet'}
         description="Get started by creating your first project to track your work"
         actionLabel="Create Project"
-        onAction={() => window.location.href = '/dashboard/projects/new'}
+        actionHref="/dashboard/projects/new"
       />
     )
   }

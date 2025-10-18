@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
+import { createProject } from '@/lib/supabase/queries/projects'
+import { logProjectCreated } from '@/lib/supabase/queries/activities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -35,40 +37,24 @@ export default function NewProjectPage() {
     e.preventDefault()
     setLoading(true)
     setError(null)
-  
+
     try {
       const { data: { user } } = await supabase.auth.getUser()
-      
+
       if (!user) throw new Error('Not authenticated')
-  
-      const { data, error } = await supabase
-        .from('projects')
-        .insert({
-          user_id: user.id,
-          title,
-          description: description || null,
-          color,
-          status: 'active',
-        })
-        .select()
-        .single()
-  
-      if (error) throw error
-  
+
+      const newProject = await createProject({
+        user_id: user.id,
+        title,
+        description: description || null,
+        color,
+        status: 'active',
+      })
+
       // Activity log ekle
-      await supabase
-        .from('activity_logs')
-        .insert({
-          user_id: user.id,
-          project_id: data.id,
-          task_id: null,
-          action_type: 'project_created',
-          metadata: {
-            project_title: title
-          }
-        })
-  
-      router.push(`/dashboard/projects/${data.id}`)
+      await logProjectCreated(user.id, newProject.id, title)
+
+      router.push(`/dashboard/projects/${newProject.id}`)
       router.refresh()
     } catch (err: any) {
       setError(err.message)

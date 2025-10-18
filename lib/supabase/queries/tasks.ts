@@ -1,12 +1,13 @@
-import { createClient } from '@/lib/supabase/client'
+import { createClient as createBrowserClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/supabase'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 export type Task = Database['public']['Tables']['tasks']['Row']
 export type TaskInsert = Database['public']['Tables']['tasks']['Insert']
 export type TaskUpdate = Database['public']['Tables']['tasks']['Update']
 
-export async function getTasks(projectId: string) {
-  const supabase = createClient()
+export async function getTasks(projectId: string, supabaseClient?: SupabaseClient<Database>) {
+  const supabase = supabaseClient || createBrowserClient()
   
   const { data, error } = await supabase
     .from('tasks')
@@ -19,7 +20,7 @@ export async function getTasks(projectId: string) {
 }
 
 export async function getTask(id: string) {
-  const supabase = createClient()
+  const supabase = createBrowserClient()
   
   const { data, error } = await supabase
     .from('tasks')
@@ -32,7 +33,7 @@ export async function getTask(id: string) {
 }
 
 export async function createTask(task: TaskInsert) {
-  const supabase = createClient()
+  const supabase = createBrowserClient()
   
   const { data, error } = await supabase
     .from('tasks')
@@ -45,7 +46,7 @@ export async function createTask(task: TaskInsert) {
 }
 
 export async function updateTask(id: string, updates: TaskUpdate) {
-  const supabase = createClient()
+  const supabase = createBrowserClient()
   
   const { data, error } = await supabase
     .from('tasks')
@@ -59,7 +60,7 @@ export async function updateTask(id: string, updates: TaskUpdate) {
 }
 
 export async function deleteTask(id: string) {
-  const supabase = createClient()
+  const supabase = createBrowserClient()
   
   const { error } = await supabase
     .from('tasks')
@@ -70,7 +71,7 @@ export async function deleteTask(id: string) {
 }
 
 export async function updateTaskStatus(id: string, status: 'todo' | 'in_progress' | 'done') {
-  const supabase = createClient()
+  const supabase = createBrowserClient()
   
   const updates: TaskUpdate = {
     status,

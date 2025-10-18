@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { createTask } from '@/lib/supabase/queries/tasks'
-import { logActivity } from '@/lib/utils/activityLogger'
+import { logActivity } from '@/lib/supabase/queries/activities'
 import {
   Dialog,
   DialogContent,

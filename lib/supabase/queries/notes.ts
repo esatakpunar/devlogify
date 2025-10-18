@@ -1,12 +1,13 @@
-import { createClient } from '@/lib/supabase/client'
+import { createClient as createBrowserClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/supabase'
+import type { SupabaseClient } from '@supabase/supabase-js'
 
 export type Note = Database['public']['Tables']['notes']['Row']
 export type NoteInsert = Database['public']['Tables']['notes']['Insert']
 export type NoteUpdate = Database['public']['Tables']['notes']['Update']
 
-export async function getNotes(userId: string) {
-  const supabase = createClient()
+export async function getNotes(userId: string, supabaseClient?: SupabaseClient<Database>) {
+  const supabase = supabaseClient || createBrowserClient()
   
   const { data, error } = await supabase
     .from('notes')
@@ -23,7 +24,7 @@ export async function getNotes(userId: string) {
 }
 
 export async function getNote(id: string) {
-  const supabase = createClient()
+  const supabase = createBrowserClient()
   
   const { data, error } = await supabase
     .from('notes')
@@ -39,7 +40,7 @@ export async function getNote(id: string) {
 }
 
 export async function createNote(note: NoteInsert) {
-  const supabase = createClient()
+  const supabase = createBrowserClient()
   
   const { data, error } = await supabase
     .from('notes')
@@ -52,7 +53,7 @@ export async function createNote(note: NoteInsert) {
 }
 
 export async function updateNote(id: string, updates: NoteUpdate) {
-  const supabase = createClient()
+  const supabase = createBrowserClient()
   
   const { data, error } = await supabase
     .from('notes')
@@ -66,7 +67,7 @@ export async function updateNote(id: string, updates: NoteUpdate) {
 }
 
 export async function deleteNote(id: string) {
-  const supabase = createClient()
+  const supabase = createBrowserClient()
   
   const { error } = await supabase
     .from('notes')
@@ -77,7 +78,7 @@ export async function deleteNote(id: string) {
 }
 
 export async function togglePinNote(id: string, isPinned: boolean) {
-  const supabase = createClient()
+  const supabase = createBrowserClient()
   
   const { data, error } = await supabase
     .from('notes')

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getProjectCount } from '@/lib/supabase/queries/projects'
 import { FolderKanban, Clock, CheckCircle2, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -8,12 +9,10 @@ export default async function DashboardPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
+  if (!user) return null
+
   // Proje sayısını al
-  const { count: projectCount } = await supabase
-    .from('projects')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', user?.id)
-    .eq('status', 'active')
+  const projectCount = await getProjectCount(user.id, 'active', supabase)
 
   const stats = [
     {

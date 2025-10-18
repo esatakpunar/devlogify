@@ -1,4 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
+import { getProject } from '@/lib/supabase/queries/projects'
+import { getTasks } from '@/lib/supabase/queries/tasks'
 import { notFound } from 'next/navigation'
 import { ProjectHeader } from '@/components/projects/ProjectHeader'
 import { KanbanBoard } from '@/components/tasks/KanbanBoard'
@@ -13,29 +15,29 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Get project
-  const { data: project, error: projectError } = await supabase
-    .from('projects')
-    .select('*')
-    .eq('id', params.id)
-    .eq('user_id', user?.id)
-    .single()
-
-  if (projectError || !project) {
+  if (!user) {
     notFound()
   }
 
-  // Get tasks
-  const { data: tasks } = await supabase
-    .from('tasks')
-    .select('*')
-    .eq('project_id', params.id)
-    .order('order_index', { ascending: true })
+  // Get project
+  try {
+    const project = await getProject(params.id, supabase)
 
-  return (
-    <div className="space-y-6">
-      <ProjectHeader project={project} />
-      <KanbanBoard projectId={params.id} initialTasks={tasks || []} userId={user?.id || ''} />
-    </div>
-  )
+    // Verify ownership
+    if (project.user_id !== user.id) {
+      notFound()
+    }
+
+    // Get tasks
+    const tasks = await getTasks(params.id, supabase)
+
+    return (
+      <div className="space-y-6">
+        <ProjectHeader project={project} />
+        <KanbanBoard projectId={params.id} initialTasks={tasks || []} userId={user.id} />
+      </div>
+    )
+  } catch (error) {
+    notFound()
+  }
 }

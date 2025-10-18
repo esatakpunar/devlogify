@@ -11,11 +11,10 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
-import { updateTaskStatus, deleteTask } from '@/lib/supabase/queries/tasks'
+import { updateTaskStatus, deleteTask, getTask } from '@/lib/supabase/queries/tasks'
+import { logActivity } from '@/lib/supabase/queries/activities'
 import { useTimer } from '@/lib/hooks/useTimer'
-import { logActivity } from '@/lib/utils/activityLogger'
 import { formatDistanceToNow } from 'date-fns'
-import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { EditTaskDialog } from './EditTaskDialog'
 import { AddManualTimeDialog } from './AddManualTimeDialog'
@@ -57,7 +56,6 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isTimeDialogOpen, setIsTimeDialogOpen] = useState(false)
   const { taskId, isRunning, elapsed, startTimer, stopTimer, formatTime } = useTimer()
-  const supabase = createClient()
 
   const isTimerActive = isRunning && taskId === task.id
 
@@ -125,22 +123,16 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
     setLoading(true)
     try {
       await stopTimer(userId)
-      
-      const { data: updatedTask } = await supabase
-        .from('tasks')
-        .select('*')
-        .eq('id', task.id)
-        .single()
 
-      if (updatedTask) {
-        setLocalTask(updatedTask)
-        onTaskUpdated(updatedTask)
-        
-        const durationMinutes = Math.floor(elapsed / 60)
-        toast.success('Timer stopped', {
-          description: `Logged ${durationMinutes} minutes to "${task.title}"`,
-        })
-      }
+      const updatedTask = await getTask(task.id)
+
+      setLocalTask(updatedTask)
+      onTaskUpdated(updatedTask)
+
+      const durationMinutes = Math.floor(elapsed / 60)
+      toast.success('Timer stopped', {
+        description: `Logged ${durationMinutes} minutes to "${task.title}"`,
+      })
     } catch (error) {
       console.error('Failed to stop timer:', error)
       toast.error('Failed to stop timer')
@@ -156,16 +148,9 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
 
   const handleTimeAdded = async (minutes: number) => {
     // Task'ı yeniden çek
-    const { data: updatedTask } = await supabase
-      .from('tasks')
-      .select('*')
-      .eq('id', task.id)
-      .single()
-
-    if (updatedTask) {
-      setLocalTask(updatedTask)
-      onTaskUpdated(updatedTask)
-    }
+    const updatedTask = await getTask(task.id)
+    setLocalTask(updatedTask)
+    onTaskUpdated(updatedTask)
   }
 
   const canMovePrevious = localTask.status !== 'todo'

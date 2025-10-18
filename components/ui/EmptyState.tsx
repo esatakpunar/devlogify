@@ -1,20 +1,23 @@
 import { LucideIcon } from 'lucide-react'
 import { Button } from './button'
+import Link from 'next/link'
 
 interface EmptyStateProps {
   icon: LucideIcon
   title: string
   description: string
   actionLabel?: string
+  actionHref?: string
   onAction?: () => void
 }
 
-export function EmptyState({ 
-  icon: Icon, 
-  title, 
-  description, 
-  actionLabel, 
-  onAction 
+export function EmptyState({
+  icon: Icon,
+  title,
+  description,
+  actionLabel,
+  actionHref,
+  onAction
 }: EmptyStateProps) {
   return (
     <div className="flex flex-col items-center justify-center py-12 px-4 bg-white dark:bg-gray-900 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-800">
@@ -27,7 +30,14 @@ export function EmptyState({
       <p className="text-gray-600 dark:text-gray-400 text-center max-w-sm mb-6">
         {description}
       </p>
-      {actionLabel && onAction && (
+      {actionLabel && actionHref && (
+        <Link href={actionHref}>
+          <Button>
+            {actionLabel}
+          </Button>
+        </Link>
+      )}
+      {actionLabel && onAction && !actionHref && (
         <Button onClick={onAction}>
           {actionLabel}
         </Button>

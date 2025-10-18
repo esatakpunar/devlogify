@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { addManualTimeEntry } from '@/lib/supabase/queries/time_entries'
+import { logTimeActivity } from '@/lib/supabase/queries/activities'
 import {
   Dialog,
   DialogContent,
@@ -37,75 +38,43 @@ export function AddManualTimeDialog({
   const [minutes, setMinutes] = useState('')
   const [note, setNote] = useState('')
   const [loading, setLoading] = useState(false)
-  const supabase = createClient()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     const totalMinutes = (parseInt(hours || '0') * 60) + parseInt(minutes || '0')
-    
+
     if (totalMinutes <= 0) {
       toast.error('Please enter a valid time')
       return
     }
-  
+
     setLoading(true)
-  
+
     try {
-      const now = new Date()
-      const startTime = new Date(now.getTime() - totalMinutes * 60000)
-  
-      // Time entry oluştur
-      const { error: timeEntryError } = await supabase
-        .from('time_entries')
-        .insert({
-          task_id: taskId,
-          user_id: userId,
-          started_at: startTime.toISOString(),
-          ended_at: now.toISOString(),
-          duration: totalMinutes,
-          note: note || null,
-          is_manual: true,
-        })
-  
-      if (timeEntryError) throw timeEntryError
-  
-      // Task'ın actual_duration'ını güncelle
-      const { data: task } = await supabase
-        .from('tasks')
-        .select('actual_duration, project_id')
-        .eq('id', taskId)
-        .single()
-  
-      if (task) {
-        await supabase
-          .from('tasks')
-          .update({
-            actual_duration: task.actual_duration + totalMinutes
-          })
-          .eq('id', taskId)
-        
-        // Activity log ekle
-        await supabase
-          .from('activity_logs')
-          .insert({
-            user_id: userId,
-            project_id: task.project_id,
-            task_id: taskId,
-            action_type: 'time_logged',
-            metadata: {
-              duration: totalMinutes,
-              task_title: taskTitle,
-              is_manual: true
-            }
-          })
-      }
-  
+      // Add manual time entry and update task duration
+      const { projectId } = await addManualTimeEntry(
+        taskId,
+        userId,
+        totalMinutes,
+        note || undefined
+      )
+
+      // Log activity
+      await logTimeActivity(
+        userId,
+        projectId,
+        taskId,
+        totalMinutes,
+        taskTitle,
+        true
+      )
+
       onTimeAdded(totalMinutes)
       toast.success('Time logged successfully', {
         description: `Added ${totalMinutes} minutes to "${taskTitle}"`,
       })
-  
+
       // Reset form
       setHours('')
       setMinutes('')

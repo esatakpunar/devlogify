@@ -3,7 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { updateProject } from '@/lib/supabase/queries/projects'
+import { updateProject, deleteProject } from '@/lib/supabase/queries/projects'
+import { logProjectUpdated, logProjectDeleted } from '@/lib/supabase/queries/activities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -54,38 +55,32 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
     e.preventDefault()
     setLoading(true)
     setError(null)
-  
+
     try {
       const { data: { user } } = await supabase.auth.getUser()
-      
+
       if (!user) throw new Error('Not authenticated')
-  
+
       const updatedProject = await updateProject(project.id, {
         title,
         description: description || null,
         color,
         status,
       })
-  
+
       // Activity log ekle
-      await supabase
-        .from('activity_logs')
-        .insert({
-          user_id: user.id,
-          project_id: updatedProject.id,
-          task_id: null,
-          action_type: 'project_updated',
-          metadata: {
-            project_title: title,
-            changes: {
-              title: project.title !== title,
-              description: project.description !== description,
-              color: project.color !== color,
-              status: project.status !== status,
-            }
-          }
-        })
-  
+      await logProjectUpdated(
+        user.id,
+        updatedProject.id,
+        title,
+        {
+          title: project.title !== title,
+          description: project.description !== description,
+          color: project.color !== color,
+          status: project.status !== status,
+        }
+      )
+
       router.push(`/dashboard/projects/${updatedProject.id}`)
       router.refresh()
     } catch (err: any) {
@@ -103,12 +98,14 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
     setError(null)
 
     try {
-      const { error } = await supabase
-        .from('projects')
-        .delete()
-        .eq('id', project.id)
+      const { data: { user } } = await supabase.auth.getUser()
 
-      if (error) throw error
+      if (!user) throw new Error('Not authenticated')
+
+      // Log activity before deleting
+      await logProjectDeleted(user.id, project.id, project.title)
+
+      await deleteProject(project.id)
 
       router.push('/dashboard/projects')
       router.refresh()

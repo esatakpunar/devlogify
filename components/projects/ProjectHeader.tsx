@@ -5,6 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { archiveProject, deleteProject } from '@/lib/supabase/queries/projects'
+import { logProjectDeleted } from '@/lib/supabase/queries/activities'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -31,16 +33,10 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
 
   const handleArchive = async () => {
     if (!confirm('Are you sure you want to archive this project?')) return
-    
+
     setLoading(true)
     try {
-      const { error } = await supabase
-        .from('projects')
-        .update({ status: 'archived' })
-        .eq('id', project.id)
-
-      if (error) throw error
-
+      await archiveProject(project.id)
       router.refresh()
     } catch (error) {
       console.error('Failed to archive project:', error)
@@ -56,12 +52,13 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
 
     setLoading(true)
     try {
-      const { error } = await supabase
-        .from('projects')
-        .delete()
-        .eq('id', project.id)
+      const { data: { user } } = await supabase.auth.getUser()
 
-      if (error) throw error
+      if (user) {
+        await logProjectDeleted(user.id, project.id, project.title)
+      }
+
+      await deleteProject(project.id)
 
       router.push('/dashboard/projects')
       router.refresh()
