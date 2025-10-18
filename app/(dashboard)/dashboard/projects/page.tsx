@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button'
 import { Plus, FolderKanban } from 'lucide-react'
 import { ProjectCard } from '@/components/projects/ProjectCard'
 import { ProjectsFilter } from '@/components/projects/ProjectsFilter'
+import { EmptyState } from '@/components/ui/EmptyState'
 import { Suspense } from 'react'
+import { ProjectsSkeleton } from '@/components/ui/LoadingSkeleton'
 
 interface ProjectsPageProps {
   searchParams: Promise<{ status?: string }>
@@ -28,26 +30,20 @@ async function ProjectsList({ status }: { status: string }) {
 
   if (!projects || projects.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg border border-gray-200">
-        <FolderKanban className="w-12 h-12 text-gray-400 mb-4" />
-        <h3 className="text-lg font-medium text-gray-900 mb-2">
-          No {status !== 'all' && status} projects yet
-        </h3>
-        <p className="text-gray-600 mb-4">Get started by creating your first project</p>
-        <Link href="/dashboard/projects/new">
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            Create Project
-          </Button>
-        </Link>
-      </div>
+      <EmptyState
+        icon={FolderKanban}
+        title={status !== 'all' ? `No ${status} projects yet` : 'No projects yet'}
+        description="Get started by creating your first project to track your work"
+        actionLabel="Create Project"
+        onAction={() => window.location.href = '/dashboard/projects/new'}
+      />
     )
   }
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {projects.map((project) => (
-        <ProjectCard key={project.id} project={project} />
+      {projects.map((project, index) => (
+        <ProjectCard key={project.id} project={project} index={index} />
       ))}
     </div>
   )
@@ -62,8 +58,8 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Projects</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-3xl font-bold dark:text-white">Projects</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
             Manage your projects and track progress
           </p>
         </div>
@@ -81,11 +77,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
       </Suspense>
 
       {/* Projects Grid */}
-      <Suspense fallback={
-        <div className="flex items-center justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        </div>
-      }>
+      <Suspense fallback={<ProjectsSkeleton />}>
         <ProjectsList status={status} />
       </Suspense>
     </div>

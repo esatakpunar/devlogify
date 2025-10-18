@@ -1,8 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
 import { MoreVertical, Calendar, ListTodo, Edit, Archive, Trash } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { formatDistanceToNow } from 'date-fns'
+import { AnimatedCard } from '@/components/ui/AnimatedCard'
 
 interface ProjectCardProps {
   project: {
@@ -24,9 +25,10 @@ interface ProjectCardProps {
     status: string
     created_at: string
   }
+  index?: number
 }
 
-export function ProjectCard({ project }: ProjectCardProps) {
+export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -72,74 +74,76 @@ export function ProjectCard({ project }: ProjectCardProps) {
   }
 
   return (
-    <Link href={`/dashboard/projects/${project.id}`}>
-      <div className="group bg-white rounded-lg border border-gray-200 hover:border-gray-300 hover:shadow-md transition-all p-6 cursor-pointer">
-        {/* Color bar */}
-        <div 
-          className="w-full h-1 rounded-full mb-4" 
-          style={{ backgroundColor: project.color }}
-        />
+    <AnimatedCard delay={index * 0.05}>
+      <Link href={`/dashboard/projects/${project.id}`}>
+        <div className="group bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-lg transition-all p-6 cursor-pointer">
+          {/* Color bar */}
+          <div 
+            className="w-full h-1 rounded-full mb-4" 
+            style={{ backgroundColor: project.color }}
+          />
 
-        {/* Header */}
-        <div className="flex items-start justify-between mb-3">
-          <h3 className="font-semibold text-lg line-clamp-1 group-hover:text-blue-600 transition-colors">
-            {project.title}
-          </h3>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                disabled={loading}
-              >
-                <MoreVertical className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-              <DropdownMenuItem asChild>
-                <Link href={`/dashboard/projects/${project.id}/edit`}>
-                  <Edit className="w-4 h-4 mr-2" />
-                  Edit
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleArchive}>
-                <Archive className="w-4 h-4 mr-2" />
-                Archive
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onClick={handleDelete}
-                className="text-red-600"
-              >
-                <Trash className="w-4 h-4 mr-2" />
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
+          {/* Header */}
+          <div className="flex items-start justify-between mb-3">
+            <h3 className="font-semibold text-lg line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors dark:text-white">
+              {project.title}
+            </h3>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                  disabled={loading}
+                >
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+                <DropdownMenuItem asChild>
+                  <Link href={`/dashboard/projects/${project.id}/edit`}>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Edit
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={handleArchive}>
+                  <Archive className="w-4 h-4 mr-2" />
+                  Archive
+                </DropdownMenuItem>
+                <DropdownMenuItem 
+                  onClick={handleDelete}
+                  className="text-red-600"
+                >
+                  <Trash className="w-4 h-4 mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
 
-        {/* Description */}
-        {project.description && (
-          <p className="text-sm text-gray-600 line-clamp-2 mb-4">
-            {project.description}
-          </p>
-        )}
+          {/* Description */}
+          {project.description && (
+            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4">
+              {project.description}
+            </p>
+          )}
 
-        {/* Footer */}
-        <div className="flex items-center justify-between text-xs text-gray-500">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1">
-              <ListTodo className="w-4 h-4" />
-              <span>0 tasks</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Calendar className="w-4 h-4" />
-              <span>{formatDistanceToNow(new Date(project.created_at), { addSuffix: true })}</span>
+          {/* Footer */}
+          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-1">
+                <ListTodo className="w-4 h-4" />
+                <span>0 tasks</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Calendar className="w-4 h-4" />
+                <span>{formatDistanceToNow(new Date(project.created_at), { addSuffix: true })}</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </AnimatedCard>
   )
 }

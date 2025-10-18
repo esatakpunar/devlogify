@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { FolderKanban, Clock, CheckCircle2, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import { AnimatedCard } from '@/components/ui/AnimatedCard'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -14,13 +15,48 @@ export default async function DashboardPage() {
     .eq('user_id', user?.id)
     .eq('status', 'active')
 
+  const stats = [
+    {
+      title: 'Active Projects',
+      value: projectCount || 0,
+      icon: FolderKanban,
+      color: 'blue',
+      bgColor: 'bg-blue-50 dark:bg-blue-900/20',
+      iconColor: 'text-blue-600 dark:text-blue-400',
+    },
+    {
+      title: 'Tasks Today',
+      value: 0,
+      icon: CheckCircle2,
+      color: 'green',
+      bgColor: 'bg-green-50 dark:bg-green-900/20',
+      iconColor: 'text-green-600 dark:text-green-400',
+    },
+    {
+      title: 'Time Today',
+      value: '0h',
+      icon: Clock,
+      color: 'purple',
+      bgColor: 'bg-purple-50 dark:bg-purple-900/20',
+      iconColor: 'text-purple-600 dark:text-purple-400',
+    },
+    {
+      title: 'This Week',
+      value: '0h',
+      icon: TrendingUp,
+      color: 'orange',
+      bgColor: 'bg-orange-50 dark:bg-orange-900/20',
+      iconColor: 'text-orange-600 dark:text-orange-400',
+    },
+  ]
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Dashboard</h1>
-          <p className="text-gray-600 mt-1">
+          <h1 className="text-3xl font-bold dark:text-white">Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-400 mt-1">
             Welcome back, {user?.email?.split('@')[0]}!
           </p>
         </div>
@@ -34,88 +70,59 @@ export default async function DashboardPage() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Active Projects</p>
-              <p className="text-2xl font-bold mt-2">{projectCount || 0}</p>
+        {stats.map((stat, index) => (
+          <AnimatedCard key={stat.title} delay={index * 0.1}>
+            <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6 hover:shadow-lg transition-shadow">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{stat.title}</p>
+                  <p className="text-2xl font-bold mt-2 dark:text-white">{stat.value}</p>
+                </div>
+                <div className={`w-12 h-12 ${stat.bgColor} rounded-lg flex items-center justify-center`}>
+                  <stat.icon className={`w-6 h-6 ${stat.iconColor}`} />
+                </div>
+              </div>
             </div>
-            <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-              <FolderKanban className="w-6 h-6 text-blue-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Tasks Today</p>
-              <p className="text-2xl font-bold mt-2">0</p>
-            </div>
-            <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
-              <CheckCircle2 className="w-6 h-6 text-green-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">Time Today</p>
-              <p className="text-2xl font-bold mt-2">0h</p>
-            </div>
-            <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
-              <Clock className="w-6 h-6 text-purple-600" />
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-white rounded-lg border border-gray-200 p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600">This Week</p>
-              <p className="text-2xl font-bold mt-2">0h</p>
-            </div>
-            <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-orange-600" />
-            </div>
-          </div>
-        </div>
+          </AnimatedCard>
+        ))}
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
+      {/* Quick Actions - animasyonlu */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
+        <h2 className="text-lg font-semibold mb-4 dark:text-white">Quick Actions</h2>
         <div className="grid gap-4 md:grid-cols-3">
-          <Link href="/dashboard/projects/new" className="p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors">
-            <FolderKanban className="w-8 h-8 text-blue-600 mb-2" />
-            <h3 className="font-medium">Create Project</h3>
-            <p className="text-sm text-gray-600 mt-1">Start a new project</p>
-          </Link>
-          <Link href="/dashboard/timeline" className="p-4 border border-gray-200 rounded-lg hover:border-purple-500 hover:bg-purple-50 transition-colors">
-            <Clock className="w-8 h-8 text-purple-600 mb-2" />
-            <h3 className="font-medium">View Timeline</h3>
-            <p className="text-sm text-gray-600 mt-1">See your activity log</p>
-          </Link>
-          <Link href="/dashboard/notes" className="p-4 border border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors">
-            <CheckCircle2 className="w-8 h-8 text-green-600 mb-2" />
-            <h3 className="font-medium">Quick Note</h3>
-            <p className="text-sm text-gray-600 mt-1">Capture an idea</p>
-          </Link>
+          {[
+            { href: '/dashboard/projects/new', icon: FolderKanban, title: 'Create Project', desc: 'Start a new project', color: 'blue' },
+            { href: '/dashboard/timeline', icon: Clock, title: 'View Timeline', desc: 'See your activity log', color: 'purple' },
+            { href: '/dashboard/notes', icon: CheckCircle2, title: 'Quick Note', desc: 'Capture an idea', color: 'green' },
+          ].map((action, index) => (
+            <AnimatedCard key={action.href} delay={0.5 + index * 0.1}>
+              <Link 
+                href={action.href} 
+                className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all block"
+              >
+                <action.icon className={`w-8 h-8 text-${action.color}-600 dark:text-${action.color}-400 mb-2`} />
+                <h3 className="font-medium dark:text-white">{action.title}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{action.desc}</p>
+              </Link>
+            </AnimatedCard>
+          ))}
         </div>
       </div>
 
-      {/* Getting Started (sadece proje yoksa göster) */}
+      {/* Getting Started */}
       {projectCount === 0 && (
-        <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border border-blue-200 p-6">
-          <h2 className="text-lg font-semibold mb-2">🚀 Get Started</h2>
-          <p className="text-gray-700 mb-4">
-            Welcome to Devlogify! Create your first project to start tracking your work.
-          </p>
-          <Link href="/dashboard/projects/new">
-            <Button>Create Your First Project</Button>
-          </Link>
-        </div>
+        <AnimatedCard delay={0.8}>
+          <div className="bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-800 p-6">
+            <h2 className="text-lg font-semibold mb-2 dark:text-white">🚀 Get Started</h2>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              Welcome to Devlogify! Create your first project to start tracking your work.
+            </p>
+            <Link href="/dashboard/projects/new">
+              <Button>Create Your First Project</Button>
+            </Link>
+          </div>
+        </AnimatedCard>
       )}
     </div>
   )
