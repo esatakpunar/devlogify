@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { getProjectCount } from '@/lib/supabase/queries/projects'
+import { getTodayStats, getWeeklyStats } from '@/lib/supabase/queries/analytics'
 import { FolderKanban, Clock, CheckCircle2, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
@@ -11,8 +12,18 @@ export default async function DashboardPage() {
 
   if (!user) return null
 
-  // Proje sayısını al
+  // Fetch actual stats
   const projectCount = await getProjectCount(user.id, 'active', supabase)
+  const todayStats = await getTodayStats(user.id)
+  const weeklyStats = await getWeeklyStats(user.id)
+
+  // Format time display
+  const formatTime = (minutes: number) => {
+    if (minutes < 60) return `${minutes}m`
+    const hours = Math.floor(minutes / 60)
+    const mins = minutes % 60
+    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`
+  }
 
   const stats = [
     {
@@ -25,7 +36,7 @@ export default async function DashboardPage() {
     },
     {
       title: 'Tasks Today',
-      value: 0,
+      value: todayStats.tasksCompleted,
       icon: CheckCircle2,
       color: 'green',
       bgColor: 'bg-green-50 dark:bg-green-900/20',
@@ -33,7 +44,7 @@ export default async function DashboardPage() {
     },
     {
       title: 'Time Today',
-      value: '0h',
+      value: formatTime(todayStats.totalMinutes),
       icon: Clock,
       color: 'purple',
       bgColor: 'bg-purple-50 dark:bg-purple-900/20',
@@ -41,7 +52,7 @@ export default async function DashboardPage() {
     },
     {
       title: 'This Week',
-      value: '0h',
+      value: formatTime(weeklyStats.currentWeek.minutes),
       icon: TrendingUp,
       color: 'orange',
       bgColor: 'bg-orange-50 dark:bg-orange-900/20',
@@ -86,21 +97,21 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* Quick Actions - animasyonlu */}
+      {/* Quick Actions */}
       <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
         <h2 className="text-lg font-semibold mb-4 dark:text-white">Quick Actions</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            { href: '/dashboard/projects/new', icon: FolderKanban, title: 'Create Project', desc: 'Start a new project', color: 'blue' },
-            { href: '/dashboard/timeline', icon: Clock, title: 'View Timeline', desc: 'See your activity log', color: 'purple' },
-            { href: '/dashboard/notes', icon: CheckCircle2, title: 'Quick Note', desc: 'Capture an idea', color: 'green' },
+            { href: '/dashboard/projects/new', icon: FolderKanban, title: 'Create Project', desc: 'Start a new project', iconColor: 'text-blue-600 dark:text-blue-400' },
+            { href: '/dashboard/timeline', icon: Clock, title: 'View Timeline', desc: 'See your activity log', iconColor: 'text-purple-600 dark:text-purple-400' },
+            { href: '/dashboard/notes', icon: CheckCircle2, title: 'Quick Note', desc: 'Capture an idea', iconColor: 'text-green-600 dark:text-green-400' },
           ].map((action, index) => (
             <AnimatedCard key={action.href} delay={0.5 + index * 0.1}>
-              <Link 
-                href={action.href} 
+              <Link
+                href={action.href}
                 className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all block"
               >
-                <action.icon className={`w-8 h-8 text-${action.color}-600 dark:text-${action.color}-400 mb-2`} />
+                <action.icon className={`w-8 h-8 ${action.iconColor} mb-2`} />
                 <h3 className="font-medium dark:text-white">{action.title}</h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{action.desc}</p>
               </Link>

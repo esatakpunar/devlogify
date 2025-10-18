@@ -26,6 +26,7 @@ interface ProjectCardProps {
     color: string
     status: string
     created_at: string
+    tasks?: { count: number }[]
   }
   index?: number
 }
@@ -34,6 +35,8 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+
+  const taskCount = project.tasks?.[0]?.count ?? 0
 
   const handleArchive = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -132,7 +135,7 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1">
                 <ListTodo className="w-4 h-4" />
-                <span>0 tasks</span>
+                <span>{taskCount} {taskCount === 1 ? 'task' : 'tasks'}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />

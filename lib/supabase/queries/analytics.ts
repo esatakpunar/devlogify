@@ -1,5 +1,5 @@
 import { createClient as createServerClient } from '@/lib/supabase/server'
-import { startOfWeek, endOfWeek, subWeeks } from 'date-fns'
+import { startOfWeek, endOfWeek, subWeeks, startOfDay, endOfDay } from 'date-fns'
 
 export async function getWeeklyStats(userId: string) {
   const supabase = await createServerClient()
@@ -161,7 +161,7 @@ export async function getMostProductiveDay(userId: string) {
 
 export async function getAverageTaskDuration(userId: string) {
   const supabase = await createServerClient()
-  
+
   const { data: tasks } = await supabase
     .from('tasks')
     .select('actual_duration')
@@ -173,4 +173,36 @@ export async function getAverageTaskDuration(userId: string) {
 
   const total = tasks.reduce((sum, task) => sum + task.actual_duration, 0)
   return Math.round(total / tasks.length)
+}
+
+export async function getTodayStats(userId: string) {
+  const supabase = await createServerClient()
+  const now = new Date()
+  const dayStart = startOfDay(now)
+  const dayEnd = endOfDay(now)
+
+  // Today's completed tasks count
+  const { count: tasksCount } = await supabase
+    .from('tasks')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('status', 'done')
+    .gte('completed_at', dayStart.toISOString())
+    .lte('completed_at', dayEnd.toISOString())
+
+  // Today's time entries
+  const { data: timeEntries } = await supabase
+    .from('time_entries')
+    .select('duration')
+    .eq('user_id', userId)
+    .gte('started_at', dayStart.toISOString())
+    .lte('started_at', dayEnd.toISOString())
+    .not('duration', 'is', null)
+
+  const totalMinutes = timeEntries?.reduce((sum, entry) => sum + (entry.duration || 0), 0) || 0
+
+  return {
+    tasksCompleted: tasksCount || 0,
+    totalMinutes,
+  }
 }

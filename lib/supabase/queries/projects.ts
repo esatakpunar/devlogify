@@ -9,10 +9,13 @@ export type ProjectUpdate = Database['public']['Tables']['projects']['Update']
 
 export async function getProjects(userId: string, status?: string, supabaseClient?: SupabaseClient<Database>) {
   const supabase = supabaseClient || createBrowserClient()
-  
+
   let query = supabase
     .from('projects')
-    .select('*')
+    .select(`
+      *,
+      tasks:tasks(count)
+    `)
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
 
