@@ -41,9 +41,8 @@ export function KanbanColumn({ title, status, tasks, count, userId, onTaskUpdate
   const Icon = statusIcons[status]
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Column Header */}
-      <div className="flex items-center justify-between mb-4 px-2">
+    <div className="flex flex-col h-full max-h-[calc(100vh-18rem)]">
+      <div className="flex items-center justify-between mb-4 px-2 flex-shrink-0">
         <div className="flex items-center gap-2">
           <div className={`p-1.5 rounded-lg ${statusColors[status]}`}>
             <Icon className="w-4 h-4" />
@@ -55,8 +54,7 @@ export function KanbanColumn({ title, status, tasks, count, userId, onTaskUpdate
         </div>
       </div>
 
-      {/* Tasks */}
-      <div className="space-y-3 flex-1">
+      <div className="flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
         {tasks.length === 0 ? (
           <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center">
             <p className="text-sm text-gray-500">No tasks</p>
