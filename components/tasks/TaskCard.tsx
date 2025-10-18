@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Clock, MoreVertical, Play, Square, ArrowRight, ArrowLeft, Edit, Plus } from 'lucide-react'
+import { Clock, MoreVertical, Play, Square, ArrowRight, ArrowLeft, Edit, Plus, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -40,9 +40,15 @@ interface TaskCardProps {
 }
 
 const priorityColors = {
-  low: 'bg-gray-100 text-gray-700',
-  medium: 'bg-yellow-100 text-yellow-700',
-  high: 'bg-red-100 text-red-700'
+  low: 'bg-emerald-100 text-emerald-700 border-emerald-200',
+  medium: 'bg-amber-100 text-amber-700 border-amber-200',
+  high: 'bg-red-100 text-red-700 border-red-200'
+}
+
+const statusStyles = {
+  todo: 'border-gray-200 bg-white',
+  in_progress: 'border-blue-200 bg-blue-50/30',
+  done: 'border-green-200 bg-green-50/30'
 }
 
 export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCardProps) {
@@ -164,21 +170,48 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
 
   const canMovePrevious = localTask.status !== 'todo'
   const canMoveNext = localTask.status !== 'done'
+  
+  const isOverTime = localTask.estimated_duration && localTask.actual_duration > localTask.estimated_duration
 
   return (
     <>
-      <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+      <div className={`border rounded-lg p-4 hover:shadow-lg transition-all duration-200 cursor-pointer group ${statusStyles[localTask.status]} ${isTimerActive ? 'ring-2 ring-blue-500 ring-opacity-50' : ''}`}>
         {/* Header */}
-        <div className="flex items-start justify-between mb-2">
-          <h4 className="font-medium text-sm flex-1 line-clamp-2">
-            {localTask.title}
-          </h4>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-6 w-6 ml-2" disabled={loading}>
-                <MoreVertical className="h-4 w-4" />
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1 min-w-0">
+            <h4 className="font-semibold text-sm line-clamp-2 group-hover:text-blue-600 transition-colors">
+              {localTask.title}
+            </h4>
+          </div>
+          <div className="flex items-center gap-1 ml-2">
+            {/* Timer Button */}
+            {localTask.status !== 'done' && (
+              <Button 
+                size="icon" 
+                variant={isTimerActive ? "default" : "ghost"}
+                className={`h-7 w-7 transition-all ${isTimerActive ? 'bg-blue-500 hover:bg-blue-600' : 'hover:bg-blue-50'}`}
+                onClick={isTimerActive ? handleStopTimer : handleStartTimer}
+                disabled={loading || (isRunning && !isTimerActive)}
+              >
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : isTimerActive ? (
+                  <Square className="h-4 w-4" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
               </Button>
-            </DropdownMenuTrigger>
+            )}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-gray-100" disabled={loading}>
+                  {loading ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <MoreVertical className="h-4 w-4" />
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
                 <Edit className="w-4 h-4 mr-2" />
@@ -210,70 +243,38 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
                 Delete
               </DropdownMenuItem>
             </DropdownMenuContent>
-          </DropdownMenu>
+            </DropdownMenu>
+          </div>
         </div>
 
         {/* Description */}
         {localTask.description && (
-          <p className="text-xs text-gray-600 mb-3 line-clamp-2">
+          <p className="text-xs text-gray-600 mb-3 line-clamp-2 leading-relaxed">
             {localTask.description}
           </p>
         )}
 
-        {/* Timer Section */}
-        {isTimerActive && (
-          <div className="mb-3 p-2 bg-blue-50 rounded border border-blue-200">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
-                <span className="text-sm font-mono font-medium text-blue-900">
-                  {formatTime(elapsed)}
-                </span>
-              </div>
-              <Button 
-                size="sm" 
-                variant="destructive"
-                onClick={handleStopTimer}
-                className="h-7"
-                disabled={loading}
-              >
-                <Square className="w-3 h-3 mr-1" />
-                {loading ? 'Stopping...' : 'Stop'}
-              </Button>
-            </div>
-          </div>
-        )}
 
-        {/* Timer Button */}
-        {localTask.status !== 'done' && !isTimerActive && (
-          <Button 
-            size="sm" 
-            variant="outline" 
-            className="w-full mb-3"
-            onClick={handleStartTimer}
-            disabled={loading || isRunning}
-          >
-            <Play className="w-3 h-3 mr-2" />
-            {isRunning ? 'Another timer active' : 'Start Timer'}
-          </Button>
-        )}
 
         {/* Footer */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Badge variant="secondary" className={priorityColors[localTask.priority]}>
+            <Badge variant="outline" className={`${priorityColors[localTask.priority]} font-medium text-xs px-2 py-1`}>
               {localTask.priority}
             </Badge>
-            {localTask.estimated_duration && (
+            {localTask.estimated_duration && !localTask.actual_duration && (
               <div className="flex items-center gap-1 text-xs text-gray-500">
                 <Clock className="w-3 h-3" />
                 <span>{localTask.estimated_duration}m</span>
               </div>
             )}
             {localTask.actual_duration > 0 && (
-              <div className="flex items-center gap-1 text-xs text-blue-600 font-medium">
+              <div className={`flex items-center gap-1 text-xs font-medium ${
+                isOverTime ? 'text-red-600' : 'text-blue-600'
+              }`}>
                 <Clock className="w-3 h-3" />
                 <span>{localTask.actual_duration}m</span>
+                {isOverTime && <span className="text-red-500">⚠️</span>}
               </div>
             )}
           </div>
