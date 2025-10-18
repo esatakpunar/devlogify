@@ -80,6 +80,41 @@ export type Database = {
           updated_at?: string
         }
       }
+      notes: {
+        Row: {
+          id: string
+          project_id: string | null
+          user_id: string
+          title: string | null
+          content: string
+          tags: string[] | null
+          is_pinned: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          project_id?: string | null
+          user_id: string
+          title?: string | null
+          content: string
+          tags?: string[] | null
+          is_pinned?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          project_id?: string | null
+          user_id?: string
+          title?: string | null
+          content?: string
+          tags?: string[] | null
+          is_pinned?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
   }
 }
