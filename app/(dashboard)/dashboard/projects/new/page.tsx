@@ -20,7 +20,6 @@ const COLORS = [
   '#22c55e', // Green
   '#14b8a6', // Teal
   '#3b82f6', // Blue
-  '#6366f1', // Indigo
 ]
 
 export default function NewProjectPage() {
