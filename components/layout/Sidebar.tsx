@@ -14,10 +14,10 @@ import { cn } from '@/lib/utils'
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Projects', href: '/dashboard/projects', icon: FolderKanban },
-  { name: 'Timeline', href: '/dashboard/timeline', icon: Clock },
-  { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-  { name: 'Notes', href: '/dashboard/notes', icon: StickyNote },
+  { name: 'Projects', href: '/projects', icon: FolderKanban },
+  { name: 'Timeline', href: '/timeline', icon: Clock },
+  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
+  { name: 'Notes', href: '/notes', icon: StickyNote },
 ]
 
 export function Sidebar() {
@@ -60,7 +60,7 @@ export function Sidebar() {
       {/* Settings at bottom */}
       <div className="border-t border-gray-200 p-3">
         <Link
-          href="/dashboard/settings"
+          href="/settings"
           className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <Settings className="w-5 h-5" />

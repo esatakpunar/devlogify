@@ -32,7 +32,7 @@ async function ProjectsList({ status }: { status: string }) {
         title={status !== 'all' ? `No ${status} projects yet` : 'No projects yet'}
         description="Get started by creating your first project to track your work"
         actionLabel="Create Project"
-        actionHref="/dashboard/projects/new"
+        actionHref="/projects/new"
       />
     )
   }
@@ -60,7 +60,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
             Manage your projects and track progress
           </p>
         </div>
-        <Link href="/dashboard/projects/new">
+        <Link href="/projects/new">
           <Button>
             <Plus className="w-4 h-4 mr-2" />
             New Project

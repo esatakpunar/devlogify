@@ -92,7 +92,7 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted 
             )}
             {note.project && (
               <Link 
-                href={`/dashboard/projects/${note.project.id}`}
+                href={`/projects/${note.project.id}`}
                 className="flex items-center gap-1 text-xs text-gray-600 hover:text-blue-600 w-fit"
               >
                 <div 

@@ -76,7 +76,7 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
 
   return (
     <AnimatedCard delay={index * 0.05}>
-      <Link href={`/dashboard/projects/${project.id}`}>
+      <Link href={`/projects/${project.id}`}>
         <div className="group bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-lg transition-all p-6 cursor-pointer">
           {/* Color bar */}
           <div 
@@ -102,7 +102,7 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                 <DropdownMenuItem asChild>
-                  <Link href={`/dashboard/projects/${project.id}/edit`}>
+                  <Link href={`/projects/${project.id}/edit`}>
                     <Edit className="w-4 h-4 mr-2" />
                     Edit
                   </Link>

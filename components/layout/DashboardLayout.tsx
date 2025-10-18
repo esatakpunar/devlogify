@@ -2,13 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Navbar } from '@/components/layout/Navbar'
 import { MobileSidebar } from '@/components/layout/MobileSidebar'
 import { Toaster } from 'sonner'
 
-export default function DashboardLayout({
+export function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
@@ -16,19 +16,28 @@ export default function DashboardLayout({
   const [user, setUser] = useState<any>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const router = useRouter()
+  const pathname = usePathname()
   const supabase = createClient()
+
+  // Auth sayfaları için dashboard layout'unu kullanma
+  const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/signup')
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
+      if (!user && !isAuthPage) {
         router.push('/login')
       } else {
         setUser(user)
       }
     }
     getUser()
-  }, [router, supabase.auth])
+  }, [router, supabase.auth, isAuthPage])
+
+  // Auth sayfaları için sadece children'ı render et
+  if (isAuthPage) {
+    return <>{children}</>
+  }
 
   if (!user) {
     return (

@@ -81,7 +81,7 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
         }
       )
 
-      router.push(`/dashboard/projects/${updatedProject.id}`)
+      router.push(`/projects/${updatedProject.id}`)
       router.refresh()
     } catch (err: any) {
       setError(err.message)
@@ -107,7 +107,7 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
 
       await deleteProject(project.id)
 
-      router.push('/dashboard/projects')
+      router.push('/projects')
       router.refresh()
     } catch (err: any) {
       setError(err.message)
@@ -119,7 +119,7 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <Link href={`/dashboard/projects/${project.id}`}>
+        <Link href={`/projects/${project.id}`}>
           <Button variant="ghost" size="sm" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Project
@@ -211,7 +211,7 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
             <Save className="w-4 h-4 mr-2" />
             {loading ? 'Saving...' : 'Save Changes'}
           </Button>
-          <Link href={`/dashboard/projects/${project.id}`} className="flex-1">
+          <Link href={`/projects/${project.id}`} className="flex-1">
             <Button type="button" variant="outline" className="w-full" disabled={loading}>
               Cancel
             </Button>

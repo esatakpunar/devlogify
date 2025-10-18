@@ -70,7 +70,7 @@ export default async function DashboardPage() {
             Welcome back, {user?.email?.split('@')[0]}!
           </p>
         </div>
-        <Link href="/dashboard/projects/new">
+        <Link href="/projects/new">
           <Button>
             <FolderKanban className="w-4 h-4 mr-2" />
             New Project
@@ -102,9 +102,9 @@ export default async function DashboardPage() {
         <h2 className="text-lg font-semibold mb-4 dark:text-white">Quick Actions</h2>
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            { href: '/dashboard/projects/new', icon: FolderKanban, title: 'Create Project', desc: 'Start a new project', iconColor: 'text-blue-600 dark:text-blue-400' },
-            { href: '/dashboard/timeline', icon: Clock, title: 'View Timeline', desc: 'See your activity log', iconColor: 'text-purple-600 dark:text-purple-400' },
-            { href: '/dashboard/notes', icon: CheckCircle2, title: 'Quick Note', desc: 'Capture an idea', iconColor: 'text-green-600 dark:text-green-400' },
+            { href: '/projects/new', icon: FolderKanban, title: 'Create Project', desc: 'Start a new project', iconColor: 'text-blue-600 dark:text-blue-400' },
+            { href: '/timeline', icon: Clock, title: 'View Timeline', desc: 'See your activity log', iconColor: 'text-purple-600 dark:text-purple-400' },
+            { href: '/notes', icon: CheckCircle2, title: 'Quick Note', desc: 'Capture an idea', iconColor: 'text-green-600 dark:text-green-400' },
           ].map((action, index) => (
             <AnimatedCard key={action.href} delay={0.5 + index * 0.1}>
               <Link
@@ -128,7 +128,7 @@ export default async function DashboardPage() {
             <p className="text-gray-700 dark:text-gray-300 mb-4">
               Welcome to Devlogify! Create your first project to start tracking your work.
             </p>
-            <Link href="/dashboard/projects/new">
+            <Link href="/projects/new">
               <Button>Create Your First Project</Button>
             </Link>
           </div>

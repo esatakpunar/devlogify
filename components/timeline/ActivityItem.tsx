@@ -62,7 +62,7 @@ export function ActivityItem({ activity }: ActivityItemProps) {
             Created task{' '}
             {activity.task && activity.project ? (
               <Link 
-                href={`/dashboard/projects/${activity.project.id}`}
+                href={`/projects/${activity.project.id}`}
                 className="font-medium text-blue-600 hover:underline"
               >
                 {activity.task.title}
@@ -112,7 +112,7 @@ export function ActivityItem({ activity }: ActivityItemProps) {
             Created project{' '}
             {activity.project ? (
               <Link 
-                href={`/dashboard/projects/${activity.project.id}`}
+                href={`/projects/${activity.project.id}`}
                 className="font-medium text-blue-600 hover:underline"
               >
                 {activity.project.title}

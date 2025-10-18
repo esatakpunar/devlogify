@@ -60,7 +60,7 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
 
       await deleteProject(project.id)
 
-      router.push('/dashboard/projects')
+      router.push('/projects')
       router.refresh()
     } catch (error) {
       console.error('Failed to delete project:', error)
@@ -70,7 +70,7 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
 
   return (
     <div className="space-y-4">
-      <Link href="/dashboard/projects">
+      <Link href="/projects">
         <Button variant="ghost" size="sm">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Projects
@@ -92,7 +92,7 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
         </div>
 
         <div className="flex items-center gap-2">
-          <Link href={`/dashboard/projects/${project.id}/edit`}>
+          <Link href={`/projects/${project.id}/edit`}>
             <Button variant="outline" disabled={loading}>
               <Edit className="w-4 h-4 mr-2" />
               Edit
@@ -107,7 +107,7 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
-                <Link href={`/dashboard/projects/${project.id}/edit`}>
+                <Link href={`/projects/${project.id}/edit`}>
                   <Settings className="w-4 h-4 mr-2" />
                   Project Settings
                 </Link>

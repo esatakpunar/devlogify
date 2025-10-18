@@ -16,7 +16,7 @@ export function ProjectsFilter() {
   ]
 
   const handleFilterChange = (value: string) => {
-    router.push(`/dashboard/projects?status=${value}`)
+    router.push(`/projects?status=${value}`)
   }
 
   return (

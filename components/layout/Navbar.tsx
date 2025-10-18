@@ -83,7 +83,7 @@ export function Navbar({ user, onMenuClick }: NavbarProps) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <a href="/dashboard/settings">Settings</a>
+              <a href="/settings">Settings</a>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
