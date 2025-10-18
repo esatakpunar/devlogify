@@ -175,7 +175,7 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
 
   return (
     <>
-      <div className={`border rounded-lg p-4 hover:shadow-lg transition-all duration-200 cursor-pointer group ${statusStyles[localTask.status]} ${isTimerActive ? 'ring-2 ring-blue-500 ring-opacity-50' : ''}`}>
+      <div className={`border rounded-lg p-4 hover:shadow-lg transition-all duration-200 cursor-pointer group ${statusStyles[localTask.status]} ${isTimerActive ? 'border-l-4 border-l-blue-500 shadow-blue-100 shadow-lg' : ''}`}>
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1 min-w-0">
