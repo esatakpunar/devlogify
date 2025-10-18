@@ -53,7 +53,7 @@ export function Navbar({ user, onMenuClick }: NavbarProps) {
       </div>
 
       {/* Right side */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 ml-auto">
         {/* Global Timer Indicator */}
         <GlobalTimerIndicator userId={user.id} />
 
