@@ -1,6 +1,44 @@
 export type Database = {
   public: {
     Tables: {
+      profiles: {
+        Row: {
+          id: string
+          email: string
+          full_name: string | null
+          avatar_url: string | null
+          timezone: string
+          theme: 'light' | 'dark' | 'system'
+          notifications_enabled: boolean
+          week_starts_on: 'monday' | 'sunday'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          email: string
+          full_name?: string | null
+          avatar_url?: string | null
+          timezone?: string
+          theme?: 'light' | 'dark' | 'system'
+          notifications_enabled?: boolean
+          week_starts_on?: 'monday' | 'sunday'
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          email?: string
+          full_name?: string | null
+          avatar_url?: string | null
+          timezone?: string
+          theme?: 'light' | 'dark' | 'system'
+          notifications_enabled?: boolean
+          week_starts_on?: 'monday' | 'sunday'
+          created_at?: string
+          updated_at?: string
+        }
+      }
       projects: {
         Row: {
           id: string
