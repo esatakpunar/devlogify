@@ -18,6 +18,8 @@ import { formatDistanceToNow } from 'date-fns'
 import { toast } from 'sonner'
 import { EditTaskDialog } from './EditTaskDialog'
 import { AddManualTimeDialog } from './AddManualTimeDialog'
+import { useDraggable } from '@dnd-kit/core'
+import { cn } from '@/lib/utils'
 
 type Task = {
   id: string
@@ -28,6 +30,7 @@ type Task = {
   priority: 'low' | 'medium' | 'high'
   estimated_duration: number | null
   actual_duration: number
+  order_index: number
   created_at: string
 }
 
@@ -56,6 +59,10 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isTimeDialogOpen, setIsTimeDialogOpen] = useState(false)
   const { taskId, isRunning, elapsed, startTimer, stopTimer, formatTime } = useTimer()
+
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+    id: task.id,
+  })
 
   const isTimerActive = isRunning && taskId === task.id
 
@@ -158,9 +165,24 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
   
   const isOverTime = localTask.estimated_duration && localTask.actual_duration > localTask.estimated_duration
 
+  const style = transform ? {
+    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+  } : undefined
+
   return (
     <>
-      <div className={`border rounded-lg p-4 hover:shadow-lg transition-all duration-200 cursor-pointer group ${statusStyles[localTask.status]} ${isTimerActive ? 'border-l-4 border-l-blue-500 shadow-blue-100 shadow-lg' : ''}`}>
+      <div 
+        ref={setNodeRef}
+        style={style}
+        className={cn(
+          "border rounded-lg p-4 hover:shadow-lg transition-all duration-200 cursor-pointer group",
+          statusStyles[localTask.status],
+          isTimerActive && 'border-l-4 border-l-blue-500 shadow-blue-100 shadow-lg',
+          isDragging && 'opacity-50 border-dashed border-2'
+        )}
+        {...listeners}
+        {...attributes}
+      >
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1 min-w-0">

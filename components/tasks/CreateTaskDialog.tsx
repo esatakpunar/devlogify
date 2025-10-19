@@ -58,6 +58,7 @@ export function CreateTaskDialog({
         priority,
         estimated_duration: estimatedDuration ? parseInt(estimatedDuration) : null,
         status: 'todo',
+        order_index: 0, // Will be updated by the database trigger or manually
       })
   
       // Activity log ekle

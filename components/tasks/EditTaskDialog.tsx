@@ -31,6 +31,7 @@ type Task = {
   priority: 'low' | 'medium' | 'high'
   estimated_duration: number | null
   actual_duration: number
+  order_index: number
   created_at: string
 }
 

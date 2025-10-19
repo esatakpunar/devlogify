@@ -2,6 +2,8 @@
 
 import { TaskCard } from './TaskCard'
 import { Circle, Clock, CheckCircle2 } from 'lucide-react'
+import { useDroppable } from '@dnd-kit/core'
+import { cn } from '@/lib/utils'
 
 type Task = {
   id: string
@@ -12,6 +14,7 @@ type Task = {
   priority: 'low' | 'medium' | 'high'
   estimated_duration: number | null
   actual_duration: number
+  order_index: number
   created_at: string
 }
 
@@ -39,6 +42,9 @@ const statusColors = {
 
 export function KanbanColumn({ title, status, tasks, count, userId, onTaskUpdated, onTaskDeleted }: KanbanColumnProps) {
   const Icon = statusIcons[status]
+  const { isOver, setNodeRef } = useDroppable({
+    id: status,
+  })
 
   return (
     <div className="flex flex-col h-full max-h-[calc(100vh-18rem)]">
@@ -54,10 +60,21 @@ export function KanbanColumn({ title, status, tasks, count, userId, onTaskUpdate
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400">
+      <div 
+        ref={setNodeRef}
+        className={cn(
+          "flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400 transition-colors",
+          isOver && "bg-blue-50 border-2 border-dashed border-blue-300 rounded-lg"
+        )}
+      >
         {tasks.length === 0 ? (
-          <div className="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center">
-            <p className="text-sm text-gray-500">No tasks</p>
+          <div className={cn(
+            "border-2 border-dashed border-gray-200 rounded-lg p-8 text-center transition-colors",
+            isOver && "border-blue-300 bg-blue-50"
+          )}>
+            <p className="text-sm text-gray-500">
+              {isOver ? "Drop task here" : "No tasks"}
+            </p>
           </div>
         ) : (
           tasks.map((task) => (

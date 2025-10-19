@@ -88,3 +88,26 @@ export async function updateTaskStatus(id: string, status: 'todo' | 'in_progress
   if (error) throw error
   return data
 }
+
+export async function updateTaskOrder(taskId: string, newOrder: number) {
+  const supabase = createBrowserClient()
+  
+  const { data, error } = await supabase
+    .from('tasks')
+    .update({ order_index: newOrder })
+    .eq('id', taskId)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+export async function updateTasksOrder(taskUpdates: { id: string; order_index: number }[]) {
+  const supabase = createBrowserClient()
+  
+  // For now, we'll disable batch updates to avoid multiple requests
+  // This function is kept for future optimization
+  console.log('Batch order update requested for:', taskUpdates.length, 'tasks')
+  return []
+}
