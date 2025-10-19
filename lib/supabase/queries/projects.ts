@@ -7,7 +7,7 @@ export type Project = Database['public']['Tables']['projects']['Row']
 export type ProjectInsert = Database['public']['Tables']['projects']['Insert']
 export type ProjectUpdate = Database['public']['Tables']['projects']['Update']
 
-export async function getProjects(userId: string, status?: string, supabaseClient?: SupabaseClient<Database>) {
+export async function getProjects(userId: string, status?: string, supabaseClient?: SupabaseClient<Database>): Promise<Project[]> {
   const supabase = supabaseClient || createBrowserClient()
 
   let query = supabase
