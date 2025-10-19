@@ -19,23 +19,24 @@ export function DashboardLayout({
   const pathname = usePathname()
   const supabase = createClient()
 
-  // Auth sayfaları için dashboard layout'unu kullanma
+  // Auth sayfaları ve landing page için dashboard layout'unu kullanma
   const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/signup')
+  const isLandingPage = pathname === '/'
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user && !isAuthPage) {
+      if (!user && !isAuthPage && !isLandingPage) {
         router.push('/login')
       } else {
         setUser(user)
       }
     }
     getUser()
-  }, [router, supabase.auth, isAuthPage])
+  }, [router, supabase.auth, isAuthPage, isLandingPage])
 
-  // Auth sayfaları için sadece children'ı render et
-  if (isAuthPage) {
+  // Auth sayfaları ve landing page için sadece children'ı render et
+  if (isAuthPage || isLandingPage) {
     return <>{children}</>
   }
 
