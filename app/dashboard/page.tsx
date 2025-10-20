@@ -1,10 +1,15 @@
 import { createClient } from '@/lib/supabase/server'
-import { getProjectCount } from '@/lib/supabase/queries/projects'
+import { getProjectCount, getPinnedProjects } from '@/lib/supabase/queries/projects'
 import { getTodayStats, getWeeklyStats } from '@/lib/supabase/queries/analytics'
+import { getRecentIncompleteTasks, getTodayCompletedTasks } from '@/lib/supabase/queries/tasks'
 import { FolderKanban, Clock, CheckCircle2, TrendingUp } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { AnimatedCard } from '@/components/ui/AnimatedCard'
+import { RecentTasks } from '@/components/dashboard/RecentTasks'
+import { TodayCompleted } from '@/components/dashboard/TodayCompleted'
+import { PinnedProjects } from '@/components/dashboard/PinnedProjects'
+import { QuickTimerCard } from '@/components/dashboard/QuickTimerCard'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -16,6 +21,11 @@ export default async function DashboardPage() {
   const projectCount = await getProjectCount(user.id, 'active', supabase)
   const todayStats = await getTodayStats(user.id)
   const weeklyStats = await getWeeklyStats(user.id)
+
+  // Fetch dashboard data
+  const recentTasks = await getRecentIncompleteTasks(user.id, 5, supabase)
+  const todayCompletedTasks = await getTodayCompletedTasks(user.id, supabase)
+  const pinnedProjects = await getPinnedProjects(user.id, supabase)
 
   // Format time display
   const formatTime = (minutes: number) => {
@@ -97,26 +107,18 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
-        <h2 className="text-lg font-semibold mb-4 dark:text-white">Quick Actions</h2>
-        <div className="grid gap-4 md:grid-cols-3">
-          {[
-            { href: '/projects/new', icon: FolderKanban, title: 'Create Project', desc: 'Start a new project', iconColor: 'text-blue-600 dark:text-blue-400' },
-            { href: '/timeline', icon: Clock, title: 'View Timeline', desc: 'See your activity log', iconColor: 'text-purple-600 dark:text-purple-400' },
-            { href: '/notes', icon: CheckCircle2, title: 'Quick Note', desc: 'Capture an idea', iconColor: 'text-green-600 dark:text-green-400' },
-          ].map((action, index) => (
-            <AnimatedCard key={action.href} delay={0.5 + index * 0.1}>
-              <Link
-                href={action.href}
-                className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all block"
-              >
-                <action.icon className={`w-8 h-8 ${action.iconColor} mb-2`} />
-                <h3 className="font-medium dark:text-white">{action.title}</h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{action.desc}</p>
-              </Link>
-            </AnimatedCard>
-          ))}
+      {/* Main Dashboard Content */}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {/* Left Column */}
+        <div className="space-y-6">
+          <RecentTasks tasks={recentTasks || []} userId={user.id} />
+          <TodayCompleted tasks={todayCompletedTasks || []} />
+        </div>
+
+        {/* Right Column */}
+        <div className="space-y-6">
+          <QuickTimerCard userId={user.id} />
+          <PinnedProjects projects={pinnedProjects || []} userId={user.id} />
         </div>
       </div>
 

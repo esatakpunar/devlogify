@@ -37,9 +37,19 @@ async function ProjectsList({ status }: { status: string }) {
     )
   }
 
+  // Sort projects: pinned first, then by updated_at
+  const sortedProjects = projects.sort((a, b) => {
+    // First sort by pinned status
+    if (a.is_pinned && !b.is_pinned) return -1
+    if (!a.is_pinned && b.is_pinned) return 1
+    
+    // Then sort by updated_at
+    return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime()
+  })
+
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {projects.map((project, index) => (
+      {sortedProjects.map((project, index) => (
         <ProjectCard key={project.id} project={project} index={index} />
       ))}
     </div>

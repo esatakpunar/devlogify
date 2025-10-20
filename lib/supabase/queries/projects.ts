@@ -133,3 +133,69 @@ export async function getProjectsWithNotes(userId: string) {
   if (error) throw error
   return data
 }
+
+/**
+ * Get pinned projects for dashboard
+ */
+export async function getPinnedProjects(userId: string, supabaseClient?: SupabaseClient<Database>) {
+  const supabase = supabaseClient || createBrowserClient()
+
+  try {
+    const { data, error } = await supabase
+      .from('projects')
+      .select(`
+        *,
+        tasks:tasks(count)
+      `)
+      .eq('user_id', userId)
+      .eq('is_pinned', true)
+      .eq('status', 'active')
+      .order('updated_at', { ascending: false })
+      .limit(6)
+
+    if (error) throw error
+    return data
+  } catch (error: any) {
+    // If is_pinned column doesn't exist yet, return empty array
+    if (error.code === '42703') {
+      console.warn('is_pinned column not found, returning empty pinned projects')
+      return []
+    }
+    throw error
+  }
+}
+
+/**
+ * Toggle pin status for a project
+ */
+export async function toggleProjectPin(projectId: string, supabaseClient?: SupabaseClient<Database>) {
+  const supabase = supabaseClient || createBrowserClient()
+
+  try {
+    // First get current pin status
+    const { data: project, error: fetchError } = await supabase
+      .from('projects')
+      .select('is_pinned')
+      .eq('id', projectId)
+      .single()
+
+    if (fetchError) throw fetchError
+
+    // Toggle the pin status
+    const { data, error } = await supabase
+      .from('projects')
+      .update({ is_pinned: !project.is_pinned })
+      .eq('id', projectId)
+      .select()
+      .single()
+
+    if (error) throw error
+    return data
+  } catch (error: any) {
+    // If is_pinned column doesn't exist yet, show error message
+    if (error.code === '42703') {
+      throw new Error('Project pinning feature is not available yet. Please run the database migration.')
+    }
+    throw error
+  }
+}

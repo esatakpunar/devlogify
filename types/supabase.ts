@@ -47,6 +47,7 @@ export type Database = {
           description: string | null
           color: string
           status: 'active' | 'archived' | 'completed'
+          is_pinned: boolean
           created_at: string
           updated_at: string
         }
@@ -57,6 +58,7 @@ export type Database = {
           description?: string | null
           color?: string
           status?: 'active' | 'archived' | 'completed'
+          is_pinned?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -67,6 +69,7 @@ export type Database = {
           description?: string | null
           color?: string
           status?: 'active' | 'archived' | 'completed'
+          is_pinned?: boolean
           created_at?: string
           updated_at?: string
         }

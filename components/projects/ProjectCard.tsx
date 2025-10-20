@@ -3,10 +3,11 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { MoreVertical, Calendar, ListTodo, Edit, Archive, Trash } from 'lucide-react'
+import { MoreVertical, Calendar, ListTodo, Edit, Archive, Trash, Pin, PinOff } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
-import { archiveProject, deleteProject } from '@/lib/supabase/queries/projects'
+import { archiveProject, deleteProject, toggleProjectPin } from '@/lib/supabase/queries/projects'
 import { logProjectDeleted } from '@/lib/supabase/queries/activities'
+import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -25,6 +26,7 @@ interface ProjectCardProps {
     description: string | null
     color: string
     status: string
+    is_pinned?: boolean
     created_at: string
     tasks?: { count: number }[]
   }
@@ -33,10 +35,12 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
   const [loading, setLoading] = useState(false)
+  const [pinLoading, setPinLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
   const taskCount = project.tasks?.[0]?.count ?? 0
+  const isPinned = project.is_pinned || false
 
   const handleArchive = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -74,6 +78,23 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
     }
   }
 
+  const handlePinToggle = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    setPinLoading(true)
+    try {
+      await toggleProjectPin(project.id)
+      toast.success(isPinned ? 'Project unpinned' : 'Project pinned')
+      router.refresh()
+    } catch (error) {
+      toast.error('Failed to update pin status')
+      console.error('Pin toggle error:', error)
+    } finally {
+      setPinLoading(false)
+    }
+  }
+
   return (
     <AnimatedCard delay={index * 0.05}>
       <Link href={`/projects/${project.id}`}>
@@ -86,20 +107,40 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
 
           {/* Header */}
           <div className="flex items-start justify-between mb-3">
-            <h3 className="font-semibold text-lg line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors dark:text-white">
-              {project.title}
-            </h3>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                  disabled={loading}
-                >
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
+            <div className="flex items-center gap-2 flex-1 min-w-0">
+              {isPinned && (
+                <Pin className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+              )}
+              <h3 className="font-semibold text-lg line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors dark:text-white">
+                {project.title}
+              </h3>
+            </div>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handlePinToggle}
+                disabled={pinLoading}
+                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-all hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer"
+                title={isPinned ? "Unpin project" : "Pin project"}
+              >
+                {isPinned ? (
+                  <PinOff className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                ) : (
+                  <Pin className="h-4 w-4 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" />
+                )}
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                    disabled={loading}
+                  >
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
               <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                 <DropdownMenuItem asChild>
                   <Link href={`/projects/${project.id}/edit`}>
@@ -121,6 +162,7 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            </div>
           </div>
 
           {/* Description */}

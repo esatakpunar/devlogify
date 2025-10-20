@@ -111,3 +111,59 @@ export async function updateTasksOrder(taskUpdates: { id: string; order_index: n
   console.log('Batch order update requested for:', taskUpdates.length, 'tasks')
   return []
 }
+
+/**
+ * Get recent incomplete tasks for dashboard
+ */
+export async function getRecentIncompleteTasks(userId: string, limit: number = 5, supabaseClient?: SupabaseClient<Database>) {
+  const supabase = supabaseClient || createBrowserClient()
+  
+  const { data, error } = await supabase
+    .from('tasks')
+    .select(`
+      *,
+      project:projects!inner(
+        id,
+        title,
+        color
+      )
+    `)
+    .eq('user_id', userId)
+    .neq('status', 'done')
+    .order('updated_at', { ascending: false })
+    .limit(limit)
+
+  if (error) throw error
+  return data
+}
+
+/**
+ * Get tasks completed today for dashboard
+ */
+export async function getTodayCompletedTasks(userId: string, supabaseClient?: SupabaseClient<Database>) {
+  const supabase = supabaseClient || createBrowserClient()
+  
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const tomorrow = new Date(today)
+  tomorrow.setDate(tomorrow.getDate() + 1)
+  
+  const { data, error } = await supabase
+    .from('tasks')
+    .select(`
+      *,
+      project:projects!inner(
+        id,
+        title,
+        color
+      )
+    `)
+    .eq('user_id', userId)
+    .eq('status', 'done')
+    .gte('completed_at', today.toISOString())
+    .lt('completed_at', tomorrow.toISOString())
+    .order('completed_at', { ascending: false })
+
+  if (error) throw error
+  return data
+}
