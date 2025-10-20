@@ -20,6 +20,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { ProgressBar } from '@/components/ui/progress-bar'
+import { TimeProgressIndicator } from './TimeProgressIndicator'
 import { toast } from 'sonner'
 
 type Task = {
@@ -31,6 +33,7 @@ type Task = {
   priority: 'low' | 'medium' | 'high'
   estimated_duration: number | null
   actual_duration: number
+  progress: number
   order_index: number
   created_at: string
 }
@@ -39,6 +42,7 @@ interface EditTaskDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   task: Task
+  userId: string
   onTaskUpdated: (task: Task) => void
 }
 
@@ -46,13 +50,19 @@ export function EditTaskDialog({
   open, 
   onOpenChange, 
   task,
+  userId,
   onTaskUpdated 
 }: EditTaskDialogProps) {
   const [title, setTitle] = useState(task.title)
   const [description, setDescription] = useState(task.description || '')
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>(task.priority)
   const [estimatedDuration, setEstimatedDuration] = useState(task.estimated_duration?.toString() || '')
+  const [progress, setProgress] = useState(task.progress)
   const [loading, setLoading] = useState(false)
+
+  const handleProgressUpdate = (newProgress: number) => {
+    setProgress(newProgress)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -64,6 +74,7 @@ export function EditTaskDialog({
         description: description || null,
         priority,
         estimated_duration: estimatedDuration ? parseInt(estimatedDuration) : null,
+        progress,
       })
 
       onTaskUpdated(updatedTask)
@@ -143,6 +154,36 @@ export function EditTaskDialog({
                 onChange={(e) => setEstimatedDuration(e.target.value)}
                 disabled={loading}
               />
+            </div>
+          </div>
+
+          {/* Progress Section */}
+          <div className="space-y-3">
+            <Label>Progress</Label>
+            <div className="space-y-3">
+              {/* Interactive Progress Bar */}
+              <div className="space-y-2">
+                <ProgressBar 
+                  value={progress} 
+                  showPercentage 
+                  size="md" 
+                  interactive={true}
+                  onValueChange={handleProgressUpdate}
+                />
+                <div className="text-xs text-gray-500">
+                  Click on the progress bar to set progress
+                </div>
+              </div>
+              
+              {/* Time Progress Indicator */}
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div className="text-sm font-medium text-gray-700">Time Status</div>
+                <TimeProgressIndicator
+                  estimatedDuration={task.estimated_duration}
+                  actualDuration={task.actual_duration}
+                  size="sm"
+                />
+              </div>
             </div>
           </div>
 

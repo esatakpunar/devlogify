@@ -3,6 +3,7 @@ import { getProject } from '@/lib/supabase/queries/projects'
 import { getTasks } from '@/lib/supabase/queries/tasks'
 import { notFound } from 'next/navigation'
 import { ProjectHeader } from '@/components/projects/ProjectHeader'
+import { ProjectProgressStats } from '@/components/projects/ProjectProgressStats'
 import { KanbanBoard } from '@/components/tasks/KanbanBoard'
 
 interface ProjectPageProps {
@@ -34,6 +35,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     return (
       <div className="space-y-6">
         <ProjectHeader project={project} />
+        <ProjectProgressStats tasks={tasks || []} />
         <KanbanBoard projectId={params.id} initialTasks={tasks || []} userId={user.id} />
       </div>
     )

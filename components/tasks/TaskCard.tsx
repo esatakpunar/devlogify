@@ -11,6 +11,9 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
+import { ProgressBar } from '@/components/ui/progress-bar'
+import { TimeProgressIndicator } from './TimeProgressIndicator'
+import { ProgressSlider } from './ProgressSlider'
 import { updateTaskStatus, deleteTask, getTask } from '@/lib/supabase/queries/tasks'
 import { logActivity } from '@/lib/supabase/queries/activities'
 import { useTimer } from '@/lib/hooks/useTimer'
@@ -23,13 +26,14 @@ import { cn } from '@/lib/utils'
 
 type Task = {
   id: string
-  project_id: string  // EKLE
+  project_id: string
   title: string
   description: string | null
   status: 'todo' | 'in_progress' | 'done'
   priority: 'low' | 'medium' | 'high'
   estimated_duration: number | null
   actual_duration: number
+  progress: number
   order_index: number
   created_at: string
 }
@@ -180,6 +184,7 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
           isTimerActive && 'border-l-4 border-l-blue-500 shadow-blue-100 shadow-lg',
           isDragging && 'opacity-50 border-dashed border-2'
         )}
+        onClick={() => setIsEditDialogOpen(true)}
         {...listeners}
         {...attributes}
       >
@@ -220,10 +225,6 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
                 </Button>
               </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
-                <Edit className="w-4 h-4 mr-2" />
-                Edit Task
-              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => setIsTimeDialogOpen(true)}>
                 <Plus className="w-4 h-4 mr-2" />
                 Log Time
@@ -261,14 +262,20 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
           </p>
         )}
 
+        {/* Progress Section */}
+        <div className="mb-3 space-y-2">
+          {/* Progress Bar */}
+          <div title="Click anywhere on card to view task details">
+            <ProgressBar value={localTask.progress} showPercentage size="sm" />
+          </div>
 
-
-        {/* Footer */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className={`${priorityColors[localTask.priority]} font-medium text-xs px-2 py-1`}>
-              {localTask.priority}
-            </Badge>
+          {/* Time Progress Indicator */}
+          <div className="flex items-center justify-between">
+            <TimeProgressIndicator
+              estimatedDuration={localTask.estimated_duration}
+              actualDuration={localTask.actual_duration}
+              size="sm"
+            />
             {localTask.estimated_duration && !localTask.actual_duration && (
               <div className="flex items-center gap-1 text-xs text-gray-500">
                 <Clock className="w-3 h-3" />
@@ -285,6 +292,15 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
               </div>
             )}
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Badge variant="outline" className={`${priorityColors[localTask.priority]} font-medium text-xs px-2 py-1`}>
+              {localTask.priority}
+            </Badge>
+          </div>
           <span className="text-xs text-gray-400">
             {formatDistanceToNow(new Date(localTask.created_at), { addSuffix: true })}
           </span>
@@ -296,6 +312,7 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
         open={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
         task={localTask}
+        userId={userId}
         onTaskUpdated={handleTaskUpdated}
       />
 

@@ -7,13 +7,14 @@ import { cn } from '@/lib/utils'
 
 type Task = {
   id: string
-  project_id: string  // EKLE
+  project_id: string
   title: string
   description: string | null
   status: 'todo' | 'in_progress' | 'done'
   priority: 'low' | 'medium' | 'high'
   estimated_duration: number | null
   actual_duration: number
+  progress: number
   order_index: number
   created_at: string
 }
@@ -46,6 +47,11 @@ export function KanbanColumn({ title, status, tasks, count, userId, onTaskUpdate
     id: status,
   })
 
+  // Calculate average progress for this column
+  const averageProgress = tasks.length > 0 
+    ? Math.round(tasks.reduce((sum, task) => sum + task.progress, 0) / tasks.length)
+    : 0
+
   return (
     <div className="flex flex-col h-full max-h-[calc(100vh-18rem)]">
       <div className="flex items-center justify-between mb-4 px-2 flex-shrink-0">
@@ -58,6 +64,44 @@ export function KanbanColumn({ title, status, tasks, count, userId, onTaskUpdate
             {count}
           </span>
         </div>
+        {/* Progress indicator */}
+        {tasks.length > 0 && (
+          <div className="flex items-center gap-1">
+            <div className="w-12 h-12 relative">
+              <svg className="w-12 h-12 transform -rotate-90" viewBox="0 0 48 48">
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="18"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                  className="text-gray-200"
+                />
+                <circle
+                  cx="24"
+                  cy="24"
+                  r="18"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  fill="none"
+                  strokeDasharray={`${2 * Math.PI * 18}`}
+                  strokeDashoffset={`${2 * Math.PI * 18 * (1 - averageProgress / 100)}`}
+                  className={cn(
+                    averageProgress <= 30 ? 'text-red-500' :
+                    averageProgress <= 70 ? 'text-amber-500' : 'text-green-500'
+                  )}
+                  strokeLinecap="round"
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className="text-xs font-medium text-gray-600">
+                  {averageProgress}%
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div 

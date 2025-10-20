@@ -21,13 +21,14 @@ import { toast } from 'sonner'
 
 type Task = {
   id: string
-  project_id: string  // EKLE
+  project_id: string
   title: string
   description: string | null
   status: 'todo' | 'in_progress' | 'done'
   priority: 'low' | 'medium' | 'high'
   estimated_duration: number | null
   actual_duration: number
+  progress: number
   order_index: number
   created_at: string
 }

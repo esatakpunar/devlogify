@@ -85,6 +85,8 @@ export type ActivityType =
   | 'task_created'
   | 'task_completed'
   | 'task_status_changed'
+  | 'task_progress_updated'
+  | 'task_progress_milestone'
   | 'time_logged'
   | 'project_created'
   | 'project_updated'
@@ -172,5 +174,31 @@ export async function logProjectDeleted(
 ) {
   return logActivity(userId, projectId, null, 'project_deleted', {
     project_title: projectTitle
+  })
+}
+
+/**
+ * Log task progress update
+ */
+export async function logTaskProgressUpdate(
+  userId: string,
+  projectId: string,
+  taskId: string,
+  oldProgress: number,
+  newProgress: number,
+  taskTitle: string
+) {
+  const isMilestone = [25, 50, 75, 100].includes(newProgress)
+  const isSignificant = Math.abs(newProgress - oldProgress) >= 20
+  
+  const activityType = isMilestone ? 'task_progress_milestone' : 'task_progress_updated'
+  
+  return logActivity(userId, projectId, taskId, activityType, {
+    old_progress: oldProgress,
+    new_progress: newProgress,
+    progress_change: newProgress - oldProgress,
+    task_title: taskTitle,
+    is_milestone: isMilestone,
+    is_significant: isSignificant
   })
 }

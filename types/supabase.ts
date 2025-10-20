@@ -85,6 +85,7 @@ export type Database = {
           priority: 'low' | 'medium' | 'high'
           estimated_duration: number | null
           actual_duration: number
+          progress: number
           order_index: number
           completed_at: string | null
           created_at: string
@@ -100,6 +101,7 @@ export type Database = {
           priority?: 'low' | 'medium' | 'high'
           estimated_duration?: number | null
           actual_duration?: number
+          progress?: number
           order_index?: number
           completed_at?: string | null
           created_at?: string
@@ -115,6 +117,7 @@ export type Database = {
           priority?: 'low' | 'medium' | 'high'
           estimated_duration?: number | null
           actual_duration?: number
+          progress?: number
           order_index?: number
           completed_at?: string | null
           created_at?: string

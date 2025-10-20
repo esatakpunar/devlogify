@@ -103,6 +103,23 @@ export async function updateTaskOrder(taskId: string, newOrder: number) {
   return data
 }
 
+export async function updateTaskProgress(id: string, progress: number) {
+  const supabase = createBrowserClient()
+  
+  // Ensure progress is within valid range
+  const clampedProgress = Math.max(0, Math.min(100, progress))
+  
+  const { data, error } = await supabase
+    .from('tasks')
+    .update({ progress: clampedProgress })
+    .eq('id', id)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
 export async function updateTasksOrder(taskUpdates: { id: string; order_index: number }[]) {
   const supabase = createBrowserClient()
   
