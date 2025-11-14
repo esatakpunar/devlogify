@@ -108,6 +108,10 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
       await updateProfileSetting({ theme: newTheme })
       // Also update localStorage for backward compatibility
       localStorage.setItem('theme', newTheme)
+      
+      // Dispatch custom event to notify ThemeProvider (for same-tab updates)
+      window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: newTheme } }))
+      
       toast.success('Theme updated')
     } catch (error) {
       toast.error('Failed to update theme')

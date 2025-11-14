@@ -45,6 +45,25 @@ export async function createTask(task: TaskInsert) {
   return data
 }
 
+/**
+ * Create multiple tasks in a single batch operation
+ */
+export async function createTasks(tasks: TaskInsert[]) {
+  const supabase = createBrowserClient()
+  
+  if (tasks.length === 0) {
+    return []
+  }
+
+  const { data, error } = await supabase
+    .from('tasks')
+    .insert(tasks)
+    .select()
+
+  if (error) throw error
+  return data || []
+}
+
 export async function updateTask(id: string, updates: TaskUpdate) {
   const supabase = createBrowserClient()
   

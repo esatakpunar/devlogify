@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { MoreVertical, Pin, Edit, Trash, Tag } from 'lucide-react'
+import { MoreVertical, Pin, Edit, Trash, Tag, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -15,6 +15,7 @@ import { togglePinNote, deleteNote } from '@/lib/supabase/queries/notes'
 import { toast } from 'sonner'
 import { formatDistanceToNow } from 'date-fns'
 import { EditNoteDialog } from './EditNoteDialog'
+import { AICreateTasksDialog } from '@/components/tasks/AICreateTasksDialog'
 import Link from 'next/link'
 
 interface Note {
@@ -43,11 +44,13 @@ interface NoteCardProps {
   userId: string
   onNoteUpdated: (note: Note) => void
   onNoteDeleted: (noteId: string) => void
+  onTasksCreated?: (tasks: any[]) => void
 }
 
-export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted }: NoteCardProps) {
+export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted, onTasksCreated }: NoteCardProps) {
   const [loading, setLoading] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
+  const [isAIDialogOpen, setIsAIDialogOpen] = useState(false)
 
   const handleTogglePin = async () => {
     setLoading(true)
@@ -119,6 +122,11 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted 
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={() => setIsAIDialogOpen(true)}>
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Create Tasks from Note
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
                   <Edit className="w-4 h-4 mr-2" />
                   Edit
@@ -172,6 +180,16 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted 
         projects={projects}
         userId={userId}
         onNoteUpdated={onNoteUpdated}
+      />
+
+      {/* AI Create Tasks Dialog */}
+      <AICreateTasksDialog
+        open={isAIDialogOpen}
+        onOpenChange={setIsAIDialogOpen}
+        projects={projects}
+        userId={userId}
+        initialNote={note}
+        onTasksCreated={onTasksCreated}
       />
     </>
   )

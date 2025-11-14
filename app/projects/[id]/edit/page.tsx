@@ -4,12 +4,13 @@ import { notFound } from 'next/navigation'
 import { EditProjectForm } from '@/components/projects/EditProjectForm'
 
 interface EditProjectPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function EditProjectPage({ params }: EditProjectPageProps) {
+  const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -18,7 +19,7 @@ export default async function EditProjectPage({ params }: EditProjectPageProps) 
   }
 
   try {
-    const project = await getProject(params.id, supabase)
+    const project = await getProject(id, supabase)
 
     // Verify ownership
     if (project.user_id !== user.id) {

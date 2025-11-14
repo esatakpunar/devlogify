@@ -29,8 +29,54 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
+## Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
+
+```env
+# Google Gemini Pro API Key
+# Get your API key from: https://makersuite.google.com/app/apikey
+GEMINI_API_KEY=your_api_key_here
+
+# Supabase Configuration (if not already set)
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+```
+
+**Important:** 
+- `GEMINI_API_KEY` is used server-side only (not exposed to client)
+- Do NOT use `NEXT_PUBLIC_` prefix for `GEMINI_API_KEY` for security
+
 ## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 1. Push your code to GitHub
+
+### 2. Import project to Vercel
+
+1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
+2. Click "Add New Project"
+3. Import your GitHub repository
+
+### 3. Configure Environment Variables
+
+In Vercel project settings, add the following environment variables:
+
+- `GEMINI_API_KEY` - Your Google Gemini Pro API key
+- `NEXT_PUBLIC_SUPABASE_URL` - Your Supabase project URL (if not already set)
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` - Your Supabase anon key (if not already set)
+
+**Steps:**
+1. Go to your project in Vercel Dashboard
+2. Navigate to **Settings** → **Environment Variables**
+3. Add each variable:
+   - **Name:** `GEMINI_API_KEY`
+   - **Value:** Your API key
+   - **Environment:** Production, Preview, Development (select all)
+4. Repeat for other variables
+5. Redeploy your application
+
+### 4. Deploy
+
+Vercel will automatically deploy your application. The AI features will work once the environment variables are configured.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

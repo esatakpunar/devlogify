@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { KanbanColumn } from './KanbanColumn'
 import { CreateTaskDialog } from './CreateTaskDialog'
+import { AICreateTasksDialog } from './AICreateTasksDialog'
 import { Button } from '@/components/ui/button'
-import { Plus } from 'lucide-react'
+import { Plus, Sparkles } from 'lucide-react'
 import {
   DndContext,
   DragEndEvent,
@@ -33,15 +34,23 @@ type Task = {
   created_at: string
 }
 
+interface Project {
+  id: string
+  title: string
+  color: string
+}
+
 interface KanbanBoardProps {
   projectId: string
   initialTasks: Task[]
   userId: string
+  project?: Project
 }
 
-export function KanbanBoard({ projectId, initialTasks, userId }: KanbanBoardProps) {
+export function KanbanBoard({ projectId, initialTasks, userId, project }: KanbanBoardProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const [isAICreateDialogOpen, setIsAICreateDialogOpen] = useState(false)
   const [activeTask, setActiveTask] = useState<Task | null>(null)
 
   const sensors = useSensors(
@@ -58,6 +67,10 @@ export function KanbanBoard({ projectId, initialTasks, userId }: KanbanBoardProp
 
   const handleTaskCreated = (newTask: Task) => {
     setTasks([...tasks, newTask])
+  }
+
+  const handleTasksCreated = (newTasks: Task[]) => {
+    setTasks([...tasks, ...newTasks])
   }
 
   const handleTaskUpdated = (updatedTask: Task) => {
@@ -169,10 +182,19 @@ export function KanbanBoard({ projectId, initialTasks, userId }: KanbanBoardProp
               {tasks.length} total
             </span>
           </div>
-          <Button onClick={() => setIsCreateDialogOpen(true)}>
-            <Plus className="w-4 h-4 mr-2" />
-            New Task
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setIsAICreateDialogOpen(true)}
+            >
+              <Sparkles className="w-4 h-4 mr-2" />
+              AI Create Tasks
+            </Button>
+            <Button onClick={() => setIsCreateDialogOpen(true)}>
+              <Plus className="w-4 h-4 mr-2" />
+              New Task
+            </Button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -211,6 +233,14 @@ export function KanbanBoard({ projectId, initialTasks, userId }: KanbanBoardProp
           projectId={projectId}
           userId={userId}
           onTaskCreated={handleTaskCreated}
+        />
+
+        <AICreateTasksDialog
+          open={isAICreateDialogOpen}
+          onOpenChange={setIsAICreateDialogOpen}
+          projects={project ? [project] : [{ id: projectId, title: 'Current Project', color: '#3b82f6' }]}
+          userId={userId}
+          onTasksCreated={handleTasksCreated}
         />
       </div>
 

@@ -7,12 +7,13 @@ import { ProjectProgressStats } from '@/components/projects/ProjectProgressStats
 import { KanbanBoard } from '@/components/tasks/KanbanBoard'
 
 interface ProjectPageProps {
-  params: {
+  params: Promise<{
     id: string
-  }
+  }>
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {
+  const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
@@ -22,7 +23,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   // Get project
   try {
-    const project = await getProject(params.id, supabase)
+    const project = await getProject(id, supabase)
 
     // Verify ownership
     if (project.user_id !== user.id) {
@@ -30,13 +31,18 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     }
 
     // Get tasks
-    const tasks = await getTasks(params.id, supabase)
+    const tasks = await getTasks(id, supabase)
 
     return (
       <div className="space-y-6">
         <ProjectHeader project={project} />
         <ProjectProgressStats tasks={tasks || []} />
-        <KanbanBoard projectId={params.id} initialTasks={tasks || []} userId={user.id} />
+        <KanbanBoard 
+          projectId={id} 
+          initialTasks={tasks || []} 
+          userId={user.id}
+          project={{ id: project.id, title: project.title, color: project.color }}
+        />
       </div>
     )
   } catch (error) {

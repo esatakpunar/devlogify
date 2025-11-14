@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Plus, Search } from 'lucide-react'
 import { StickyNote } from 'lucide-react'
+import { toast } from 'sonner'
 
 interface Note {
   id: string
@@ -116,6 +117,10 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
                     userId={userId}
                     onNoteUpdated={handleNoteUpdated}
                     onNoteDeleted={handleNoteDeleted}
+                    onTasksCreated={() => {
+                      // Tasks created - could refresh notes or show notification
+                      toast.success('Tasks created successfully!')
+                    }}
                   />
                 ))}
               </div>
@@ -139,6 +144,10 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
                     userId={userId}
                     onNoteUpdated={handleNoteUpdated}
                     onNoteDeleted={handleNoteDeleted}
+                    onTasksCreated={() => {
+                      // Tasks created - could refresh notes or show notification
+                      toast.success('Tasks created successfully!')
+                    }}
                   />
                 ))}
               </div>
