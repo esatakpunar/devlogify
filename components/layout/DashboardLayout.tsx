@@ -19,8 +19,11 @@ export function DashboardLayout({
   const pathname = usePathname()
   const supabase = createClient()
 
-  // Auth sayfaları ve landing page için dashboard layout'unu kullanma
-  const isAuthPage = pathname?.startsWith('/login') || pathname?.startsWith('/signup')
+  // Don't use dashboard layout for auth pages and landing page
+  const isAuthPage = pathname?.startsWith('/login') || 
+                     pathname?.startsWith('/signup') || 
+                     pathname?.startsWith('/forgot-password') || 
+                     pathname?.startsWith('/reset-password')
   const isLandingPage = pathname === '/'
 
   useEffect(() => {
