@@ -68,7 +68,7 @@ export function useKeyboardShortcuts(config: {
       if (
         activeElement?.tagName === 'INPUT' ||
         activeElement?.tagName === 'TEXTAREA' ||
-        activeElement?.isContentEditable
+        (activeElement instanceof HTMLElement && activeElement.isContentEditable)
       ) {
         // Allow Escape to close dialogs even when typing
         if (e.key === 'Escape') {

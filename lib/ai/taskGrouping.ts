@@ -115,7 +115,7 @@ Return ONLY valid JSON, no additional text or markdown formatting.`
               }
               return tasks[taskIndex]
             })
-            .filter((task): task is Task => task !== null && task !== undefined)
+            .filter((task: Task | null): task is Task => task !== null && task !== undefined)
 
           if (groupTasks.length === 0) {
             console.warn(`Group "${group.name}" has no valid tasks after mapping`)
