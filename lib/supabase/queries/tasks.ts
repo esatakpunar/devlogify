@@ -32,8 +32,8 @@ export async function getTask(id: string) {
   return data
 }
 
-export async function createTask(task: TaskInsert) {
-  const supabase = createBrowserClient()
+export async function createTask(task: TaskInsert, supabaseClient?: SupabaseClient<Database>) {
+  const supabase = supabaseClient || createBrowserClient()
   
   const { data, error } = await supabase
     .from('tasks')
@@ -144,7 +144,6 @@ export async function updateTasksOrder(taskUpdates: { id: string; order_index: n
   
   // For now, we'll disable batch updates to avoid multiple requests
   // This function is kept for future optimization
-  console.log('Batch order update requested for:', taskUpdates.length, 'tasks')
   return []
 }
 
@@ -202,4 +201,61 @@ export async function getTodayCompletedTasks(userId: string, supabaseClient?: Su
 
   if (error) throw error
   return data
+}
+
+/**
+ * Add tags to multiple tasks
+ */
+export async function addTagsToTasks(taskIds: string[], tags: string[], supabaseClient?: SupabaseClient<Database>) {
+  const supabase = supabaseClient || createBrowserClient()
+  
+  // Get current tasks
+  const { data: existingTasks, error: fetchError } = await supabase
+    .from('tasks')
+    .select('id, tags')
+    .in('id', taskIds)
+
+  if (fetchError) {
+    console.error('Error fetching tasks:', fetchError)
+    throw fetchError
+  }
+  
+  if (!existingTasks || existingTasks.length === 0) {
+    console.error('No tasks found for IDs:', taskIds)
+    throw new Error(`Tasks not found for IDs: ${taskIds.join(', ')}`)
+  }
+
+  // Update each task with new tags (merge with existing)
+  const updates = existingTasks.map(task => {
+    const existingTags = (task.tags || []) as string[]
+    const newTags = [...new Set([...existingTags, ...tags])] // Remove duplicates
+    return {
+      id: task.id,
+      tags: newTags
+    }
+  })
+
+  // Update tasks
+  const updatePromises = updates.map(update =>
+    supabase
+      .from('tasks')
+      .update({ tags: update.tags })
+      .eq('id', update.id)
+      .select()
+  )
+
+  const results = await Promise.all(updatePromises)
+  
+  // Check for errors
+  for (let i = 0; i < results.length; i++) {
+    const result = results[i]
+    if (result.error) {
+      console.error(`Error updating task ${updates[i].id} tags:`, result.error)
+      throw result.error
+    }
+  }
+
+  const updatedTasks = results.map(r => r.data).filter(Boolean).flat()
+  
+  return updatedTasks
 }

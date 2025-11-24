@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { KanbanColumn } from './KanbanColumn'
 import { CreateTaskDialog } from './CreateTaskDialog'
 import { AICreateTasksDialog } from './AICreateTasksDialog'
+import { TaskGroupingButton } from './TaskGroupingButton'
 import { Button } from '@/components/ui/button'
 import { Plus, Sparkles } from 'lucide-react'
 import {
@@ -32,6 +33,7 @@ type Task = {
   progress: number
   order_index: number
   created_at: string
+  tags?: string[] | null
 }
 
 interface Project {
@@ -163,7 +165,6 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
     } else {
       // Same-column reordering is disabled to avoid multiple database requests
       // Only cross-column movement is supported
-      console.log('Same-column reordering disabled for performance')
     }
   }
 
@@ -190,6 +191,14 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
               <Sparkles className="w-4 h-4 mr-2" />
               AI Create Tasks
             </Button>
+            <TaskGroupingButton 
+              projectId={projectId} 
+              userId={userId}
+              onTasksUpdated={() => {
+                // Refresh tasks by reloading the page data
+                window.location.reload()
+              }}
+            />
             <Button onClick={() => setIsCreateDialogOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               New Task

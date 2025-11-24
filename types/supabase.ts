@@ -159,6 +159,97 @@ export type Database = {
           updated_at?: string
         }
       }
+      task_templates: {
+        Row: {
+          id: string
+          user_id: string
+          title: string
+          description: string | null
+          priority: 'low' | 'medium' | 'high'
+          estimated_duration: number | null
+          tags: string[]
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          title: string
+          description?: string | null
+          priority?: 'low' | 'medium' | 'high'
+          estimated_duration?: number | null
+          tags?: string[]
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          title?: string
+          description?: string | null
+          priority?: 'low' | 'medium' | 'high'
+          estimated_duration?: number | null
+          tags?: string[]
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      recurring_tasks: {
+        Row: {
+          id: string
+          user_id: string
+          project_id: string | null
+          template_id: string | null
+          title: string
+          description: string | null
+          priority: 'low' | 'medium' | 'high'
+          estimated_duration: number | null
+          schedule_type: 'daily' | 'weekly' | 'monthly' | 'custom'
+          schedule_config: Record<string, any>
+          cron_expression: string | null
+          is_active: boolean
+          last_created_at: string | null
+          next_run_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          project_id?: string | null
+          template_id?: string | null
+          title: string
+          description?: string | null
+          priority?: 'low' | 'medium' | 'high'
+          estimated_duration?: number | null
+          schedule_type: 'daily' | 'weekly' | 'monthly' | 'custom'
+          schedule_config?: Record<string, any>
+          cron_expression?: string | null
+          is_active?: boolean
+          last_created_at?: string | null
+          next_run_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          project_id?: string | null
+          template_id?: string | null
+          title?: string
+          description?: string | null
+          priority?: 'low' | 'medium' | 'high'
+          estimated_duration?: number | null
+          schedule_type?: 'daily' | 'weekly' | 'monthly' | 'custom'
+          schedule_config?: Record<string, any>
+          cron_expression?: string | null
+          is_active?: boolean
+          last_created_at?: string | null
+          next_run_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
     }
   }
 }

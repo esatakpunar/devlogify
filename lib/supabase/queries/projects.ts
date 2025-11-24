@@ -181,16 +181,27 @@ export async function toggleProjectPin(projectId: string, supabaseClient?: Supab
 
     if (fetchError) throw fetchError
 
-    // Toggle the pin status
-    const { data, error } = await supabase
-      .from('projects')
-      .update({ is_pinned: !project.is_pinned })
-      .eq('id', projectId)
-      .select()
-      .single()
+    if (!project) {
+      throw new Error('Project not found')
+    }
 
-    if (error) throw error
-    return data
+    const currentPinStatus = (project as { is_pinned: boolean }).is_pinned
+
+    // Toggle the pin status - use updateProject if no client provided, otherwise use direct update
+    if (supabaseClient) {
+      const { data, error } = await (supabaseClient as any)
+        .from('projects')
+        .update({ is_pinned: !currentPinStatus })
+        .eq('id', projectId)
+        .select()
+        .single()
+
+      if (error) throw error
+      return data
+    } else {
+      // Use the helper function when no client is provided
+      return await updateProject(projectId, { is_pinned: !currentPinStatus })
+    }
   } catch (error: any) {
     // If is_pinned column doesn't exist yet, show error message
     if (error.code === '42703') {

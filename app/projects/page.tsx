@@ -1,10 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { getProjects } from '@/lib/supabase/queries/projects'
-import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Plus, FolderKanban } from 'lucide-react'
+import { FolderKanban } from 'lucide-react'
 import { ProjectCard } from '@/components/projects/ProjectCard'
 import { ProjectsFilter } from '@/components/projects/ProjectsFilter'
+import { ProjectsHeader } from '@/components/projects/ProjectsHeader'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { Suspense } from 'react'
 import { ProjectsSkeleton } from '@/components/ui/LoadingSkeleton'
@@ -13,14 +12,11 @@ interface ProjectsPageProps {
   searchParams: Promise<{ status?: string }>
 }
 
-async function ProjectsList({ status }: { status: string }) {
+async function ProjectsList({ status, userId }: { status: string; userId: string }) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-
-  if (!user) return null
 
   const projects = await getProjects(
-    user.id,
+    userId,
     status !== 'all' ? status : undefined,
     supabase
   )
@@ -50,7 +46,7 @@ async function ProjectsList({ status }: { status: string }) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
       {sortedProjects.map((project, index) => (
-        <ProjectCard key={project.id} project={project} index={index} />
+        <ProjectCard key={project.id} project={project} index={index} userId={userId} />
       ))}
     </div>
   )
@@ -59,24 +55,16 @@ async function ProjectsList({ status }: { status: string }) {
 export default async function ProjectsPage({ searchParams }: ProjectsPageProps) {
   const params = await searchParams
   const status = params?.status || 'active'
+  
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) return null
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold dark:text-white">Projects</h1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
-            Manage your projects and track progress
-          </p>
-        </div>
-        <Link href="/projects/new">
-          <Button>
-            <Plus className="w-4 h-4 mr-2" />
-            New Project
-          </Button>
-        </Link>
-      </div>
+      <ProjectsHeader userId={user.id} />
 
       {/* Filter */}
       <Suspense fallback={<div>Loading filters...</div>}>
@@ -85,7 +73,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
 
       {/* Projects Grid */}
       <Suspense fallback={<ProjectsSkeleton />}>
-        <ProjectsList status={status} />
+        <ProjectsList status={status} userId={user.id} />
       </Suspense>
     </div>
   )

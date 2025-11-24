@@ -10,6 +10,9 @@ import { RecentTasks } from '@/components/dashboard/RecentTasks'
 import { TodayCompleted } from '@/components/dashboard/TodayCompleted'
 import { PinnedProjects } from '@/components/dashboard/PinnedProjects'
 import { QuickTimerCard } from '@/components/dashboard/QuickTimerCard'
+import { TaskSuggestions } from '@/components/dashboard/TaskSuggestions'
+import { DailyStandup } from '@/components/dashboard/DailyStandup'
+import { PomodoroTimer } from '@/components/timer/PomodoroTimer'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -111,14 +114,17 @@ export default async function DashboardPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Left Column */}
         <div className="space-y-6">
+          <DailyStandup userId={user.id} />
           <RecentTasks tasks={recentTasks || []} userId={user.id} />
           <TodayCompleted tasks={todayCompletedTasks || []} />
         </div>
 
         {/* Right Column */}
         <div className="space-y-6">
+          <PomodoroTimer />
           <QuickTimerCard userId={user.id} />
           <PinnedProjects projects={pinnedProjects || []} userId={user.id} />
+          <TaskSuggestions userId={user.id} />
         </div>
       </div>
 

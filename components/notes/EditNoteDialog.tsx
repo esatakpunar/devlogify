@@ -101,7 +101,7 @@ export function EditNoteDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Note</DialogTitle>
           <DialogDescription>
@@ -109,7 +109,7 @@ export function EditNoteDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 min-w-0">
           <div className="space-y-2">
             <Label htmlFor="edit-note-title">Title (optional)</Label>
             <Input
@@ -121,7 +121,7 @@ export function EditNoteDialog({
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 min-w-0">
             <Label htmlFor="edit-note-content">
               Content <span className="text-red-500">*</span>
             </Label>
@@ -130,9 +130,9 @@ export function EditNoteDialog({
               placeholder="Write your note here..."
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              rows={8}
               disabled={loading}
               required
+              className="resize-none break-words overflow-wrap-anywhere w-full max-w-full h-64 overflow-y-auto"
             />
           </div>
 

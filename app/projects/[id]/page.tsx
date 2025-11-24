@@ -35,7 +35,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
     return (
       <div className="space-y-6">
-        <ProjectHeader project={project} />
+        <ProjectHeader project={project} userId={user.id} />
         <ProjectProgressStats tasks={tasks || []} />
         <KanbanBoard 
           projectId={id} 

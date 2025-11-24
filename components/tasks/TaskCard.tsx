@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
+import { Tag } from 'lucide-react'
 import { ProgressBar } from '@/components/ui/progress-bar'
 import { TimeProgressIndicator } from './TimeProgressIndicator'
 import { ProgressSlider } from './ProgressSlider'
@@ -36,6 +37,7 @@ type Task = {
   progress: number
   order_index: number
   created_at: string
+  tags?: string[] | null
 }
 
 interface TaskCardProps {
@@ -293,6 +295,18 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
             )}
           </div>
         </div>
+
+        {/* Tags */}
+        {localTask.tags && localTask.tags.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-3">
+            {localTask.tags.map((tag, index) => (
+              <Badge key={index} variant="secondary" className="text-xs">
+                <Tag className="w-3 h-3 mr-1" />
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        )}
 
         {/* Footer */}
         <div className="flex items-center justify-between">

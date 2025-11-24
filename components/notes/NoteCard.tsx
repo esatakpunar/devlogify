@@ -82,9 +82,25 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
     }
   }
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Don't open modal if clicking on dropdown or links
+    const target = e.target as HTMLElement
+    if (
+      target.closest('[role="menuitem"]') ||
+      target.closest('button') ||
+      target.closest('a')
+    ) {
+      return
+    }
+    setIsEditDialogOpen(true)
+  }
+
   return (
     <>
-      <div className="group bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow">
+      <div 
+        className="group bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow cursor-pointer"
+        onClick={handleCardClick}
+      >
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex-1 min-w-0">
@@ -97,6 +113,7 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
               <Link 
                 href={`/projects/${note.project.id}`}
                 className="flex items-center gap-1 text-xs text-gray-600 hover:text-blue-600 w-fit"
+                onClick={(e) => e.stopPropagation()}
               >
                 <div 
                   className="w-2 h-2 rounded-full" 
@@ -117,11 +134,12 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
                   size="icon" 
                   className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
                   disabled={loading}
+                  onClick={(e) => e.stopPropagation()}
                 >
                   <MoreVertical className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
+              <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
                 <DropdownMenuItem onClick={() => setIsAIDialogOpen(true)}>
                   <Sparkles className="w-4 h-4 mr-2" />
                   Create Tasks from Note

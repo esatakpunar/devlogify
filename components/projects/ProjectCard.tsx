@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { formatDistanceToNow } from 'date-fns'
 import { AnimatedCard } from '@/components/ui/AnimatedCard'
+import { EditProjectDialog } from './EditProjectDialog'
 
 interface ProjectCardProps {
   project: {
@@ -25,17 +26,19 @@ interface ProjectCardProps {
     title: string
     description: string | null
     color: string
-    status: string
+    status: 'active' | 'archived' | 'completed'
     is_pinned?: boolean
     created_at: string
     tasks?: { count: number }[]
   }
   index?: number
+  userId?: string
 }
 
-export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
+export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
   const [loading, setLoading] = useState(false)
   const [pinLoading, setPinLoading] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -142,11 +145,15 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
                   </Button>
                 </DropdownMenuTrigger>
               <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                <DropdownMenuItem asChild>
-                  <Link href={`/projects/${project.id}/edit`}>
-                    <Edit className="w-4 h-4 mr-2" />
-                    Edit
-                  </Link>
+                <DropdownMenuItem onClick={(e) => {
+                  e.preventDefault()
+                  e.stopPropagation()
+                  if (userId) {
+                    setEditDialogOpen(true)
+                  }
+                }}>
+                  <Edit className="w-4 h-4 mr-2" />
+                  Edit
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleArchive}>
@@ -166,11 +173,11 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
           </div>
 
           {/* Description */}
-          {project.description && (
-            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-4">
-              {project.description}
+          <div className="min-h-[2.5rem] mb-4">
+            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+              {project.description || '\u00A0'}
             </p>
-          )}
+          </div>
 
           {/* Footer */}
           <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
@@ -187,6 +194,23 @@ export function ProjectCard({ project, index = 0 }: ProjectCardProps) {
           </div>
         </div>
       </Link>
+      {userId && (
+        <EditProjectDialog
+          open={editDialogOpen}
+          onOpenChange={setEditDialogOpen}
+          project={{
+            id: project.id,
+            title: project.title,
+            description: project.description,
+            color: project.color,
+            status: project.status,
+          }}
+          userId={userId}
+          onProjectUpdated={() => {
+            router.refresh()
+          }}
+        />
+      )}
     </AnimatedCard>
   )
 }

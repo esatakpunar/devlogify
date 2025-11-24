@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { GlobalTimerIndicator } from '@/components/timer/GlobalTimerIndicator'
+import { ThemeToggle } from '@/components/ui/ThemeToggle'
 
 interface NavbarProps {
   user: {
@@ -56,6 +57,9 @@ export function Navbar({ user, onMenuClick }: NavbarProps) {
       <div className="flex items-center gap-2 ml-auto">
         {/* Global Timer Indicator */}
         <GlobalTimerIndicator userId={user.id} />
+
+        {/* Theme Toggle */}
+        <ThemeToggle userId={user.id} />
 
         {/* Notifications */}
         <Button variant="ghost" size="icon" className="relative">

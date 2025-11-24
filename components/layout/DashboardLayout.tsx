@@ -6,6 +6,9 @@ import { useRouter, usePathname } from 'next/navigation'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Navbar } from '@/components/layout/Navbar'
 import { MobileSidebar } from '@/components/layout/MobileSidebar'
+import { CommandPalette } from '@/components/layout/CommandPalette'
+import { ShortcutsHelp } from '@/components/ui/ShortcutsHelp'
+import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts'
 import { Toaster } from 'sonner'
 
 export function DashboardLayout({
@@ -15,6 +18,8 @@ export function DashboardLayout({
 }) {
   const [user, setUser] = useState<any>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
+  const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
   const supabase = createClient()
@@ -37,6 +42,27 @@ export function DashboardLayout({
     }
     getUser()
   }, [router, supabase.auth, isAuthPage, isLandingPage])
+
+  // Keyboard shortcuts
+  useKeyboardShortcuts({
+    onCreateTask: () => {
+      // Navigate to projects page where user can create task
+      router.push('/projects')
+    },
+    onCreateNote: () => {
+      router.push('/notes')
+    },
+    onCreateProject: () => {
+      router.push('/projects/new')
+    },
+    onShowShortcuts: () => {
+      setShortcutsHelpOpen(true)
+    },
+    onOpenCommandPalette: () => {
+      setCommandPaletteOpen(true)
+    },
+    userId: user?.id,
+  })
 
   // Auth sayfaları ve landing page için sadece children'ı render et
   if (isAuthPage || isLandingPage) {
@@ -71,6 +97,21 @@ export function DashboardLayout({
         </div>
       </div>
       <Toaster position="bottom-right" />
+      
+      {/* Command Palette */}
+      {user && (
+        <CommandPalette
+          open={commandPaletteOpen}
+          onOpenChange={setCommandPaletteOpen}
+          userId={user.id}
+        />
+      )}
+
+      {/* Shortcuts Help */}
+      <ShortcutsHelp
+        open={shortcutsHelpOpen}
+        onOpenChange={setShortcutsHelpOpen}
+      />
     </>
   )
 }

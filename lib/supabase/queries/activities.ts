@@ -27,10 +27,13 @@ export async function getActivities(
 
 export async function getActivitiesByDateRange(
   userId: string,
-  startDate: Date,
-  endDate: Date
+  startDate: string | Date,
+  endDate: string | Date
 ) {
   const supabase = createBrowserClient()
+
+  const start = typeof startDate === 'string' ? startDate : startDate.toISOString()
+  const end = typeof endDate === 'string' ? endDate : endDate.toISOString()
 
   const { data, error } = await supabase
     .from('activity_logs')
@@ -40,8 +43,8 @@ export async function getActivitiesByDateRange(
       task:tasks(id, title)
     `)
     .eq('user_id', userId)
-    .gte('created_at', startDate.toISOString())
-    .lte('created_at', endDate.toISOString())
+    .gte('created_at', start)
+    .lte('created_at', end)
     .order('created_at', { ascending: false })
 
   if (error) throw error

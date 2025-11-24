@@ -1,0 +1,9 @@
+{
+  "crons": [
+    {
+      "path": "/api/recurring-tasks/process",
+      "schedule": "*/15 * * * *"
+    }
+  ]
+}
+

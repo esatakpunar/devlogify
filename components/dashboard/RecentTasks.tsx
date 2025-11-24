@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { Play, Check, Clock, MoreHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -29,6 +30,7 @@ interface RecentTasksProps {
 }
 
 export function RecentTasks({ tasks, userId }: RecentTasksProps) {
+  const router = useRouter()
   const [localTasks, setLocalTasks] = useState<Task[]>(tasks)
   const [loadingTasks, setLoadingTasks] = useState<Set<string>>(new Set())
   const { isRunning, taskId: activeTaskId, startTimer } = useTimerStore()
@@ -80,6 +82,8 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
     try {
       await updateTaskStatus(taskId, 'done')
       toast.success('Task marked as complete!')
+      // Refresh the page to update Today's Completed section
+      router.refresh()
     } catch (error) {
       // Revert optimistic update on error
       setLocalTasks(tasks)

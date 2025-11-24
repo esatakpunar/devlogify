@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { updateTask } from '@/lib/supabase/queries/tasks'
 import {
   Dialog,
@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/select'
 import { ProgressBar } from '@/components/ui/progress-bar'
 import { TimeProgressIndicator } from './TimeProgressIndicator'
+import { TaskTemplateDialog } from './TaskTemplateDialog'
 import { toast } from 'sonner'
 
 type Task = {
@@ -36,6 +37,7 @@ type Task = {
   progress: number
   order_index: number
   created_at: string
+  tags?: string[] | null
 }
 
 interface EditTaskDialogProps {
@@ -49,7 +51,7 @@ interface EditTaskDialogProps {
 export function EditTaskDialog({ 
   open, 
   onOpenChange, 
-  task,
+  task, 
   userId,
   onTaskUpdated 
 }: EditTaskDialogProps) {
@@ -58,7 +60,18 @@ export function EditTaskDialog({
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>(task.priority)
   const [estimatedDuration, setEstimatedDuration] = useState(task.estimated_duration?.toString() || '')
   const [progress, setProgress] = useState(task.progress)
+  const [tags, setTags] = useState(task.tags?.join(', ') || '')
   const [loading, setLoading] = useState(false)
+
+  // Update state when task prop changes
+  useEffect(() => {
+    setTitle(task.title)
+    setDescription(task.description || '')
+    setPriority(task.priority)
+    setEstimatedDuration(task.estimated_duration?.toString() || '')
+    setProgress(task.progress)
+    setTags(task.tags?.join(', ') || '')
+  }, [task])
 
   const handleProgressUpdate = (newProgress: number) => {
     setProgress(newProgress)
@@ -69,12 +82,18 @@ export function EditTaskDialog({
     setLoading(true)
 
     try {
+      const tagsArray = tags
+        .split(',')
+        .map(t => t.trim())
+        .filter(t => t.length > 0)
+
       const updatedTask = await updateTask(task.id, {
         title,
         description: description || null,
         priority,
         estimated_duration: estimatedDuration ? parseInt(estimatedDuration) : null,
         progress,
+        tags: tagsArray.length > 0 ? tagsArray : null,
       })
 
       onTaskUpdated(updatedTask)
@@ -98,7 +117,7 @@ export function EditTaskDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 min-w-0">
           <div className="space-y-2">
             <Label htmlFor="edit-task-title">
               Task Title <span className="text-red-500">*</span>
@@ -113,15 +132,15 @@ export function EditTaskDialog({
             />
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-2 min-w-0">
             <Label htmlFor="edit-task-description">Description</Label>
             <Textarea
               id="edit-task-description"
               placeholder="Add more details..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              rows={3}
               disabled={loading}
+              className="resize-none break-words overflow-wrap-anywhere w-full max-w-full h-40 overflow-y-auto"
             />
           </div>
 
@@ -155,6 +174,18 @@ export function EditTaskDialog({
                 disabled={loading}
               />
             </div>
+          </div>
+
+          <div className="space-y-2 min-w-0">
+            <Label htmlFor="edit-task-tags">Tags (optional)</Label>
+            <Input
+              id="edit-task-tags"
+              placeholder="api, frontend, bug (separate with commas)"
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              disabled={loading}
+            />
+            <p className="text-xs text-gray-500">Separate tags with commas</p>
           </div>
 
           {/* Progress Section */}
@@ -199,6 +230,15 @@ export function EditTaskDialog({
             >
               Cancel
             </Button>
+            <TaskTemplateDialog
+              userId={userId}
+              initialTask={{
+                title,
+                description: description || null,
+                priority,
+                estimated_duration: estimatedDuration ? parseInt(estimatedDuration) : null,
+              }}
+            />
           </div>
         </form>
       </DialogContent>

@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { EditProjectDialog } from './EditProjectDialog'
 
 interface ProjectHeaderProps {
   project: {
@@ -22,12 +23,14 @@ interface ProjectHeaderProps {
     title: string
     description: string | null
     color: string
-    status: string
+    status: 'active' | 'archived' | 'completed'
   }
+  userId: string
 }
 
-export function ProjectHeader({ project }: ProjectHeaderProps) {
+export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
   const [loading, setLoading] = useState(false)
+  const [editDialogOpen, setEditDialogOpen] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -77,27 +80,31 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
         </Button>
       </Link>
 
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-4">
+      <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start gap-4 min-w-0 flex-1">
           <div 
             className="w-12 h-12 rounded-lg flex-shrink-0" 
             style={{ backgroundColor: project.color }}
           />
-          <div>
-            <h1 className="text-3xl font-bold">{project.title}</h1>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-3xl font-bold break-words">{project.title}</h1>
             {project.description && (
-              <p className="text-gray-600 mt-2">{project.description}</p>
+              <p className="text-gray-600 dark:text-gray-400 mt-2 break-words overflow-wrap-anywhere">
+                {project.description}
+              </p>
             )}
           </div>
         </div>
 
         <div className="flex items-center gap-2">
-          <Link href={`/projects/${project.id}/edit`}>
-            <Button variant="outline" disabled={loading}>
-              <Edit className="w-4 h-4 mr-2" />
-              Edit
-            </Button>
-          </Link>
+          <Button 
+            variant="outline" 
+            disabled={loading}
+            onClick={() => setEditDialogOpen(true)}
+          >
+            <Edit className="w-4 h-4 mr-2" />
+            Edit
+          </Button>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -106,11 +113,9 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem asChild>
-                <Link href={`/projects/${project.id}/edit`}>
-                  <Settings className="w-4 h-4 mr-2" />
-                  Project Settings
-                </Link>
+              <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                <Settings className="w-4 h-4 mr-2" />
+                Project Settings
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleArchive}>
@@ -125,6 +130,22 @@ export function ProjectHeader({ project }: ProjectHeaderProps) {
           </DropdownMenu>
         </div>
       </div>
+      
+      <EditProjectDialog
+        open={editDialogOpen}
+        onOpenChange={setEditDialogOpen}
+        project={{
+          id: project.id,
+          title: project.title,
+          description: project.description,
+          color: project.color,
+          status: project.status,
+        }}
+        userId={userId}
+        onProjectUpdated={() => {
+          router.refresh()
+        }}
+      />
     </div>
   )
 }

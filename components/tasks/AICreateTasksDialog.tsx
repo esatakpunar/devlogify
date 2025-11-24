@@ -47,6 +47,12 @@ interface AICreateTasksDialogProps {
   projects: Project[]
   userId: string
   initialNote?: Note | null
+  initialSuggestion?: {
+    title: string
+    description: string
+    priority: 'low' | 'medium' | 'high'
+    estimated_duration?: number
+  } | null
   onTasksCreated?: (tasks: any[]) => void
 }
 
@@ -60,6 +66,7 @@ export function AICreateTasksDialog({
   projects,
   userId,
   initialNote,
+  initialSuggestion,
   onTasksCreated,
 }: AICreateTasksDialogProps) {
   const [notesInput, setNotesInput] = useState('')
@@ -70,15 +77,25 @@ export function AICreateTasksDialog({
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'input' | 'preview'>('input')
 
-  // Load initial note if provided
+  // Load initial note or suggestion if provided
   useEffect(() => {
-    if (initialNote && open) {
-      setNotesInput(initialNote.content)
-      if (initialNote.title) {
-        setNotesInput(`${initialNote.title}\n\n${initialNote.content}`)
+    if (open) {
+      if (initialNote) {
+        setNotesInput(initialNote.content)
+        if (initialNote.title) {
+          setNotesInput(`${initialNote.title}\n\n${initialNote.content}`)
+        }
+      } else if (initialSuggestion) {
+        // Pre-fill with suggestion
+        const suggestionText = `${initialSuggestion.title}\n\n${initialSuggestion.description}`
+        setNotesInput(suggestionText)
+        // Auto-select first project if available
+        if (projects.length > 0 && !selectedProjectId) {
+          setSelectedProjectId(projects[0].id)
+        }
       }
     }
-  }, [initialNote, open])
+  }, [initialNote, initialSuggestion, open, projects, selectedProjectId])
 
   // Reset form when dialog closes
   useEffect(() => {

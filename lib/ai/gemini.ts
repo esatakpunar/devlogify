@@ -66,7 +66,6 @@ async function generateWithRetry(
       const delay = baseDelay * Math.pow(2, attempt - 1)
       // Only log in development
       if (process.env.NODE_ENV === 'development') {
-        console.log(`Retrying after ${delay}ms (attempt ${attempt}/${maxRetries})...`)
       }
       await new Promise(resolve => setTimeout(resolve, delay))
     }
