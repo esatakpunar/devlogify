@@ -5,6 +5,10 @@ import { createTask } from '@/lib/supabase/queries/tasks'
 import { calculateNextRunAt } from '@/lib/utils/recurringTasks'
 import type { Database } from '@/types/supabase'
 
+type RecurringTask = Database['public']['Tables']['recurring_tasks']['Row']
+type RecurringTaskUpdate = Database['public']['Tables']['recurring_tasks']['Update']
+type Task = Database['public']['Tables']['tasks']['Row']
+
 /**
  * Process recurring tasks and create new tasks
  * This should be called by a cron job (Vercel Cron or Supabase Edge Function)
@@ -54,7 +58,7 @@ async function processRecurringTasks(request: NextRequest) {
     )
 
     // Get all due recurring tasks (pass supabase client to bypass RLS)
-    const dueTasks = await getDueRecurringTasks(supabase)
+    const dueTasks: RecurringTask[] = await getDueRecurringTasks(supabase)
 
     const results = []
 
@@ -66,7 +70,7 @@ async function processRecurringTasks(request: NextRequest) {
           continue
         }
 
-        const newTask = await createTask({
+        const newTask: Task = await createTask({
           project_id: recurringTask.project_id,
           user_id: recurringTask.user_id,
           title: recurringTask.title,
@@ -85,12 +89,14 @@ async function processRecurringTasks(request: NextRequest) {
           recurringTask.last_created_at || undefined
         )
 
-        const { error: updateError } = await supabase
-          .from('recurring_tasks')
-          .update({
-            last_created_at: new Date().toISOString(),
-            next_run_at: nextRunAt.toISOString(),
-          })
+        const updateData: RecurringTaskUpdate = {
+          last_created_at: new Date().toISOString(),
+          next_run_at: nextRunAt.toISOString(),
+        }
+
+        const { error: updateError } = await (supabase
+          .from('recurring_tasks') as any)
+          .update(updateData)
           .eq('id', recurringTask.id)
 
         if (updateError) {
