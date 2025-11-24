@@ -6,12 +6,13 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import type { TaskWithProject } from '@/lib/supabase/queries/tasks'
 
 interface Task {
   id: string
   title: string
   actual_duration: number
-  completed_at: string
+  completed_at: string | null
   project: {
     id: string
     title: string
@@ -33,7 +34,8 @@ export function TodayCompleted({ tasks }: TodayCompletedProps) {
     return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`
   }
 
-  const formatCompletedTime = (dateString: string) => {
+  const formatCompletedTime = (dateString: string | null) => {
+    if (!dateString) return ''
     const date = new Date(dateString)
     return date.toLocaleTimeString('en-US', { 
       hour: 'numeric', 
@@ -87,7 +89,9 @@ export function TodayCompleted({ tasks }: TodayCompletedProps) {
                   {formatTime(task.actual_duration)}
                 </span>
                 <span>•</span>
-                <span>{t('dashboard.completedAt')} {formatCompletedTime(task.completed_at)}</span>
+                {task.completed_at && (
+                  <span>{t('dashboard.completedAt')} {formatCompletedTime(task.completed_at)}</span>
+                )}
               </div>
             </div>
           </div>

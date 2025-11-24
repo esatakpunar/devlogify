@@ -6,6 +6,15 @@ export type Task = Database['public']['Tables']['tasks']['Row']
 export type TaskInsert = Database['public']['Tables']['tasks']['Insert']
 export type TaskUpdate = Database['public']['Tables']['tasks']['Update']
 
+// Task with project information (for dashboard queries)
+export type TaskWithProject = Task & {
+  project: {
+    id: string
+    title: string
+    color: string
+  }
+}
+
 export async function getTasks(projectId: string, supabaseClient?: SupabaseClient<Database>) {
   const supabase = supabaseClient || createBrowserClient()
   
@@ -150,7 +159,7 @@ export async function updateTasksOrder(taskUpdates: { id: string; order_index: n
 /**
  * Get recent incomplete tasks for dashboard
  */
-export async function getRecentIncompleteTasks(userId: string, limit: number = 5, supabaseClient?: SupabaseClient<Database>) {
+export async function getRecentIncompleteTasks(userId: string, limit: number = 5, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithProject[]> {
   const supabase = supabaseClient || createBrowserClient()
   
   const { data, error } = await supabase
@@ -169,13 +178,13 @@ export async function getRecentIncompleteTasks(userId: string, limit: number = 5
     .limit(limit)
 
   if (error) throw error
-  return data
+  return data as TaskWithProject[]
 }
 
 /**
  * Get tasks completed today for dashboard
  */
-export async function getTodayCompletedTasks(userId: string, supabaseClient?: SupabaseClient<Database>) {
+export async function getTodayCompletedTasks(userId: string, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithProject[]> {
   const supabase = supabaseClient || createBrowserClient()
   
   const today = new Date()
@@ -200,7 +209,7 @@ export async function getTodayCompletedTasks(userId: string, supabaseClient?: Su
     .order('completed_at', { ascending: false })
 
   if (error) throw error
-  return data
+  return data as TaskWithProject[]
 }
 
 /**

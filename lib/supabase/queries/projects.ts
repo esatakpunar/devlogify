@@ -7,7 +7,12 @@ export type Project = Database['public']['Tables']['projects']['Row']
 export type ProjectInsert = Database['public']['Tables']['projects']['Insert']
 export type ProjectUpdate = Database['public']['Tables']['projects']['Update']
 
-export async function getProjects(userId: string, status?: string, supabaseClient?: SupabaseClient<Database>): Promise<Project[]> {
+// Project with tasks count (for queries that join tasks)
+export type ProjectWithTasks = Project & {
+  tasks: { count: number }[]
+}
+
+export async function getProjects(userId: string, status?: string, supabaseClient?: SupabaseClient<Database>): Promise<ProjectWithTasks[]> {
   const supabase = supabaseClient || createBrowserClient()
 
   let query = supabase
@@ -26,7 +31,7 @@ export async function getProjects(userId: string, status?: string, supabaseClien
   const { data, error } = await query
 
   if (error) throw error
-  return data
+  return data as ProjectWithTasks[]
 }
 
 export async function getProject(id: string, supabaseClient?: SupabaseClient<Database>) {
@@ -137,7 +142,7 @@ export async function getProjectsWithNotes(userId: string) {
 /**
  * Get pinned projects for dashboard
  */
-export async function getPinnedProjects(userId: string, supabaseClient?: SupabaseClient<Database>) {
+export async function getPinnedProjects(userId: string, supabaseClient?: SupabaseClient<Database>): Promise<ProjectWithTasks[]> {
   const supabase = supabaseClient || createBrowserClient()
 
   try {
@@ -154,7 +159,7 @@ export async function getPinnedProjects(userId: string, supabaseClient?: Supabas
       .limit(6)
 
     if (error) throw error
-    return data
+    return data as ProjectWithTasks[]
   } catch (error: any) {
     // If is_pinned column doesn't exist yet, return empty array
     if (error.code === '42703') {

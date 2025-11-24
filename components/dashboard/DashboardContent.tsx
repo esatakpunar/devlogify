@@ -15,8 +15,8 @@ import { PomodoroTimer } from '@/components/timer/PomodoroTimer'
 import { AIFeaturesPromo } from '@/components/dashboard/AIFeaturesPromo'
 import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog'
 import { useTranslation } from '@/lib/i18n/useTranslation'
-import type { Project } from '@/lib/supabase/queries/projects'
-import type { Task } from '@/lib/supabase/queries/tasks'
+import type { ProjectWithTasks } from '@/lib/supabase/queries/projects'
+import type { TaskWithProject } from '@/lib/supabase/queries/tasks'
 
 interface DashboardContentProps {
   user: {
@@ -33,9 +33,9 @@ interface DashboardContentProps {
       minutes: number
     }
   }
-  recentTasks: Task[]
-  todayCompletedTasks: Task[]
-  pinnedProjects: Project[]
+  recentTasks: TaskWithProject[]
+  todayCompletedTasks: TaskWithProject[]
+  pinnedProjects: ProjectWithTasks[]
 }
 
 export function DashboardContent({

@@ -342,6 +342,7 @@
     "createTask": "Crear Tarea",
     "createTasksWithAI": "Crear Tareas con IA",
     "dropTaskHere": "Soltar tarea aquí",
+    "total": "total",
     "groupTasks": "Agrupar Tareas",
     "taskGrouping": "Agrupación de Tareas",
     "taskGroupingDescription": "Agrupación de tareas impulsada por IA basada en similitud y flujo de trabajo",

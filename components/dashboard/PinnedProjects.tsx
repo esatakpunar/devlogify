@@ -9,17 +9,10 @@ import { Badge } from '@/components/ui/badge'
 import { toggleProjectPin } from '@/lib/supabase/queries/projects'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/useTranslation'
-
-interface Project {
-  id: string
-  title: string
-  description: string | null
-  color: string
-  tasks: { count: number }[]
-}
+import type { ProjectWithTasks } from '@/lib/supabase/queries/projects'
 
 interface PinnedProjectsProps {
-  projects: Project[]
+  projects: ProjectWithTasks[]
   userId: string
 }
 
