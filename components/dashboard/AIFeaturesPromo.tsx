@@ -7,42 +7,44 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { usePremium } from '@/lib/hooks/usePremium'
 import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface AIFeaturesPromoProps {
   userId: string
 }
 
-const features = [
-  {
-    icon: Brain,
-    title: 'AI Task Suggestions',
-    description: 'Get intelligent recommendations',
-  },
-  {
-    icon: Calendar,
-    title: 'Daily Standup',
-    description: 'Automated summaries',
-  },
-  {
-    icon: Sparkles,
-    title: 'AI Task Generation',
-    description: 'Create tasks from notes',
-  },
-  {
-    icon: Layers,
-    title: 'Smart Grouping',
-    description: 'Organize tasks with AI',
-  },
-]
-
 export function AIFeaturesPromo({ userId }: AIFeaturesPromoProps) {
   const { isPremium, loading } = usePremium(userId)
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
+  const t = useTranslation()
 
   // Don't show if user is premium or still loading
   if (loading || isPremium) {
     return null
   }
+
+  const features = [
+    {
+      icon: Brain,
+      title: t('dashboard.aiFeatures.aiTaskSuggestions'),
+      description: t('dashboard.aiFeatures.aiTaskSuggestionsDescription'),
+    },
+    {
+      icon: Calendar,
+      title: t('dashboard.aiFeatures.dailyStandup'),
+      description: t('dashboard.aiFeatures.dailyStandupDescription'),
+    },
+    {
+      icon: Sparkles,
+      title: t('dashboard.aiFeatures.aiTaskGeneration'),
+      description: t('dashboard.aiFeatures.aiTaskGenerationDescription'),
+    },
+    {
+      icon: Layers,
+      title: t('dashboard.aiFeatures.smartGrouping'),
+      description: t('dashboard.aiFeatures.smartGroupingDescription'),
+    },
+  ]
 
   return (
     <>
@@ -54,11 +56,11 @@ export function AIFeaturesPromo({ userId }: AIFeaturesPromoProps) {
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-lg font-semibold">AI-Powered Features</h3>
-                <Badge className="bg-purple-600 text-white">Premium</Badge>
+                <h3 className="text-lg font-semibold">{t('dashboard.aiFeatures.title')}</h3>
+                <Badge className="bg-purple-600 text-white">{t('premium.premium')}</Badge>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Unlock powerful AI features to boost your productivity
+                {t('dashboard.aiFeatures.description')}
               </p>
             </div>
           </div>
@@ -88,7 +90,7 @@ export function AIFeaturesPromo({ userId }: AIFeaturesPromoProps) {
           className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
         >
           <Sparkles className="w-4 h-4 mr-2" />
-          Upgrade to Premium
+          {t('premium.upgradeToPremium')}
           <ArrowRight className="w-4 h-4 ml-2" />
         </Button>
       </Card>

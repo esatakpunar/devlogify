@@ -1,10 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { getProjects } from '@/lib/supabase/queries/projects'
-import { FolderKanban } from 'lucide-react'
 import { ProjectCard } from '@/components/projects/ProjectCard'
 import { ProjectsFilter } from '@/components/projects/ProjectsFilter'
 import { ProjectsHeader } from '@/components/projects/ProjectsHeader'
-import { EmptyState } from '@/components/ui/EmptyState'
+import { ProjectsEmptyState } from '@/components/projects/ProjectsEmptyState'
 import { Suspense } from 'react'
 import { ProjectsSkeleton } from '@/components/ui/LoadingSkeleton'
 
@@ -22,15 +21,7 @@ async function ProjectsList({ status, userId }: { status: string; userId: string
   )
 
   if (!projects || projects.length === 0) {
-    return (
-      <EmptyState
-        icon={FolderKanban}
-        title={status !== 'all' ? `No ${status} projects yet` : 'No projects yet'}
-        description="Get started by creating your first project to track your work"
-        actionLabel="Create Project"
-        actionHref="/projects/new"
-      />
-    )
+    return null // ProjectsEmptyState will be handled by ProjectsHeader
   }
 
   // Sort projects: pinned first, then by updated_at

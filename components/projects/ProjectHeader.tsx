@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { EditProjectDialog } from './EditProjectDialog'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface ProjectHeaderProps {
   project: {
@@ -33,9 +34,10 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+  const t = useTranslation()
 
   const handleArchive = async () => {
-    if (!confirm('Are you sure you want to archive this project?')) return
+    if (!confirm(t('projects.areYouSureArchiveProject'))) return
 
     setLoading(true)
     try {
@@ -49,7 +51,7 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
   }
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this project? This action cannot be undone and will delete all associated tasks.')) {
+    if (!confirm(t('projects.areYouSureDeleteProjectWithTasks'))) {
       return
     }
 
@@ -76,7 +78,7 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
       <Link href="/projects">
         <Button variant="ghost" size="sm">
           <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Projects
+          {t('projects.backToProjects')}
         </Button>
       </Link>
 
@@ -103,7 +105,7 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
             onClick={() => setEditDialogOpen(true)}
           >
             <Edit className="w-4 h-4 mr-2" />
-            Edit
+            {t('common.edit')}
           </Button>
 
           <DropdownMenu>
@@ -115,16 +117,16 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
                 <Settings className="w-4 h-4 mr-2" />
-                Project Settings
+                {t('projects.projectSettings')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleArchive}>
                 <Archive className="w-4 h-4 mr-2" />
-                Archive Project
+                {t('projects.archiveProject')}
               </DropdownMenuItem>
               <DropdownMenuItem onClick={handleDelete} className="text-red-600">
                 <Trash className="w-4 h-4 mr-2" />
-                Delete Project
+                {t('projects.deleteProject')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

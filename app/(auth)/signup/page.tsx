@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 export default function SignupPage() {
   const [email, setEmail] = useState('')
@@ -17,6 +18,7 @@ export default function SignupPage() {
   const [success, setSuccess] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+  const t = useTranslation()
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -44,19 +46,19 @@ export default function SignupPage() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Check your email</CardTitle>
+          <CardTitle>{t('auth.checkYourEmail')}</CardTitle>
           <CardDescription>
-            We've sent you a confirmation link to {email}
+            {t('auth.confirmationLinkSent', { email })}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-gray-600">
-            Click the link in the email to verify your account and get started.
+            {t('auth.clickLinkToVerify')}
           </p>
         </CardContent>
         <CardFooter>
           <Button onClick={() => router.push('/login')} variant="outline" className="w-full">
-            Back to login
+            {t('auth.backToLogin')}
           </Button>
         </CardFooter>
       </Card>
@@ -66,9 +68,9 @@ export default function SignupPage() {
   return (
     <Card>
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
+        <CardTitle className="text-2xl font-bold">{t('auth.createAccount')}</CardTitle>
         <CardDescription>
-          Enter your email and password to get started
+          {t('auth.enterEmailAndPasswordToGetStarted')}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSignup}>
@@ -79,11 +81,11 @@ export default function SignupPage() {
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('auth.email')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="name@example.com"
+              placeholder={t('auth.emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -91,11 +93,11 @@ export default function SignupPage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t('auth.password')}</Label>
             <Input
               id="password"
               type="password"
-              placeholder="Min. 6 characters"
+              placeholder={t('auth.passwordPlaceholder')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -106,12 +108,12 @@ export default function SignupPage() {
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Creating account...' : 'Sign up'}
+            {loading ? t('auth.creatingAccount') : t('auth.signUp')}
           </Button>
           <p className="text-sm text-center text-gray-600">
-            Already have an account?{' '}
+            {t('auth.alreadyHaveAccount')}{' '}
             <Link href="/login" className="text-blue-600 hover:underline">
-              Sign in
+              {t('auth.signIn')}
             </Link>
           </p>
         </CardFooter>

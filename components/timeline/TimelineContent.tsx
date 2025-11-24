@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ActivityFeed } from './ActivityFeed'
 import { Button } from '@/components/ui/button'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface Activity {
   id: string
@@ -26,13 +27,14 @@ interface TimelineContentProps {
 }
 
 export function TimelineContent({ initialActivities, userId }: TimelineContentProps) {
+  const t = useTranslation()
   const [filter, setFilter] = useState<'all' | 'today' | 'week' | 'month'>('all')
 
   const filters = [
-    { label: 'All', value: 'all' as const },
-    { label: 'Today', value: 'today' as const },
-    { label: 'This Week', value: 'week' as const },
-    { label: 'This Month', value: 'month' as const },
+    { label: t('timeline.all'), value: 'all' as const },
+    { label: t('timeline.today'), value: 'today' as const },
+    { label: t('timeline.thisWeek'), value: 'week' as const },
+    { label: t('timeline.thisMonth'), value: 'month' as const },
   ]
 
   // Filter activities based on selected filter

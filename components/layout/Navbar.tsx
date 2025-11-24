@@ -14,6 +14,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { GlobalTimerIndicator } from '@/components/timer/GlobalTimerIndicator'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface NavbarProps {
   user: {
@@ -24,6 +25,8 @@ interface NavbarProps {
 }
 
 export function Navbar({ user, onMenuClick }: NavbarProps) {
+  const t = useTranslation()
+  
   const getInitials = (email?: string) => {
     if (!email) return 'U'
     return email.charAt(0).toUpperCase()
@@ -47,7 +50,7 @@ export function Navbar({ user, onMenuClick }: NavbarProps) {
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-500" />
           <Input
             type="search"
-            placeholder="Search projects, tasks..."
+            placeholder={t('common.searchPlaceholder')}
             className="pl-8 w-full"
           />
         </div>
@@ -81,19 +84,19 @@ export function Navbar({ user, onMenuClick }: NavbarProps) {
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel>
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium">My Account</p>
+                <p className="text-sm font-medium">{t('common.myAccount')}</p>
                 <p className="text-xs text-gray-500">{user?.email}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <a href="/settings">Settings</a>
+              <a href="/settings">{t('common.settings')}</a>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <form action="/auth/signout" method="post" className="w-full">
                 <button type="submit" className="w-full text-left text-red-600">
-                  Sign out
+                  {t('common.signOut')}
                 </button>
               </form>
             </DropdownMenuItem>

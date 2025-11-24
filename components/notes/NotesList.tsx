@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Plus, Search } from 'lucide-react'
 import { StickyNote } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface Note {
   id: string
@@ -39,6 +40,7 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
   const [notes, setNotes] = useState<Note[]>(initialNotes)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const t = useTranslation()
 
   const filteredNotes = notes.filter(note => {
     const searchLower = searchQuery.toLowerCase()
@@ -71,7 +73,7 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
-            placeholder="Search notes..."
+            placeholder={t('notesList.searchNotes')}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="pl-9"
@@ -79,7 +81,7 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
         </div>
         <Button onClick={() => setIsCreateDialogOpen(true)}>
           <Plus className="w-4 h-4 mr-2" />
-          New Note
+          {t('notes.newNote')}
         </Button>
       </div>
 
@@ -88,15 +90,15 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
         <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg border border-gray-200">
           <StickyNote className="w-12 h-12 text-gray-400 mb-4" />
           <h3 className="text-lg font-medium text-gray-900 mb-2">
-            {searchQuery ? 'No notes found' : 'No notes yet'}
+            {searchQuery ? t('notesList.noNotesFound') : t('notes.noNotes')}
           </h3>
           <p className="text-gray-600 mb-4">
-            {searchQuery ? 'Try a different search query' : 'Start capturing your ideas'}
+            {searchQuery ? t('notesList.tryDifferentSearch') : t('notesList.startCapturingIdeas')}
           </p>
           {!searchQuery && (
             <Button onClick={() => setIsCreateDialogOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
-              Create Note
+              {t('notes.createNote')}
             </Button>
           )}
         </div>
@@ -106,7 +108,7 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
           {pinnedNotes.length > 0 && (
             <div className="space-y-3">
               <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                Pinned
+                {t('notesList.pinned')}
               </h2>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                 {pinnedNotes.map((note) => (
@@ -119,7 +121,7 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
                     onNoteDeleted={handleNoteDeleted}
                     onTasksCreated={() => {
                       // Tasks created - could refresh notes or show notification
-                      toast.success('Tasks created successfully!')
+                      toast.success(t('notesList.tasksCreatedSuccessfully'))
                     }}
                   />
                 ))}
@@ -132,7 +134,7 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
             <div className="space-y-3">
               {pinnedNotes.length > 0 && (
                 <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">
-                  All Notes
+                  {t('notesList.allNotes')}
                 </h2>
               )}
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -146,7 +148,7 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
                     onNoteDeleted={handleNoteDeleted}
                     onTasksCreated={() => {
                       // Tasks created - could refresh notes or show notification
-                      toast.success('Tasks created successfully!')
+                      toast.success(t('notesList.tasksCreatedSuccessfully'))
                     }}
                   />
                 ))}

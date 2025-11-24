@@ -4,8 +4,10 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 export function CTA() {
+  const t = useTranslation()
   return (
     <section className="py-20 px-4">
       <div className="container mx-auto max-w-4xl">
@@ -20,22 +22,21 @@ export function CTA() {
 
           <div className="relative space-y-6">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold">
-              Ready to Start Tracking?
+              {t('landing.readyToStartTracking')}
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-              Join thousands of developers who are already using Devlogify to document
-              their development journey and build better products.
+              {t('landing.joinThousandsOfDevelopers')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button size="lg" asChild className="text-lg px-8 h-12">
                 <Link href="/signup">
-                  Get Started Free
+                  {t('landing.getStartedFree')}
                   <ArrowRight className="ml-2 h-5 w-5" />
                 </Link>
               </Button>
             </div>
             <p className="text-sm text-muted-foreground">
-              No credit card required • Free forever • Start in seconds
+              {t('landing.noCreditCardRequired')}
             </p>
           </div>
         </motion.div>

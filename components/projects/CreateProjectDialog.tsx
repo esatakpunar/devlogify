@@ -27,6 +27,7 @@ import {
 import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 const COLORS = [
   '#6366f1', // Indigo
@@ -63,6 +64,7 @@ export function CreateProjectDialog({
   const router = useRouter()
   const supabase = createClient()
   const { isPremium, loading: premiumLoading } = usePremium(userId)
+  const t = useTranslation()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -92,7 +94,7 @@ export function CreateProjectDialog({
       // Activity log ekle
       await logProjectCreated(userId, newProject.id, title)
 
-      toast.success('Project created successfully!')
+      toast.success(t('projects.projectCreatedSuccessfully'))
       
       // Reset form
       setTitle('')
@@ -110,7 +112,7 @@ export function CreateProjectDialog({
       router.refresh()
     } catch (err: any) {
       setError(err.message)
-      toast.error('Failed to create project')
+      toast.error(t('projects.failedToCreateProject'))
       setLoading(false)
     }
   }
@@ -132,9 +134,9 @@ export function CreateProjectDialog({
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-[500px]">
           <DialogHeader>
-            <DialogTitle>Create New Project</DialogTitle>
+            <DialogTitle>{t('projects.createNewProject')}</DialogTitle>
             <DialogDescription>
-              Start a new project to organize and track your work
+              {t('projects.startNewProject')}
             </DialogDescription>
           </DialogHeader>
 
@@ -147,7 +149,7 @@ export function CreateProjectDialog({
 
           <div className="space-y-2">
             <Label htmlFor="title">
-              Project Name <span className="text-red-500">*</span>
+              {t('projects.projectName')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="title"
@@ -160,10 +162,10 @@ export function CreateProjectDialog({
           </div>
 
           <div className="space-y-2 min-w-0">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('projects.description')}</Label>
             <Textarea
               id="description"
-              placeholder="What is this project about?"
+              placeholder={t('projects.whatIsThisProjectAbout')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               disabled={loading}
@@ -172,7 +174,7 @@ export function CreateProjectDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="status">Status</Label>
+            <Label htmlFor="status">{t('projects.status')}</Label>
             <Select 
               value={status} 
               onValueChange={(value: 'active' | 'archived' | 'completed') => setStatus(value)}
@@ -182,18 +184,18 @@ export function CreateProjectDialog({
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="archived">Archived</SelectItem>
+                <SelectItem value="active">{t('common.active')}</SelectItem>
+                <SelectItem value="completed">{t('common.completed')}</SelectItem>
+                <SelectItem value="archived">{t('common.archived')}</SelectItem>
               </SelectContent>
             </Select>
             <p className="text-xs text-gray-500">
-              You can change this later from the project settings
+              {t('projects.youCanChangeThisLater')}
             </p>
           </div>
 
           <div className="space-y-2">
-            <Label>Project Color</Label>
+            <Label>{t('projects.projectColor')}</Label>
             <div className="flex gap-2 flex-wrap">
               {COLORS.map((c) => (
                 <button
@@ -215,7 +217,7 @@ export function CreateProjectDialog({
           <div className="flex gap-3 pt-4">
             <Button type="submit" disabled={loading} className="flex-1">
               <Plus className="w-4 h-4 mr-2" />
-              {loading ? 'Creating...' : 'Create Project'}
+              {loading ? t('projects.creating') : t('projects.createProject')}
             </Button>
             <Button 
               type="button" 
@@ -223,7 +225,7 @@ export function CreateProjectDialog({
               onClick={() => handleOpenChange(false)}
               disabled={loading}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
           </div>
         </form>

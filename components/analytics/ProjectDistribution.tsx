@@ -1,6 +1,7 @@
 'use client'
 
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from 'recharts'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface ProjectDistributionProps {
   data: Array<{
@@ -11,10 +12,12 @@ interface ProjectDistributionProps {
 }
 
 export function ProjectDistribution({ data }: ProjectDistributionProps) {
+  const t = useTranslation()
+  
   if (data.length === 0) {
     return (
       <div className="bg-white rounded-lg border border-gray-200 p-6 flex items-center justify-center h-[368px]">
-        <p className="text-gray-500">No project data yet</p>
+        <p className="text-gray-500">{t('analytics.noProjectDataYet')}</p>
       </div>
     )
   }
@@ -27,7 +30,7 @@ export function ProjectDistribution({ data }: ProjectDistributionProps) {
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold mb-4">Time by Project</h3>
+      <h3 className="text-lg font-semibold mb-4">{t('analytics.timeByProject')}</h3>
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie

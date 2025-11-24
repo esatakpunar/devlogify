@@ -11,6 +11,7 @@ import {
   StickyNote,
   ArrowRight
 } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface Activity {
   id: string
@@ -51,6 +52,7 @@ const activityColors = {
 }
 
 export function ActivityItem({ activity }: ActivityItemProps) {
+  const t = useTranslation()
   const Icon = activityIcons[activity.action_type as keyof typeof activityIcons] || Clock
   const colorClass = activityColors[activity.action_type as keyof typeof activityColors] || 'bg-gray-50 text-gray-600'
 
@@ -59,7 +61,7 @@ export function ActivityItem({ activity }: ActivityItemProps) {
       case 'task_created':
         return (
           <>
-            Created task{' '}
+            {t('timeline.createdTask')}{' '}
             {activity.task && activity.project ? (
               <Link 
                 href={`/projects/${activity.project.id}`}
@@ -75,17 +77,17 @@ export function ActivityItem({ activity }: ActivityItemProps) {
       case 'task_completed':
         return (
           <>
-            Completed task{' '}
+            {t('timeline.completedTask')}{' '}
             <span className="font-medium">{activity.task?.title}</span>
           </>
         )
       case 'task_status_changed':
         return (
           <>
-            Moved{' '}
+            {t('timeline.moved')}{' '}
             <span className="font-medium">{activity.task?.title}</span>
-            {' '}to{' '}
-            <span className="font-medium">{activity.metadata?.new_status || 'unknown'}</span>
+            {' '}{t('timeline.to')}{' '}
+            <span className="font-medium">{activity.metadata?.new_status || t('timeline.unknown')}</span>
           </>
         )
       case 'time_logged':
@@ -94,13 +96,13 @@ export function ActivityItem({ activity }: ActivityItemProps) {
         const mins = minutes % 60
         return (
           <>
-            Logged{' '}
+            {t('timeline.logged')}{' '}
             <span className="font-medium">
               {hours > 0 ? `${hours}h ${mins}m` : `${mins}m`}
             </span>
             {activity.task && (
               <>
-                {' '}on{' '}
+                {' '}{t('timeline.on')}{' '}
                 <span className="font-medium">{activity.task.title}</span>
               </>
             )}
@@ -109,7 +111,7 @@ export function ActivityItem({ activity }: ActivityItemProps) {
       case 'project_created':
         return (
           <>
-            Created project{' '}
+            {t('timeline.createdProject')}{' '}
             {activity.project ? (
               <Link 
                 href={`/projects/${activity.project.id}`}
@@ -118,14 +120,14 @@ export function ActivityItem({ activity }: ActivityItemProps) {
                 {activity.project.title}
               </Link>
             ) : (
-              <span className="font-medium">Unknown</span>
+              <span className="font-medium">{t('timeline.unknown')}</span>
             )}
           </>
         )
       case 'note_created':
-        return <>Created a new note</>
+        return <>{t('timeline.createdNewNote')}</>
       default:
-        return <>Performed an action</>
+        return <>{t('timeline.performedAction')}</>
     }
   }
 

@@ -35,6 +35,7 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Save, Trash } from 'lucide-react'
 import { toast } from 'sonner'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 const COLORS = [
   '#6366f1', // Indigo
@@ -78,6 +79,7 @@ export function EditProjectDialog({
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+  const t = useTranslation()
 
   // Update form when project changes
   useEffect(() => {
@@ -116,7 +118,7 @@ export function EditProjectDialog({
         }
       )
 
-      toast.success('Project updated successfully!')
+      toast.success(t('projects.projectUpdatedSuccessfully'))
       
       // Close dialog
       onOpenChange(false)
@@ -128,7 +130,7 @@ export function EditProjectDialog({
       router.refresh()
     } catch (err: any) {
       setError(err.message)
-      toast.error('Failed to update project')
+      toast.error(t('projects.failedToUpdateProject'))
       setLoading(false)
     }
   }
@@ -143,7 +145,7 @@ export function EditProjectDialog({
 
       await deleteProject(project.id)
 
-      toast.success('Project deleted successfully')
+      toast.success(t('projects.projectDeletedSuccessfully'))
       
       // Close dialogs
       setShowDeleteDialog(false)
@@ -157,7 +159,7 @@ export function EditProjectDialog({
       router.refresh()
     } catch (err: any) {
       setError(err.message)
-      toast.error('Failed to delete project')
+      toast.error(t('projects.failedToDeleteProject'))
       setLoading(false)
     }
   }
@@ -179,9 +181,9 @@ export function EditProjectDialog({
       <Dialog open={open} onOpenChange={handleOpenChange}>
         <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Edit Project</DialogTitle>
+            <DialogTitle>{t('projects.editProject')}</DialogTitle>
             <DialogDescription>
-              Update your project details
+              {t('projects.updateProjectDetails')}
             </DialogDescription>
           </DialogHeader>
 
@@ -194,7 +196,7 @@ export function EditProjectDialog({
 
             <div className="space-y-2">
               <Label htmlFor="edit-title">
-                Project Name <span className="text-red-500">*</span>
+                {t('projects.projectName')} <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="edit-title"
@@ -207,10 +209,10 @@ export function EditProjectDialog({
             </div>
 
             <div className="space-y-2 min-w-0">
-              <Label htmlFor="edit-description">Description</Label>
+              <Label htmlFor="edit-description">{t('projects.description')}</Label>
               <Textarea
                 id="edit-description"
-                placeholder="What is this project about?"
+                placeholder={t('projects.whatIsThisProjectAbout')}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 disabled={loading}
@@ -219,7 +221,7 @@ export function EditProjectDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="edit-status">Status</Label>
+              <Label htmlFor="edit-status">{t('projects.status')}</Label>
               <Select 
                 value={status} 
                 onValueChange={(value: 'active' | 'archived' | 'completed') => setStatus(value)}
@@ -229,18 +231,18 @@ export function EditProjectDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="active">Active</SelectItem>
-                  <SelectItem value="completed">Completed</SelectItem>
-                  <SelectItem value="archived">Archived</SelectItem>
+                  <SelectItem value="active">{t('common.active')}</SelectItem>
+                  <SelectItem value="completed">{t('common.completed')}</SelectItem>
+                  <SelectItem value="archived">{t('common.archived')}</SelectItem>
                 </SelectContent>
               </Select>
               <p className="text-xs text-gray-500">
-                Archived projects won't show in your active projects list
+                {t('projects.archivedProjectsWontShow')}
               </p>
             </div>
 
             <div className="space-y-2">
-              <Label>Project Color</Label>
+              <Label>{t('projects.projectColor')}</Label>
               <div className="flex gap-2 flex-wrap">
                 {COLORS.map((c) => (
                   <button
@@ -262,7 +264,7 @@ export function EditProjectDialog({
             <div className="flex gap-3 pt-4">
               <Button type="submit" disabled={loading} className="flex-1">
                 <Save className="w-4 h-4 mr-2" />
-                {loading ? 'Saving...' : 'Save Changes'}
+                {loading ? t('projects.saving') : t('projects.saveChanges')}
               </Button>
               <Button 
                 type="button" 
@@ -270,7 +272,7 @@ export function EditProjectDialog({
                 onClick={() => handleOpenChange(false)}
                 disabled={loading}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
             </div>
           </form>
@@ -278,9 +280,9 @@ export function EditProjectDialog({
           {/* Danger Zone */}
           <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
             <div className="space-y-2">
-              <Label className="text-red-600 dark:text-red-400">Danger Zone</Label>
+              <Label className="text-red-600 dark:text-red-400">{t('projects.dangerZone')}</Label>
               <p className="text-xs text-gray-500">
-                Irreversible and destructive actions
+                {t('projects.irreversibleActions')}
               </p>
               <Button 
                 type="button" 
@@ -290,7 +292,7 @@ export function EditProjectDialog({
                 className="w-full"
               >
                 <Trash className="w-4 h-4 mr-2" />
-                Delete Project
+                {t('projects.deleteProject')}
               </Button>
             </div>
           </div>
@@ -300,20 +302,19 @@ export function EditProjectDialog({
       <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogTitle>{t('projects.areYouSureDeleteProject')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the project
-              and all associated tasks.
+              {t('projects.deleteProjectDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={loading}>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
               disabled={loading}
               className="bg-red-600 hover:bg-red-700"
             >
-              {loading ? 'Deleting...' : 'Delete'}
+              {loading ? t('projects.deleting') : t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

@@ -6,42 +6,44 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { usePremium } from '@/lib/hooks/usePremium'
 import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface PremiumSettingsProps {
   userId: string
 }
 
-const aiFeatures = [
-  {
-    icon: Brain,
-    title: 'AI Task Suggestions',
-    description: 'Get intelligent task recommendations based on your work patterns and project history',
-  },
-  {
-    icon: Calendar,
-    title: 'Daily Standup Summary',
-    description: 'Automated daily standup summaries with insights, priorities, and time estimates',
-  },
-  {
-    icon: Sparkles,
-    title: 'AI Task Generation',
-    description: 'Generate tasks from notes and descriptions using advanced AI',
-  },
-  {
-    icon: Layers,
-    title: 'Smart Task Grouping',
-    description: 'Automatically group and organize tasks with AI assistance',
-  },
-  {
-    icon: Zap,
-    title: 'AI Tag Suggestions',
-    description: 'Get smart tag recommendations for better task organization',
-  },
-]
-
 export function PremiumSettings({ userId }: PremiumSettingsProps) {
   const { isPremium, loading } = usePremium(userId)
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
+  const t = useTranslation()
+
+  const aiFeatures = [
+    {
+      icon: Brain,
+      title: t('premium.aiTaskSuggestions'),
+      description: t('premium.aiTaskSuggestionsDescription'),
+    },
+    {
+      icon: Calendar,
+      title: t('premium.dailyStandupSummary'),
+      description: t('premium.dailyStandupSummaryDescription'),
+    },
+    {
+      icon: Sparkles,
+      title: t('premium.aiTaskGeneration'),
+      description: t('premium.aiTaskGenerationDescription'),
+    },
+    {
+      icon: Layers,
+      title: t('premium.smartTaskGrouping'),
+      description: t('premium.smartTaskGroupingDescription'),
+    },
+    {
+      icon: Zap,
+      title: t('premium.aiTagSuggestions'),
+      description: t('premium.aiTagSuggestionsDescription'),
+    },
+  ]
 
   if (loading) {
     return (
@@ -61,11 +63,11 @@ export function PremiumSettings({ userId }: PremiumSettingsProps) {
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-xl font-semibold">Premium Active</h3>
-                <Badge className="bg-purple-600 text-white">Active</Badge>
+                <h3 className="text-xl font-semibold">{t('premium.premiumActive')}</h3>
+                <Badge className="bg-purple-600 text-white">{t('premium.active')}</Badge>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                You have access to all premium AI features
+                {t('premium.accessToAllPremiumFeatures')}
               </p>
             </div>
           </div>
@@ -106,11 +108,11 @@ export function PremiumSettings({ userId }: PremiumSettingsProps) {
             </div>
             <div>
               <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-xl font-semibold">Premium Features</h3>
-                <Badge className="bg-gray-600 text-white">Upgrade Required</Badge>
+                <h3 className="text-xl font-semibold">{t('premium.premiumFeatures')}</h3>
+                <Badge className="bg-gray-600 text-white">{t('premium.upgradeRequired')}</Badge>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
-                Unlock powerful AI features to boost your productivity
+                {t('premium.unlockPowerfulAIFeatures')}
               </p>
             </div>
           </div>
@@ -135,27 +137,27 @@ export function PremiumSettings({ userId }: PremiumSettingsProps) {
           </div>
 
           <div className="bg-white/80 dark:bg-gray-900/80 rounded-lg p-4 border border-purple-200 dark:border-purple-800 mb-4">
-            <h4 className="font-semibold text-sm mb-2">What you get with Premium:</h4>
+            <h4 className="font-semibold text-sm mb-2">{t('premium.whatYouGetWithPremium')}</h4>
             <ul className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-purple-600" />
-                All AI-powered features unlocked
+                {t('premium.allAIPoweredFeaturesUnlocked')}
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-purple-600" />
-                Unlimited AI task suggestions
+                {t('premium.unlimitedAITaskSuggestions')}
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-purple-600" />
-                Daily standup summaries
+                {t('premium.dailyStandupSummaries')}
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-purple-600" />
-                Smart task grouping and organization
+                {t('premium.smartTaskGroupingAndOrganization')}
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-purple-600" />
-                Priority support
+                {t('premium.prioritySupport')}
               </li>
             </ul>
           </div>
@@ -165,7 +167,7 @@ export function PremiumSettings({ userId }: PremiumSettingsProps) {
             className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
           >
             <Sparkles className="w-4 h-4 mr-2" />
-            Upgrade to Premium
+            {t('premium.upgradeToPremium')}
           </Button>
         </div>
       </div>

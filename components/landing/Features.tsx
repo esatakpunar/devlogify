@@ -9,41 +9,43 @@ import {
   Users,
   Zap
 } from 'lucide-react'
-
-const features = [
-  {
-    icon: BookOpen,
-    title: 'Development Logs',
-    description: 'Document your development journey with rich text notes and code snippets.',
-  },
-  {
-    icon: Kanban,
-    title: 'Kanban Boards',
-    description: 'Organize tasks with intuitive drag-and-drop boards and custom workflows.',
-  },
-  {
-    icon: LineChart,
-    title: 'Analytics & Insights',
-    description: 'Track your productivity and progress with detailed analytics and reports.',
-  },
-  {
-    icon: Timer,
-    title: 'Timeline View',
-    description: 'Visualize your project timeline and milestones in a beautiful interface.',
-  },
-  {
-    icon: Users,
-    title: 'Team Collaboration',
-    description: 'Work together with your team seamlessly with shared projects and real-time updates.',
-  },
-  {
-    icon: Zap,
-    title: 'Lightning Fast',
-    description: 'Built with modern tech stack for exceptional performance and reliability.',
-  },
-]
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 export function Features() {
+  const t = useTranslation()
+  
+  const features = [
+    {
+      icon: BookOpen,
+      title: t('landing.features.developmentLogs'),
+      description: t('landing.features.developmentLogsDescription'),
+    },
+    {
+      icon: Kanban,
+      title: t('landing.features.kanbanBoards'),
+      description: t('landing.features.kanbanBoardsDescription'),
+    },
+    {
+      icon: LineChart,
+      title: t('landing.features.analyticsInsights'),
+      description: t('landing.features.analyticsInsightsDescription'),
+    },
+    {
+      icon: Timer,
+      title: t('landing.features.timelineView'),
+      description: t('landing.features.timelineViewDescription'),
+    },
+    {
+      icon: Users,
+      title: t('landing.features.teamCollaboration'),
+      description: t('landing.features.teamCollaborationDescription'),
+    },
+    {
+      icon: Zap,
+      title: t('landing.features.lightningFast'),
+      description: t('landing.features.lightningFastDescription'),
+    },
+  ]
   return (
     <section id="features" className="py-20 px-4">
       <div className="container mx-auto max-w-6xl">
@@ -55,10 +57,10 @@ export function Features() {
           className="text-center space-y-4 mb-16"
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold">
-            Everything You Need to Succeed
+            {t('landing.everythingYouNeedToSucceed')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Powerful features designed to help developers track, manage, and showcase their work.
+            {t('landing.featuresDescription')}
           </p>
         </motion.div>
 

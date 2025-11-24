@@ -11,6 +11,7 @@ export type Database = {
           theme: 'light' | 'dark' | 'system'
           notifications_enabled: boolean
           week_starts_on: 'monday' | 'sunday'
+          language: 'tr' | 'en' | 'de' | 'es'
           is_premium: boolean
           created_at: string
           updated_at: string
@@ -24,6 +25,7 @@ export type Database = {
           theme?: 'light' | 'dark' | 'system'
           notifications_enabled?: boolean
           week_starts_on?: 'monday' | 'sunday'
+          language?: 'tr' | 'en' | 'de' | 'es'
           is_premium?: boolean
           created_at?: string
           updated_at?: string
@@ -37,6 +39,7 @@ export type Database = {
           theme?: 'light' | 'dark' | 'system'
           notifications_enabled?: boolean
           week_starts_on?: 'monday' | 'sunday'
+          language?: 'tr' | 'en' | 'de' | 'es'
           is_premium?: boolean
           created_at?: string
           updated_at?: string

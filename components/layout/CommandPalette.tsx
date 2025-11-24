@@ -78,7 +78,7 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
       } else if (type === 'note') {
         router.push('/notes')
       } else if (type === 'project') {
-        router.push('/projects/new')
+        router.push('/projects')
       } else if (type === 'ai-task') {
         // Open AI Create Tasks Dialog or Upgrade Dialog
         onOpenChange(false) // Close command palette first

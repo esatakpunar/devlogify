@@ -9,6 +9,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Sparkles, Check, Zap, Brain, Calendar, Layers } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface UpgradeDialogProps {
   open: boolean
@@ -16,35 +17,36 @@ interface UpgradeDialogProps {
   feature?: string
 }
 
-const aiFeatures = [
-  {
-    icon: Brain,
-    title: 'AI Task Suggestions',
-    description: 'Get intelligent task recommendations based on your work patterns',
-  },
-  {
-    icon: Calendar,
-    title: 'Daily Standup Summary',
-    description: 'Automated daily standup summaries with insights and priorities',
-  },
-  {
-    icon: Sparkles,
-    title: 'AI Task Generation',
-    description: 'Generate tasks from notes and descriptions using AI',
-  },
-  {
-    icon: Layers,
-    title: 'Smart Task Grouping',
-    description: 'Automatically group and organize tasks with AI assistance',
-  },
-  {
-    icon: Zap,
-    title: 'AI Tag Suggestions',
-    description: 'Get smart tag recommendations for better task organization',
-  },
-]
-
 export function UpgradeDialog({ open, onOpenChange, feature }: UpgradeDialogProps) {
+  const t = useTranslation()
+  
+  const aiFeatures = [
+    {
+      icon: Brain,
+      title: t('premium.aiTaskSuggestions'),
+      description: t('premium.aiTaskSuggestionsDescription'),
+    },
+    {
+      icon: Calendar,
+      title: t('premium.dailyStandupSummary'),
+      description: t('premium.dailyStandupSummaryDescription'),
+    },
+    {
+      icon: Sparkles,
+      title: t('premium.aiTaskGeneration'),
+      description: t('premium.aiTaskGenerationDescription'),
+    },
+    {
+      icon: Layers,
+      title: t('premium.smartTaskGrouping'),
+      description: t('premium.smartTaskGroupingDescription'),
+    },
+    {
+      icon: Zap,
+      title: t('premium.aiTagSuggestions'),
+      description: t('premium.aiTagSuggestionsDescription'),
+    },
+  ]
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-2xl">
@@ -55,12 +57,12 @@ export function UpgradeDialog({ open, onOpenChange, feature }: UpgradeDialogProp
             </div>
             <div>
             <DialogTitle className="text-2xl">
-              {feature === 'Unlimited Projects' ? 'Upgrade to Premium' : 'Unlock AI Features'}
+              {feature === 'Unlimited Projects' ? t('premium.upgradeToPremium') : t('premium.unlockAIFeatures')}
             </DialogTitle>
             <DialogDescription className="text-base mt-1">
               {feature === 'Unlimited Projects' 
-                ? 'Upgrade to Premium to create unlimited projects and access all features'
-                : 'Upgrade to Premium to access powerful AI-powered features'}
+                ? t('premium.upgradeToPremiumForUnlimitedProjects')
+                : t('premium.unlockPowerfulAIFeatures')}
             </DialogDescription>
             </div>
           </div>
@@ -72,11 +74,11 @@ export function UpgradeDialog({ open, onOpenChange, feature }: UpgradeDialogProp
               <p className="text-sm font-medium text-purple-900 dark:text-purple-200">
                 {feature === 'Unlimited Projects' ? (
                   <>
-                    🔒 Free plan is limited to <span className="font-semibold">3 projects</span>. Upgrade to Premium for <span className="font-semibold">unlimited projects</span>.
+                    🔒 {t('premium.freePlanLimitedTo3Projects')} <span className="font-semibold">{t('premium.upgradeForUnlimitedProjects')}</span>.
                   </>
                 ) : (
                   <>
-                    🔒 This feature requires Premium: <span className="font-semibold">{feature}</span>
+                    🔒 {t('premium.thisFeatureRequiresPremium')}: <span className="font-semibold">{feature}</span>
                   </>
                 )}
               </p>
@@ -84,7 +86,7 @@ export function UpgradeDialog({ open, onOpenChange, feature }: UpgradeDialogProp
           )}
 
           <div>
-            <h3 className="text-lg font-semibold mb-4">Premium AI Features</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('premium.premiumAIFeatures')}</h3>
             <div className="grid gap-4 sm:grid-cols-2">
               {aiFeatures.map((feature, index) => (
                 <div
@@ -109,14 +111,14 @@ export function UpgradeDialog({ open, onOpenChange, feature }: UpgradeDialogProp
             <div className="flex items-start gap-2 mb-3">
               <Check className="w-5 h-5 text-purple-600 dark:text-purple-400 flex-shrink-0 mt-0.5" />
               <div>
-                <h4 className="font-semibold text-sm mb-1">What you get with Premium:</h4>
+                <h4 className="font-semibold text-sm mb-1">{t('premium.whatYouGetWithPremium')}</h4>
                 <ul className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
-                  <li>• Unlimited projects</li>
-                  <li>• All AI-powered features unlocked</li>
-                  <li>• Unlimited AI task suggestions</li>
-                  <li>• Daily standup summaries</li>
-                  <li>• Smart task grouping and organization</li>
-                  <li>• Priority support</li>
+                  <li>• {t('premium.unlimitedProjects')}</li>
+                  <li>• {t('premium.allAIPoweredFeaturesUnlocked')}</li>
+                  <li>• {t('premium.unlimitedAITaskSuggestions')}</li>
+                  <li>• {t('premium.dailyStandupSummaries')}</li>
+                  <li>• {t('premium.smartTaskGroupingAndOrganization')}</li>
+                  <li>• {t('premium.prioritySupport')}</li>
                 </ul>
               </div>
             </div>
@@ -128,16 +130,16 @@ export function UpgradeDialog({ open, onOpenChange, feature }: UpgradeDialogProp
               onClick={() => onOpenChange(false)}
               className="flex-1"
             >
-              Maybe Later
+              {t('premium.maybeLater')}
             </Button>
             <Button
               onClick={() => {
-                window.location.href = 'mailto:esatakpunar@gmail.com?subject=Premium Upgrade Request&body=Hello, I would like to upgrade to Premium to access AI features.'
+                window.location.href = `mailto:esatakpunar@gmail.com?subject=${encodeURIComponent(t('premium.upgradeRequestSubject'))}&body=${encodeURIComponent(t('premium.upgradeRequestBody'))}`
               }}
               className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
             >
               <Sparkles className="w-4 h-4 mr-2" />
-              Upgrade to Premium
+              {t('premium.upgradeToPremium')}
             </Button>
           </div>
         </div>

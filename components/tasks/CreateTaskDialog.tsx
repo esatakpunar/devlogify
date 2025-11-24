@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/select'
 import { FileText, X } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface CreateTaskDialogProps {
   open: boolean
@@ -51,6 +52,7 @@ export function CreateTaskDialog({
   const [templates, setTemplates] = useState<TaskTemplate[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<TaskTemplate | null>(null)
   const [showTemplates, setShowTemplates] = useState(false)
+  const t = useTranslation()
 
   // Load templates when dialog opens
   useEffect(() => {
@@ -140,9 +142,9 @@ export function CreateTaskDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Create New Task</DialogTitle>
+          <DialogTitle>{t('tasks.createNewTask')}</DialogTitle>
           <DialogDescription>
-            Add a new task to your project
+            {t('tasks.addNewTaskToProject')}
           </DialogDescription>
         </DialogHeader>
 
@@ -157,7 +159,7 @@ export function CreateTaskDialog({
           {templates.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label>Quick Start from Template</Label>
+                <Label>{t('tasks.quickStartFromTemplate')}</Label>
                 {!showTemplates && (
                   <Button
                     type="button"
@@ -166,7 +168,7 @@ export function CreateTaskDialog({
                     onClick={() => setShowTemplates(true)}
                   >
                     <FileText className="w-4 h-4 mr-1" />
-                    Browse Templates
+                    {t('tasks.browseTemplates')}
                   </Button>
                 )}
               </div>
@@ -174,7 +176,7 @@ export function CreateTaskDialog({
               {showTemplates && (
                 <div className="space-y-2 max-h-48 overflow-y-auto border rounded-lg p-2">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">Select a template</span>
+                    <span className="text-sm font-medium">{t('tasks.selectATemplate')}</span>
                     <Button
                       type="button"
                       variant="ghost"
@@ -220,7 +222,7 @@ export function CreateTaskDialog({
                 <div className="flex items-center gap-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                   <FileText className="w-4 h-4 text-blue-600" />
                   <span className="text-sm flex-1">
-                    Using template: <strong>{selectedTemplate.title}</strong>
+                    {t('tasks.usingTemplate')} <strong>{selectedTemplate.title}</strong>
                   </span>
                   <Button
                     type="button"
@@ -237,11 +239,11 @@ export function CreateTaskDialog({
 
           <div className="space-y-2">
             <Label htmlFor="task-title">
-              Task Title <span className="text-red-500">*</span>
+              {t('tasks.taskTitle')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="task-title"
-              placeholder="What needs to be done?"
+              placeholder={t('tasks.whatNeedsToBeDone')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -250,10 +252,10 @@ export function CreateTaskDialog({
           </div>
 
           <div className="space-y-2 min-w-0">
-            <Label htmlFor="task-description">Description</Label>
+            <Label htmlFor="task-description">{t('projects.description')}</Label>
             <Textarea
               id="task-description"
-              placeholder="Add more details..."
+              placeholder={t('tasks.addMoreDetails')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               disabled={loading}
@@ -263,7 +265,7 @@ export function CreateTaskDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="task-priority">Priority</Label>
+              <Label htmlFor="task-priority">{t('tasks.priority')}</Label>
               <Select 
                 value={priority} 
                 onValueChange={(value: 'low' | 'medium' | 'high') => setPriority(value)}
@@ -273,15 +275,15 @@ export function CreateTaskDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="low">{t('common.low')}</SelectItem>
+                  <SelectItem value="medium">{t('common.medium')}</SelectItem>
+                  <SelectItem value="high">{t('common.high')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="task-duration">Estimated Time (min)</Label>
+              <Label htmlFor="task-duration">{t('tasks.estimatedTime')}</Label>
               <Input
                 id="task-duration"
                 type="number"
@@ -294,20 +296,20 @@ export function CreateTaskDialog({
           </div>
 
           <div className="space-y-2 min-w-0">
-            <Label htmlFor="task-tags">Tags (optional)</Label>
+            <Label htmlFor="task-tags">{t('tasks.tags')}</Label>
             <Input
               id="task-tags"
-              placeholder="api, frontend, bug (separate with commas)"
+              placeholder={t('tasks.tagsPlaceholder')}
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               disabled={loading}
             />
-            <p className="text-xs text-gray-500">Separate tags with commas</p>
+            <p className="text-xs text-gray-500">{t('tasks.separateTagsWithCommas')}</p>
           </div>
 
           <div className="flex gap-3 pt-4">
             <Button type="submit" disabled={loading} className="flex-1">
-              {loading ? 'Creating...' : 'Create Task'}
+              {loading ? t('tasks.creatingTask') : t('tasks.createTask')}
             </Button>
             <Button 
               type="button" 
@@ -315,7 +317,7 @@ export function CreateTaskDialog({
               onClick={() => onOpenChange(false)}
               disabled={loading}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
           </div>
         </form>

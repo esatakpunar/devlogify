@@ -9,6 +9,8 @@ import { MobileSidebar } from '@/components/layout/MobileSidebar'
 import { CommandPalette } from '@/components/layout/CommandPalette'
 import { ShortcutsHelp } from '@/components/ui/ShortcutsHelp'
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts'
+import { LanguageProvider } from '@/components/providers/LanguageProvider'
+import { LanguageHtml } from '@/components/providers/LanguageHtml'
 import { Toaster } from 'sonner'
 
 export function DashboardLayout({
@@ -53,7 +55,7 @@ export function DashboardLayout({
       router.push('/notes')
     },
     onCreateProject: () => {
-      router.push('/projects/new')
+      router.push('/projects')
     },
     onShowShortcuts: () => {
       setShortcutsHelpOpen(true)
@@ -64,9 +66,14 @@ export function DashboardLayout({
     userId: user?.id,
   })
 
-  // Auth sayfaları ve landing page için sadece children'ı render et
+  // Auth sayfaları ve landing page için LanguageProvider ile birlikte render et
   if (isAuthPage || isLandingPage) {
-    return <>{children}</>
+    return (
+      <LanguageProvider userId={undefined}>
+        <LanguageHtml />
+        {children}
+      </LanguageProvider>
+    )
   }
 
   if (!user) {
@@ -78,7 +85,8 @@ export function DashboardLayout({
   }
 
   return (
-    <>
+    <LanguageProvider userId={user?.id}>
+      <LanguageHtml />
       <div className="flex h-screen overflow-hidden bg-gray-50">
         {/* Desktop Sidebar */}
         <div className="hidden md:flex">
@@ -112,6 +120,6 @@ export function DashboardLayout({
         open={shortcutsHelpOpen}
         onOpenChange={setShortcutsHelpOpen}
       />
-    </>
+    </LanguageProvider>
   )
 }

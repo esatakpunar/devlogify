@@ -11,13 +11,14 @@ import {
   Settings
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'Projects', href: '/projects', icon: FolderKanban },
-  { name: 'Timeline', href: '/timeline', icon: Clock },
-  { name: 'Analytics', href: '/analytics', icon: BarChart3 },
-  { name: 'Notes', href: '/notes', icon: StickyNote },
+  { key: 'dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { key: 'projects', href: '/projects', icon: FolderKanban },
+  { key: 'timeline', href: '/timeline', icon: Clock },
+  { key: 'analytics', href: '/analytics', icon: BarChart3 },
+  { key: 'notes', href: '/notes', icon: StickyNote },
 ]
 
 interface SidebarProps {
@@ -26,6 +27,7 @@ interface SidebarProps {
 
 export function Sidebar({ onLinkClick }: SidebarProps = {}) {
   const pathname = usePathname()
+  const t = useTranslation()
 
   return (
     <div className="flex h-full w-64 flex-col bg-white border-r border-gray-200">
@@ -46,7 +48,7 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
           
           return (
             <Link
-              key={item.name}
+              key={item.key}
               href={item.href}
               onClick={onLinkClick}
               className={cn(
@@ -57,7 +59,7 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
               )}
             >
               <item.icon className="w-5 h-5" />
-              <span>{item.name}</span>
+              <span>{t(`nav.${item.key}`)}</span>
             </Link>
           )
         })}
@@ -71,7 +73,7 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
           className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors"
         >
           <Settings className="w-5 h-5" />
-          <span>Settings</span>
+          <span>{t('common.settings')}</span>
         </Link>
       </div>
     </div>

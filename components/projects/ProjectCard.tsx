@@ -19,6 +19,7 @@ import {
 import { formatDistanceToNow } from 'date-fns'
 import { AnimatedCard } from '@/components/ui/AnimatedCard'
 import { EditProjectDialog } from './EditProjectDialog'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface ProjectCardProps {
   project: {
@@ -41,13 +42,14 @@ export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+  const t = useTranslation()
 
   const taskCount = project.tasks?.[0]?.count ?? 0
   const isPinned = project.is_pinned || false
 
   const handleArchive = async (e: React.MouseEvent) => {
     e.preventDefault()
-    if (!confirm('Are you sure you want to archive this project?')) return
+    if (!confirm(t('projects.areYouSureArchiveProject'))) return
 
     setLoading(true)
     try {
@@ -62,7 +64,7 @@ export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault()
-    if (!confirm('Are you sure you want to delete this project? All tasks will be deleted.')) return
+    if (!confirm(t('projects.areYouSureDeleteProjectWithTasks'))) return
 
     setLoading(true)
     try {
@@ -88,10 +90,10 @@ export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
     setPinLoading(true)
     try {
       await toggleProjectPin(project.id)
-      toast.success(isPinned ? 'Project unpinned' : 'Project pinned')
+      toast.success(isPinned ? t('projects.projectUnpinned') : t('projects.projectPinned'))
       router.refresh()
     } catch (error) {
-      toast.error('Failed to update pin status')
+      toast.error(t('projects.failedToUpdatePinStatus'))
       console.error('Pin toggle error:', error)
     } finally {
       setPinLoading(false)
@@ -125,7 +127,7 @@ export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
                 onClick={handlePinToggle}
                 disabled={pinLoading}
                 className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-all hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer"
-                title={isPinned ? "Unpin project" : "Pin project"}
+                title={isPinned ? t('projects.unpinProject') : t('projects.pinProject')}
               >
                 {isPinned ? (
                   <PinOff className="h-4 w-4 text-blue-600 dark:text-blue-400" />
@@ -153,19 +155,19 @@ export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
                   }
                 }}>
                   <Edit className="w-4 h-4 mr-2" />
-                  Edit
+                  {t('common.edit')}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleArchive}>
                   <Archive className="w-4 h-4 mr-2" />
-                  Archive
+                  {t('projects.archive')}
                 </DropdownMenuItem>
                 <DropdownMenuItem 
                   onClick={handleDelete}
                   className="text-red-600"
                 >
                   <Trash className="w-4 h-4 mr-2" />
-                  Delete
+                  {t('common.delete')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -184,7 +186,7 @@ export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-1">
                 <ListTodo className="w-4 h-4" />
-                <span>{taskCount} {taskCount === 1 ? 'task' : 'tasks'}</span>
+                <span>{taskCount} {taskCount === 1 ? t('projects.task') : t('projects.tasks')}</span>
               </div>
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />

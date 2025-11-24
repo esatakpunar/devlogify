@@ -19,6 +19,7 @@ import { AICreateTasksDialog } from '@/components/tasks/AICreateTasksDialog'
 import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 import Link from 'next/link'
 import { usePremium } from '@/lib/hooks/usePremium'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface Note {
   id: string
@@ -55,32 +56,33 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false)
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
+  const t = useTranslation()
 
   const handleTogglePin = async () => {
     setLoading(true)
     try {
       const updatedNote = await togglePinNote(note.id, !note.is_pinned)
       onNoteUpdated(updatedNote as any)
-      toast.success(note.is_pinned ? 'Note unpinned' : 'Note pinned')
+      toast.success(note.is_pinned ? t('noteCard.noteUnpinned') : t('noteCard.notePinned'))
     } catch (error) {
       console.error('Failed to toggle pin:', error)
-      toast.error('Failed to update note')
+      toast.error(t('notes.failedToUpdateNote'))
     } finally {
       setLoading(false)
     }
   }
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this note?')) return
+    if (!confirm(t('noteCard.areYouSureDeleteNote'))) return
 
     setLoading(true)
     try {
       await deleteNote(note.id)
       onNoteDeleted(note.id)
-      toast.success('Note deleted')
+      toast.success(t('noteCard.noteDeleted'))
     } catch (error) {
       console.error('Failed to delete note:', error)
-      toast.error('Failed to delete note')
+      toast.error(t('noteCard.failedToDeleteNote'))
     } finally {
       setLoading(false)
     }
@@ -154,21 +156,21 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
                   }}
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Create Tasks from Note
+                  {t('noteCard.createTasksFromNote')}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
                   <Edit className="w-4 h-4 mr-2" />
-                  Edit
+                  {t('common.edit')}
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleTogglePin}>
                   <Pin className="w-4 h-4 mr-2" />
-                  {note.is_pinned ? 'Unpin' : 'Pin'}
+                  {note.is_pinned ? t('noteCard.unpin') : t('noteCard.pin')}
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleDelete} className="text-red-600">
                   <Trash className="w-4 h-4 mr-2" />
-                  Delete
+                  {t('common.delete')}
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

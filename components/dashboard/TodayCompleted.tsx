@@ -5,6 +5,7 @@ import { CheckCircle2, Clock } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface Task {
   id: string
@@ -23,6 +24,8 @@ interface TodayCompletedProps {
 }
 
 export function TodayCompleted({ tasks }: TodayCompletedProps) {
+  const t = useTranslation()
+  
   const formatTime = (minutes: number) => {
     if (minutes < 60) return `${minutes}m`
     const hours = Math.floor(minutes / 60)
@@ -42,11 +45,11 @@ export function TodayCompleted({ tasks }: TodayCompletedProps) {
   if (tasks.length === 0) {
     return (
       <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Today's Completed</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('dashboard.todaysCompleted')}</h3>
         <div className="text-center py-6 text-gray-500">
           <CheckCircle2 className="w-10 h-10 mx-auto mb-2 text-gray-300" />
-          <p className="text-sm">No tasks completed today</p>
-          <p className="text-xs">Keep working to see your progress!</p>
+          <p className="text-sm">{t('dashboard.noTasksCompletedToday')}</p>
+          <p className="text-xs">{t('dashboard.keepWorking')}</p>
         </div>
       </Card>
     )
@@ -54,7 +57,7 @@ export function TodayCompleted({ tasks }: TodayCompletedProps) {
 
   return (
     <Card className="p-6">
-      <h3 className="text-lg font-semibold mb-4">Today's Completed</h3>
+      <h3 className="text-lg font-semibold mb-4">{t('dashboard.todaysCompleted')}</h3>
       <div className="space-y-3">
         {tasks.map((task) => (
           <div
@@ -84,7 +87,7 @@ export function TodayCompleted({ tasks }: TodayCompletedProps) {
                   {formatTime(task.actual_duration)}
                 </span>
                 <span>•</span>
-                <span>Completed at {formatCompletedTime(task.completed_at)}</span>
+                <span>{t('dashboard.completedAt')} {formatCompletedTime(task.completed_at)}</span>
               </div>
             </div>
           </div>
@@ -95,7 +98,7 @@ export function TodayCompleted({ tasks }: TodayCompletedProps) {
         <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
           <Link href="/timeline">
             <Button variant="ghost" size="sm" className="w-full">
-              View timeline
+              {t('dashboard.viewTimeline')}
             </Button>
           </Link>
         </div>

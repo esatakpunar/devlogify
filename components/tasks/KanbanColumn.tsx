@@ -4,6 +4,7 @@ import { TaskCard } from './TaskCard'
 import { Circle, Clock, CheckCircle2 } from 'lucide-react'
 import { useDroppable } from '@dnd-kit/core'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 type Task = {
   id: string
@@ -46,6 +47,7 @@ export function KanbanColumn({ title, status, tasks, count, userId, onTaskUpdate
   const { isOver, setNodeRef } = useDroppable({
     id: status,
   })
+  const t = useTranslation()
 
   // Calculate average progress for this column
   const averageProgress = tasks.length > 0 
@@ -117,7 +119,7 @@ export function KanbanColumn({ title, status, tasks, count, userId, onTaskUpdate
             isOver && "border-blue-300 bg-blue-50"
           )}>
             <p className="text-sm text-gray-500">
-              {isOver ? "Drop task here" : "No tasks"}
+              {isOver ? t('kanban.dropTaskHere') || "Drop task here" : t('tasks.noTasks')}
             </p>
           </div>
         ) : (

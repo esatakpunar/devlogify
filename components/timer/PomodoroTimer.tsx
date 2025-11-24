@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { ProgressBar } from '@/components/ui/progress-bar'
 import { usePomodoroStore, startPomodoroInterval, stopPomodoroInterval } from '@/lib/store/pomodoroStore'
 import { PomodoroSettings } from '@/components/timer/PomodoroSettings'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 export function PomodoroTimer() {
   const {
@@ -25,6 +26,7 @@ export function PomodoroTimer() {
   } = usePomodoroStore()
 
   const [showSettings, setShowSettings] = useState(false)
+  const t = useTranslation()
 
   useEffect(() => {
     startPomodoroInterval()
@@ -42,11 +44,11 @@ export function PomodoroTimer() {
   const getPhaseLabel = () => {
     switch (currentPhase) {
       case 'work':
-        return 'Focus Time'
+        return t('pomodoro.focusTime')
       case 'shortBreak':
-        return 'Short Break'
+        return t('timer.shortBreak')
       case 'longBreak':
-        return 'Long Break'
+        return t('timer.longBreak')
     }
   }
 
@@ -76,7 +78,7 @@ export function PomodoroTimer() {
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-lg font-semibold">Pomodoro Timer</h3>
+            <h3 className="text-lg font-semibold">{t('pomodoro.title')}</h3>
             <p className={`text-sm font-medium ${getPhaseColor()}`}>
               {getPhaseLabel()}
             </p>
@@ -94,7 +96,7 @@ export function PomodoroTimer() {
         <div className="text-center mb-6">
           <div className="text-6xl font-bold mb-2">{formatTime(timeRemaining)}</div>
           <div className="text-sm text-gray-500">
-            {completedPomodorosToday} pomodoro{completedPomodorosToday !== 1 ? 's' : ''} today
+            {completedPomodorosToday} {completedPomodorosToday !== 1 ? t('pomodoro.pomodorosTodayPlural') : t('pomodoro.pomodorosToday')} {t('pomodoro.today')}
           </div>
         </div>
 
@@ -108,37 +110,37 @@ export function PomodoroTimer() {
           {!isRunning ? (
             <Button onClick={start} size="lg">
               <Play className="w-4 h-4 mr-2" />
-              Start
+              {t('timer.start')}
             </Button>
           ) : (
             <Button onClick={pause} size="lg" variant="outline">
               <Pause className="w-4 h-4 mr-2" />
-              Pause
+              {t('timer.pause')}
             </Button>
           )}
           
           {isPaused && (
             <Button onClick={resume} size="lg">
               <Play className="w-4 h-4 mr-2" />
-              Resume
+              {t('timer.resume')}
             </Button>
           )}
 
           <Button onClick={skip} variant="outline" size="lg">
             <SkipForward className="w-4 h-4 mr-2" />
-            Skip
+            {t('pomodoro.skip')}
           </Button>
 
           <Button onClick={reset} variant="outline" size="lg">
             <RotateCcw className="w-4 h-4 mr-2" />
-            Reset
+            {t('timer.reset')}
           </Button>
         </div>
 
         {/* Stats */}
         <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-800">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600 dark:text-gray-400">Total Pomodoros</span>
+            <span className="text-gray-600 dark:text-gray-400">{t('pomodoro.totalPomodoros')}</span>
             <span className="font-semibold">{completedPomodoros}</span>
           </div>
         </div>

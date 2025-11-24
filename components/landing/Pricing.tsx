@@ -4,71 +4,73 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Check, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
-
-const plans = [
-  {
-    name: 'Free',
-    price: '$0',
-    description: 'Perfect for solo developers',
-    features: [
-      'Up to 3 projects',
-      'Basic analytics',
-      'Community support',
-      '1 GB storage',
-      'Timeline view',
-    ],
-    aiFeatures: [],
-    cta: 'Get Started',
-    popular: false,
-  },
-  {
-    name: 'Pro',
-    price: '$12',
-    description: 'For professional developers',
-    features: [
-      'Unlimited projects',
-      'Advanced analytics',
-      'Priority support',
-      '10 GB storage',
-      'Custom integrations',
-      'Team collaboration (up to 5)',
-      'Export functionality',
-    ],
-    aiFeatures: [
-      'AI Task Suggestions',
-      'Daily Standup Summary',
-      'AI Task Generation',
-      'Smart Task Grouping',
-      'AI Tag Suggestions',
-    ],
-    cta: 'Start Free Trial',
-    popular: true,
-  },
-  {
-    name: 'Team',
-    price: '$29',
-    description: 'For growing teams',
-    features: [
-      'Everything in Pro',
-      'Unlimited team members',
-      'Dedicated support',
-      '100 GB storage',
-      'Advanced security',
-      'Custom branding',
-      'API access',
-      'SSO authentication',
-    ],
-    aiFeatures: [
-      'All AI Features from Pro',
-      'Team-wide AI insights',
-      'Advanced AI analytics',
-    ],
-    cta: 'Contact Sales',
-    popular: false,
-  },
-]
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 export function Pricing() {
+  const t = useTranslation()
+  
+  const plans = [
+    {
+      name: t('landing.pricing.free'),
+      price: '$0',
+      description: t('landing.pricing.freeDescription'),
+      features: [
+        t('landing.pricing.upTo3Projects'),
+        t('landing.pricing.basicAnalytics'),
+        t('landing.pricing.communitySupport'),
+        t('landing.pricing.1GBStorage'),
+        t('landing.pricing.timelineView'),
+      ],
+      aiFeatures: [],
+      cta: t('landing.pricing.getStarted'),
+      popular: false,
+    },
+    {
+      name: t('landing.pricing.pro'),
+      price: '$12',
+      description: t('landing.pricing.proDescription'),
+      features: [
+        t('landing.pricing.unlimitedProjects'),
+        t('landing.pricing.advancedAnalytics'),
+        t('landing.pricing.prioritySupport'),
+        t('landing.pricing.10GBStorage'),
+        t('landing.pricing.customIntegrations'),
+        t('landing.pricing.teamCollaboration'),
+        t('landing.pricing.exportFunctionality'),
+      ],
+      aiFeatures: [
+        t('premium.aiTaskSuggestions'),
+        t('premium.dailyStandupSummary'),
+        t('premium.aiTaskGeneration'),
+        t('premium.smartTaskGrouping'),
+        t('premium.aiTagSuggestions'),
+      ],
+      cta: t('landing.pricing.startFreeTrial'),
+      popular: true,
+    },
+    {
+      name: t('landing.pricing.team'),
+      price: '$29',
+      description: t('landing.pricing.teamDescription'),
+      features: [
+        t('landing.pricing.everythingInPro'),
+        t('landing.pricing.unlimitedTeamMembers'),
+        t('landing.pricing.dedicatedSupport'),
+        t('landing.pricing.100GBStorage'),
+        t('landing.pricing.advancedSecurity'),
+        t('landing.pricing.customBranding'),
+        t('landing.pricing.apiAccess'),
+        t('landing.pricing.ssoAuthentication'),
+      ],
+      aiFeatures: [
+        t('landing.pricing.allAIFeaturesFromPro'),
+        t('landing.pricing.teamWideAIInsights'),
+        t('landing.pricing.advancedAIAnalytics'),
+      ],
+      cta: t('landing.pricing.contactSales'),
+      popular: false,
+    },
+  ]
   return (
     <section id="pricing" className="py-20 px-4 bg-muted/30">
       <div className="container mx-auto max-w-6xl">
@@ -80,10 +82,10 @@ export function Pricing() {
           className="text-center space-y-4 mb-16"
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold">
-            Simple, Transparent Pricing
+            {t('landing.pricing.title')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Choose the plan that fits your needs. All plans include a 14-day free trial.
+            {t('landing.pricing.description')}
           </p>
         </motion.div>
 
@@ -104,7 +106,7 @@ export function Pricing() {
               {plan.popular && (
                 <div className="absolute -top-4 left-0 right-0 flex justify-center">
                   <span className="bg-primary text-primary-foreground text-sm font-medium px-4 py-1 rounded-full">
-                    Most Popular
+                    {t('landing.pricing.mostPopular')}
                   </span>
                 </div>
               )}
@@ -119,7 +121,7 @@ export function Pricing() {
 
                 <div className="flex items-baseline gap-1">
                   <span className="text-4xl font-bold">{plan.price}</span>
-                  <span className="text-muted-foreground">/month</span>
+                  <span className="text-muted-foreground">/{t('landing.pricing.perMonth')}</span>
                 </div>
 
                 <Button
@@ -143,7 +145,7 @@ export function Pricing() {
                       <div className="pt-4 border-t">
                         <div className="flex items-center gap-2 mb-3">
                           <Sparkles className="h-4 w-4 text-purple-600" />
-                          <span className="text-sm font-semibold text-purple-600">AI Features</span>
+                          <span className="text-sm font-semibold text-purple-600">{t('landing.pricing.aiFeatures')}</span>
                         </div>
                         {plan.aiFeatures.map((feature) => (
                           <div key={feature} className="flex items-start gap-3 mb-2">
@@ -167,7 +169,7 @@ export function Pricing() {
           viewport={{ once: true }}
           className="text-center text-sm text-muted-foreground mt-8"
         >
-          All plans include basic features. No credit card required for free trial.
+          {t('landing.pricing.footerNote')}
         </motion.p>
       </div>
     </section>

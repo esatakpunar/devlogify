@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { useTimerStore } from '@/lib/store/timerStore'
 import { getRecentIncompleteTasks } from '@/lib/supabase/queries/tasks'
 import { toast } from 'sonner'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface Task {
   id: string
@@ -32,6 +33,7 @@ export function QuickTimerCard({ userId }: QuickTimerCardProps) {
     startTimer, 
     stopTimer 
   } = useTimerStore()
+  const t = useTranslation()
   
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600)
@@ -66,9 +68,9 @@ export function QuickTimerCard({ userId }: QuickTimerCardProps) {
     setLoading(true)
     try {
       await startTimer(task.id, task.title, userId)
-      toast.success(`Started timer for "${task.title}"`)
+      toast.success(t('tasks.startedTimerFor', { title: task.title }))
     } catch (error) {
-      toast.error('Failed to start timer')
+      toast.error(t('tasks.failedToStartTimer'))
       console.error('Timer start error:', error)
     } finally {
       setLoading(false)
@@ -79,9 +81,9 @@ export function QuickTimerCard({ userId }: QuickTimerCardProps) {
     setLoading(true)
     try {
       await stopTimer(userId)
-      toast.success('Timer stopped')
+      toast.success(t('tasks.timerStopped'))
     } catch (error) {
-      toast.error('Failed to stop timer')
+      toast.error(t('tasks.failedToStopTimer'))
       console.error('Timer stop error:', error)
     } finally {
       setLoading(false)
@@ -92,10 +94,10 @@ export function QuickTimerCard({ userId }: QuickTimerCardProps) {
     return (
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold">Active Timer</h3>
+          <h3 className="text-lg font-semibold">{t('timerCard.activeTimer')}</h3>
           <Badge variant="default" className="bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
             <div className="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse" />
-            Running
+            {t('common.running')}
           </Badge>
         </div>
         
@@ -119,7 +121,7 @@ export function QuickTimerCard({ userId }: QuickTimerCardProps) {
             variant="destructive"
           >
             <Square className="w-4 h-4 mr-2" />
-            Stop Timer
+            {t('timerCard.stopTimer')}
           </Button>
         </div>
       </Card>
@@ -128,18 +130,18 @@ export function QuickTimerCard({ userId }: QuickTimerCardProps) {
 
   return (
     <Card className="p-6">
-      <h3 className="text-lg font-semibold mb-4">Quick Timer</h3>
+      <h3 className="text-lg font-semibold mb-4">{t('timerCard.quickTimer')}</h3>
       
       {availableTasks.length === 0 ? (
         <div className="text-center py-6 text-gray-500">
           <Play className="w-10 h-10 mx-auto mb-2 text-gray-300" />
-          <p className="text-sm">No tasks available</p>
-          <p className="text-xs">Create some tasks to start tracking time</p>
+          <p className="text-sm">{t('timerCard.noTasksAvailable')}</p>
+          <p className="text-xs">{t('timerCard.createTasksToStart')}</p>
         </div>
       ) : (
         <div className="space-y-3">
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-            Start tracking time for a recent task:
+            {t('timerCard.startTrackingForRecent')}
           </p>
           
           {availableTasks.slice(0, 3).map((task) => (
@@ -167,10 +169,10 @@ export function QuickTimerCard({ userId }: QuickTimerCardProps) {
                 onClick={() => handleStartTimer(task)}
                 disabled={loading}
                 className="ml-3 hover:bg-blue-600 hover:text-white transition-colors cursor-pointer"
-                title="Start timer for this task"
+                title={t('timerCard.startTimerForTask')}
               >
                 <Play className="w-4 h-4 mr-1" />
-                Start
+                {t('timer.start')}
               </Button>
             </div>
           ))}
@@ -178,7 +180,7 @@ export function QuickTimerCard({ userId }: QuickTimerCardProps) {
           {availableTasks.length > 3 && (
             <div className="pt-2 border-t border-gray-200 dark:border-gray-700">
               <p className="text-xs text-gray-500 text-center">
-                +{availableTasks.length - 3} more tasks available
+                +{availableTasks.length - 3} {t('timerCard.moreTasksAvailable')}
               </p>
             </div>
           )}

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('')
@@ -14,6 +15,7 @@ export default function ForgotPasswordPage() {
   const [message, setMessage] = useState('')
   const [error, setError] = useState<string | null>(null)
   const supabase = createClient()
+  const t = useTranslation()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -35,16 +37,16 @@ export default function ForgotPasswordPage() {
     if (error) {
       setError(error.message)
     } else {
-      setMessage('Password reset link has been sent to your email address! Please check your inbox.')
+      setMessage(t('auth.passwordResetLinkSent'))
     }
   }
 
   return (
     <Card>
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Forgot Password</CardTitle>
+        <CardTitle className="text-2xl font-bold">{t('auth.forgotPassword')}</CardTitle>
         <CardDescription>
-          Enter your email address and we'll send you a link to reset your password
+          {t('auth.enterEmailToResetPassword')}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -60,13 +62,13 @@ export default function ForgotPasswordPage() {
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
+            <Label htmlFor="email">{t('auth.emailAddress')}</Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="name@example.com"
+              placeholder={t('auth.emailPlaceholder')}
               required
               disabled={loading}
             />
@@ -74,11 +76,11 @@ export default function ForgotPasswordPage() {
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Sending...' : 'Send Reset Link'}
+            {loading ? t('auth.sending') : t('auth.sendResetLink')}
           </Button>
           <p className="text-sm text-center text-gray-600">
             <Link href="/login" className="text-blue-600 hover:underline">
-              Back to login
+              {t('auth.backToLogin')}
             </Link>
           </p>
         </CardFooter>

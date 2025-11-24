@@ -2,6 +2,7 @@
 
 import { ActivityItem } from './ActivityItem'
 import { format, isToday, isYesterday, parseISO } from 'date-fns'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface Activity {
   id: string
@@ -24,11 +25,13 @@ interface ActivityFeedProps {
 }
 
 export function ActivityFeed({ activities }: ActivityFeedProps) {
+  const t = useTranslation()
+  
   if (activities.length === 0) {
     return (
       <div className="bg-white rounded-lg border border-gray-200 p-12 text-center">
-        <p className="text-gray-500">No activities yet</p>
-        <p className="text-sm text-gray-400 mt-2">Start working on tasks to see your activity here</p>
+        <p className="text-gray-500">{t('timeline.noActivitiesYet')}</p>
+        <p className="text-sm text-gray-400 mt-2">{t('timeline.startWorkingToSeeActivity')}</p>
       </div>
     )
   }
@@ -45,8 +48,8 @@ export function ActivityFeed({ activities }: ActivityFeedProps) {
 
   const getDateLabel = (dateString: string) => {
     const date = parseISO(dateString)
-    if (isToday(date)) return 'Today'
-    if (isYesterday(date)) return 'Yesterday'
+    if (isToday(date)) return t('timeline.today')
+    if (isYesterday(date)) return t('timeline.yesterday')
     return format(date, 'MMMM dd, yyyy')
   }
 

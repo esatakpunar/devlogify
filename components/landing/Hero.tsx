@@ -4,8 +4,10 @@ import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { ArrowRight, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 export function Hero() {
+  const t = useTranslation()
   return (
     <section className="relative pt-32 pb-20 px-4 overflow-hidden">
       {/* Background gradient */}
@@ -26,7 +28,7 @@ export function Hero() {
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full border bg-muted/50"
           >
             <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">Track Your Development Journey</span>
+            <span className="text-sm font-medium">{t('landing.trackYourDevelopmentJourney')}</span>
           </motion.div>
 
           {/* Main Heading */}
@@ -36,9 +38,9 @@ export function Hero() {
             transition={{ delay: 0.2 }}
             className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight"
           >
-            Build Better Products
+            {t('landing.buildBetterProducts')}
             <br />
-            <span className="text-primary">Track Every Step</span>
+            <span className="text-primary">{t('landing.trackEveryStep')}</span>
           </motion.h1>
 
           {/* Description */}
@@ -48,8 +50,7 @@ export function Hero() {
             transition={{ delay: 0.3 }}
             className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto"
           >
-            Devlogify helps developers and teams document their progress, manage projects,
-            and track development milestones all in one beautiful platform.
+            {t('landing.heroDescription')}
           </motion.p>
 
           {/* CTA Buttons */}
@@ -61,13 +62,13 @@ export function Hero() {
           >
             <Button size="lg" asChild className="text-lg px-8 h-12">
               <Link href="/signup">
-                Get Started Free
+                {t('landing.getStartedFree')}
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
             <Button size="lg" variant="outline" asChild className="text-lg px-8 h-12">
               <Link href="#features">
-                Learn More
+                {t('landing.learnMore')}
               </Link>
             </Button>
           </motion.div>
@@ -81,15 +82,15 @@ export function Hero() {
           >
             <div>
               <div className="text-3xl font-bold">10K+</div>
-              <div className="text-sm text-muted-foreground">Active Users</div>
+              <div className="text-sm text-muted-foreground">{t('landing.activeUsers')}</div>
             </div>
             <div>
               <div className="text-3xl font-bold">50K+</div>
-              <div className="text-sm text-muted-foreground">Projects Tracked</div>
+              <div className="text-sm text-muted-foreground">{t('landing.projectsTracked')}</div>
             </div>
             <div>
               <div className="text-3xl font-bold">99.9%</div>
-              <div className="text-sm text-muted-foreground">Uptime</div>
+              <div className="text-sm text-muted-foreground">{t('landing.uptime')}</div>
             </div>
           </motion.div>
         </motion.div>

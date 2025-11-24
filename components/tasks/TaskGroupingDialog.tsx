@@ -14,6 +14,7 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from 'sonner'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface TaskGroup {
   id: string
@@ -37,6 +38,7 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
   const [loading, setLoading] = useState(false)
   const [applying, setApplying] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const t = useTranslation()
 
   useEffect(() => {
     if (open) {
@@ -60,7 +62,7 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
       
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to load groups')
+        throw new Error(errorData.error || t('kanban.failedToLoadGroups'))
       }
 
       const data = await response.json()
@@ -69,7 +71,7 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
       setGroups(loadedGroups)
     } catch (err: any) {
       console.error('Error loading groups:', err)
-      setError(err.message || 'Failed to load groups')
+      setError(err.message || t('kanban.failedToLoadGroups'))
     } finally {
       setLoading(false)
     }
@@ -87,7 +89,7 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
 
   const applyTagsToSelectedGroups = async () => {
     if (selectedGroups.size === 0) {
-      toast.error('Please select at least one group')
+      toast.error(t('kanban.pleaseSelectAtLeastOneGroup'))
       return
     }
 
@@ -145,7 +147,14 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
       const totalTasks = taskTagMap.size
       const totalTags = new Set(Array.from(taskTagMap.values()).flatMap(tags => Array.from(tags))).size
       
-      toast.success(`Tags applied to ${totalTasks} task${totalTasks !== 1 ? 's' : ''} (${totalTags} unique tag${totalTags !== 1 ? 's' : ''})`)
+      const tasksText = totalTasks === 1 ? t('common.task') : t('common.tasks')
+      const tagsText = totalTags === 1 ? 'tag' : 'tags'
+      toast.success(t('kanban.tagsApplied', { 
+        tasks: totalTasks, 
+        tags: totalTags,
+        tasksText,
+        tagsText
+      }))
       
       // Clear selection
       setSelectedGroups(new Set())
@@ -154,7 +163,7 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
       onTasksUpdated?.()
     } catch (err: any) {
       console.error('Error applying tags:', err)
-      toast.error(err.message || 'Failed to apply tags')
+      toast.error(err.message || t('kanban.failedToApplyTags'))
     } finally {
       setApplying(false)
     }
@@ -174,10 +183,10 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Layers className="w-5 h-5" />
-            Task Grouping
+            {t('kanban.taskGrouping')}
           </DialogTitle>
           <DialogDescription>
-            AI-powered task grouping based on similarity and workflow
+            {t('kanban.taskGroupingDescription')}
           </DialogDescription>
         </DialogHeader>
 
@@ -191,15 +200,15 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
           <div className="text-center py-8">
             <p className="text-sm text-red-600 mb-4">{error}</p>
             <Button variant="outline" size="sm" onClick={loadGroups}>
-              Try Again
+              {t('common.tryAgain')}
             </Button>
           </div>
         )}
 
         {!loading && !error && groups.length === 0 && (
           <div className="text-center py-8 text-gray-500">
-            <p className="text-sm">No groups found</p>
-            <p className="text-xs mt-1">Create more tasks to enable grouping</p>
+            <p className="text-sm">{t('kanban.noGroupsFound')}</p>
+            <p className="text-xs mt-1">{t('kanban.createMoreTasksToEnableGrouping')}</p>
           </div>
         )}
 
@@ -209,7 +218,7 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
             <div className="flex items-center justify-between pb-2 border-b">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {selectedGroups.size} of {groups.length} groups selected
+                  {t('kanban.groupsSelected', { selected: selectedGroups.size, total: groups.length })}
                 </span>
               </div>
               <div className="flex items-center gap-2">
@@ -219,7 +228,7 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
                   onClick={selectAllGroups}
                   disabled={selectedGroups.size === groups.length}
                 >
-                  Select All
+                  {t('kanban.selectAll')}
                 </Button>
                 <Button
                   variant="ghost"
@@ -227,7 +236,7 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
                   onClick={deselectAllGroups}
                   disabled={selectedGroups.size === 0}
                 >
-                  Deselect All
+                  {t('kanban.deselectAll')}
                 </Button>
               </div>
             </div>
@@ -266,7 +275,7 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
                         ))}
                       </div>
                       <p className="text-xs text-gray-500">
-                        {group.tasks.length} task{group.tasks.length !== 1 ? 's' : ''}
+                        {group.tasks.length} {group.tasks.length === 1 ? t('common.task') : t('common.tasks')}
                       </p>
                     </div>
                   </div>
@@ -296,12 +305,15 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
                 {applying ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Applying...
+                    {t('kanban.applying')}
                   </>
                 ) : (
                   <>
                     <Check className="w-4 h-4" />
-                    Apply Tags ({selectedGroups.size} group{selectedGroups.size !== 1 ? 's' : ''})
+                    {t('kanban.applyTags', { 
+                      count: selectedGroups.size,
+                      groupText: selectedGroups.size === 1 ? t('kanban.group') : t('kanban.groups')
+                    })}
                   </>
                 )}
               </Button>
@@ -310,11 +322,11 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
           <div className="flex gap-2">
             {!loading && !error && groups.length > 0 && (
               <Button onClick={loadGroups} variant="outline" size="sm">
-                Refresh
+                {t('common.refresh')}
               </Button>
             )}
             <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Close
+              {t('common.close')}
             </Button>
           </div>
         </div>

@@ -2,65 +2,61 @@
 
 import { motion } from 'framer-motion'
 import { Star } from 'lucide-react'
-
-const testimonials = [
-  {
-    name: 'Sarah Chen',
-    role: 'Full Stack Developer',
-    company: 'Tech Startup',
-    image: '👩‍💻',
-    content:
-      'Devlogify has completely transformed how I track my projects. The timeline view is incredible for showcasing my work to clients.',
-    rating: 5,
-  },
-  {
-    name: 'Marcus Rodriguez',
-    role: 'Engineering Manager',
-    company: 'Fortune 500',
-    image: '👨‍💼',
-    content:
-      'Our team productivity increased by 40% after switching to Devlogify. The kanban boards and analytics are game-changers.',
-    rating: 5,
-  },
-  {
-    name: 'Emily Watson',
-    role: 'Indie Developer',
-    company: 'Self-Employed',
-    image: '👩‍🎨',
-    content:
-      'As a solo developer, Devlogify helps me stay organized and motivated. The development logs are perfect for documenting my journey.',
-    rating: 5,
-  },
-  {
-    name: 'James Park',
-    role: 'Tech Lead',
-    company: 'SaaS Company',
-    image: '👨‍💻',
-    content:
-      'The best project tracking tool I\'ve used. Clean interface, powerful features, and the team collaboration features are outstanding.',
-    rating: 5,
-  },
-  {
-    name: 'Aisha Patel',
-    role: 'Product Designer',
-    company: 'Design Agency',
-    image: '👩‍🎨',
-    content:
-      'Love how intuitive Devlogify is! I can track my design projects alongside development work seamlessly.',
-    rating: 5,
-  },
-  {
-    name: 'David Kim',
-    role: 'Senior Developer',
-    company: 'Consulting Firm',
-    image: '👨‍🔬',
-    content:
-      'Devlogify made it easy to manage multiple client projects. The analytics help me understand where I spend my time.',
-    rating: 5,
-  },
-]
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 export function Testimonials() {
+  const t = useTranslation()
+  
+  const testimonials = [
+    {
+      name: 'Sarah Chen',
+      role: t('landing.testimonials.fullStackDeveloper'),
+      company: t('landing.testimonials.techStartup'),
+      image: '👩‍💻',
+      content: t('landing.testimonials.sarahChen'),
+      rating: 5,
+    },
+    {
+      name: 'Marcus Rodriguez',
+      role: t('landing.testimonials.engineeringManager'),
+      company: t('landing.testimonials.fortune500'),
+      image: '👨‍💼',
+      content: t('landing.testimonials.marcusRodriguez'),
+      rating: 5,
+    },
+    {
+      name: 'Emily Watson',
+      role: t('landing.testimonials.indieDeveloper'),
+      company: t('landing.testimonials.selfEmployed'),
+      image: '👩‍🎨',
+      content: t('landing.testimonials.emilyWatson'),
+      rating: 5,
+    },
+    {
+      name: 'James Park',
+      role: t('landing.testimonials.techLead'),
+      company: t('landing.testimonials.saasCompany'),
+      image: '👨‍💻',
+      content: t('landing.testimonials.jamesPark'),
+      rating: 5,
+    },
+    {
+      name: 'Aisha Patel',
+      role: t('landing.testimonials.productDesigner'),
+      company: t('landing.testimonials.designAgency'),
+      image: '👩‍🎨',
+      content: t('landing.testimonials.aishaPatel'),
+      rating: 5,
+    },
+    {
+      name: 'David Kim',
+      role: t('landing.testimonials.seniorDeveloper'),
+      company: t('landing.testimonials.consultingFirm'),
+      image: '👨‍🔬',
+      content: t('landing.testimonials.davidKim'),
+      rating: 5,
+    },
+  ]
   return (
     <section className="py-20 px-4">
       <div className="container mx-auto max-w-6xl">
@@ -72,10 +68,10 @@ export function Testimonials() {
           className="text-center space-y-4 mb-16"
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold">
-            Loved by Developers Worldwide
+            {t('landing.testimonials.title')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            See what our community has to say about their experience with Devlogify.
+            {t('landing.testimonials.description')}
           </p>
         </motion.div>
 

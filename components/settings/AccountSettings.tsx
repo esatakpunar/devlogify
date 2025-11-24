@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label'
 import { AlertCircle, LogOut, Trash2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { User } from '@supabase/supabase-js'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -31,17 +32,18 @@ export function AccountSettings({ user }: AccountSettingsProps) {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+  const t = useTranslation()
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (newPassword !== confirmPassword) {
-      toast.error('Passwords do not match')
+      toast.error(t('account.passwordsDoNotMatch'))
       return
     }
 
     if (newPassword.length < 6) {
-      toast.error('Password must be at least 6 characters')
+      toast.error(t('account.passwordMustBeAtLeast6'))
       return
     }
 
@@ -54,12 +56,12 @@ export function AccountSettings({ user }: AccountSettingsProps) {
 
       if (error) throw error
 
-      toast.success('Password updated successfully')
+      toast.success(t('account.passwordUpdatedSuccessfully'))
       setNewPassword('')
       setConfirmPassword('')
     } catch (error: any) {
       console.error('Failed to update password:', error)
-      toast.error('Failed to update password')
+      toast.error(t('account.failedToUpdatePassword'))
     } finally {
       setLoading(false)
     }
@@ -72,7 +74,7 @@ export function AccountSettings({ user }: AccountSettingsProps) {
   }
 
   const handleDeleteAccount = async () => {
-    toast.error('Account deletion is not available yet. Please contact support.')
+    toast.error(t('account.accountDeletionNotAvailable'))
   }
 
   return (
@@ -80,19 +82,19 @@ export function AccountSettings({ user }: AccountSettingsProps) {
       {/* Change Password */}
       <div className="space-y-4">
         <div>
-          <h3 className="text-lg font-medium">Change Password</h3>
+          <h3 className="text-lg font-medium">{t('account.changePassword')}</h3>
           <p className="text-sm text-gray-600">
-            Update your password to keep your account secure
+            {t('account.updatePasswordToKeepSecure')}
           </p>
         </div>
 
         <form onSubmit={handleChangePassword} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="new-password">New Password</Label>
+            <Label htmlFor="new-password">{t('account.newPassword')}</Label>
             <Input
               id="new-password"
               type="password"
-              placeholder="Enter new password"
+              placeholder={t('account.enterNewPassword')}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               disabled={loading}
@@ -100,11 +102,11 @@ export function AccountSettings({ user }: AccountSettingsProps) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirm-password">Confirm Password</Label>
+            <Label htmlFor="confirm-password">{t('account.confirmPassword')}</Label>
             <Input
               id="confirm-password"
               type="password"
-              placeholder="Confirm new password"
+              placeholder={t('account.confirmNewPassword')}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               disabled={loading}
@@ -112,7 +114,7 @@ export function AccountSettings({ user }: AccountSettingsProps) {
           </div>
 
           <Button type="submit" disabled={loading}>
-            {loading ? 'Updating...' : 'Update Password'}
+            {loading ? t('account.updating') : t('account.updatePassword')}
           </Button>
         </form>
       </div>
@@ -120,24 +122,24 @@ export function AccountSettings({ user }: AccountSettingsProps) {
       {/* Sign Out */}
       <div className="space-y-4 pt-6 border-t">
         <div>
-          <h3 className="text-lg font-medium">Sign Out</h3>
+          <h3 className="text-lg font-medium">{t('account.signOut')}</h3>
           <p className="text-sm text-gray-600">
-            Sign out from your account on this device
+            {t('account.signOutFromAccount')}
           </p>
         </div>
 
         <Button variant="outline" onClick={handleSignOut}>
           <LogOut className="w-4 h-4 mr-2" />
-          Sign Out
+          {t('account.signOut')}
         </Button>
       </div>
 
       {/* Danger Zone */}
       <div className="space-y-4 pt-6 border-t border-red-200">
         <div>
-          <h3 className="text-lg font-medium text-red-600">Danger Zone</h3>
+          <h3 className="text-lg font-medium text-red-600">{t('account.dangerZone')}</h3>
           <p className="text-sm text-gray-600">
-            Irreversible and destructive actions
+            {t('account.irreversibleActions')}
           </p>
         </div>
 
@@ -145,9 +147,9 @@ export function AccountSettings({ user }: AccountSettingsProps) {
           <div className="flex items-start gap-3">
             <AlertCircle className="w-5 h-5 text-red-600 mt-0.5" />
             <div className="flex-1">
-              <h4 className="font-medium text-red-900">Delete Account</h4>
+              <h4 className="font-medium text-red-900">{t('account.deleteAccount')}</h4>
               <p className="text-sm text-red-700 mt-1">
-                Once you delete your account, there is no going back. All your data will be permanently deleted.
+                {t('account.deleteAccountDescription')}
               </p>
             </div>
           </div>
@@ -156,21 +158,20 @@ export function AccountSettings({ user }: AccountSettingsProps) {
             <AlertDialogTrigger asChild>
               <Button variant="destructive" className="mt-4">
                 <Trash2 className="w-4 h-4 mr-2" />
-                Delete Account
+                {t('account.deleteAccount')}
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogTitle>{t('account.areYouAbsolutelySure')}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  This action cannot be undone. This will permanently delete your
-                  account and remove all your data from our servers.
+                  {t('account.deleteAccountWarning')}
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
                 <AlertDialogAction onClick={handleDeleteAccount} className="bg-red-600 hover:bg-red-700">
-                  Delete Account
+                  {t('account.deleteAccount')}
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

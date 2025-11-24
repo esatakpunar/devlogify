@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { toast } from 'sonner'
 import { User } from '@supabase/supabase-js'
 import { getProfile, updateProfile, createProfile, Profile } from '@/lib/supabase/queries/profiles'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface ProfileSettingsProps {
   user: User
@@ -18,6 +19,7 @@ export function ProfileSettings({ user }: ProfileSettingsProps) {
   const [fullName, setFullName] = useState('')
   const [loading, setLoading] = useState(false)
   const [initialLoading, setInitialLoading] = useState(true)
+  const t = useTranslation()
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -62,10 +64,10 @@ export function ProfileSettings({ user }: ProfileSettingsProps) {
         setProfile(newProfile)
       }
 
-      toast.success('Profile updated successfully')
+      toast.success(t('profile.profileUpdatedSuccessfully'))
     } catch (error: any) {
       console.error('Failed to update profile:', error)
-      toast.error('Failed to update profile')
+      toast.error(t('profile.failedToUpdateProfile'))
     } finally {
       setLoading(false)
     }
@@ -99,17 +101,17 @@ export function ProfileSettings({ user }: ProfileSettingsProps) {
           </AvatarFallback>
         </Avatar>
         <div>
-          <h3 className="font-medium">{fullName || 'User'}</h3>
+          <h3 className="font-medium">{fullName || t('profile.user')}</h3>
           <p className="text-sm text-gray-600">{user.email}</p>
         </div>
       </div>
 
       {/* Full Name */}
       <div className="space-y-2">
-        <Label htmlFor="full-name">Full Name</Label>
+        <Label htmlFor="full-name">{t('profile.fullName')}</Label>
         <Input
           id="full-name"
-          placeholder="Enter your name"
+          placeholder={t('profile.enterYourName')}
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
           disabled={loading}
@@ -118,7 +120,7 @@ export function ProfileSettings({ user }: ProfileSettingsProps) {
 
       {/* Email (Read-only) */}
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{t('profile.email')}</Label>
         <Input
           id="email"
           type="email"
@@ -127,13 +129,13 @@ export function ProfileSettings({ user }: ProfileSettingsProps) {
           className="bg-gray-50"
         />
         <p className="text-xs text-gray-500">
-          Email cannot be changed. Contact support if needed.
+          {t('profile.emailCannotBeChanged')}
         </p>
       </div>
 
       {/* Save Button */}
       <Button type="submit" disabled={loading}>
-        {loading ? 'Saving...' : 'Save Changes'}
+        {loading ? t('projects.saving') : t('projects.saveChanges')}
       </Button>
     </form>
   )

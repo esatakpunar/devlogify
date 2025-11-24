@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { toast } from 'sonner'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface Note {
   id: string
@@ -64,12 +65,13 @@ export function EditNoteDialog({
   const [projectId, setProjectId] = useState<string>(note.project?.id || '')
   const [tags, setTags] = useState(note.tags?.join(', ') || '')
   const [loading, setLoading] = useState(false)
+  const t = useTranslation()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
     if (!content.trim()) {
-      toast.error('Please enter note content')
+      toast.error(t('notes.pleaseEnterNoteContent'))
       return
     }
 
@@ -89,11 +91,11 @@ export function EditNoteDialog({
       })
 
       onNoteUpdated(updatedNote)
-      toast.success('Note updated')
+      toast.success(t('notes.noteUpdated'))
       onOpenChange(false)
     } catch (error: any) {
       console.error('Failed to update note:', error)
-      toast.error('Failed to update note')
+      toast.error(t('notes.failedToUpdateNote'))
     } finally {
       setLoading(false)
     }
@@ -103,18 +105,18 @@ export function EditNoteDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Note</DialogTitle>
+          <DialogTitle>{t('notes.editNote')}</DialogTitle>
           <DialogDescription>
-            Update your note
+            {t('notes.updateNote')}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 min-w-0">
           <div className="space-y-2">
-            <Label htmlFor="edit-note-title">Title (optional)</Label>
+            <Label htmlFor="edit-note-title">{t('notes.titleOptional')}</Label>
             <Input
               id="edit-note-title"
-              placeholder="Note title..."
+              placeholder={t('notes.noteTitle')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               disabled={loading}
@@ -123,11 +125,11 @@ export function EditNoteDialog({
 
           <div className="space-y-2 min-w-0">
             <Label htmlFor="edit-note-content">
-              Content <span className="text-red-500">*</span>
+              {t('notes.content')} <span className="text-red-500">*</span>
             </Label>
             <Textarea
               id="edit-note-content"
-              placeholder="Write your note here..."
+              placeholder={t('notes.writeYourNoteHere')}
               value={content}
               onChange={(e) => setContent(e.target.value)}
               disabled={loading}
@@ -138,14 +140,14 @@ export function EditNoteDialog({
 
           <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="edit-note-project">Project (optional)</Label>
+            <Label htmlFor="edit-note-project">{t('notes.projectOptional')}</Label>
             <Select 
               value={projectId || undefined}  
               onValueChange={setProjectId}
               disabled={loading}
             >
               <SelectTrigger id="edit-note-project">
-                <SelectValue placeholder="None" />
+                <SelectValue placeholder={t('common.none')} />
               </SelectTrigger>
               <SelectContent>
                 {projects.map((project) => (
@@ -161,25 +163,25 @@ export function EditNoteDialog({
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-gray-500">Leave empty for no project</p>  
+            <p className="text-xs text-gray-500">{t('notes.leaveEmptyForNoProject')}</p>  
           </div>
 
             <div className="space-y-2">
-              <Label htmlFor="edit-note-tags">Tags (optional)</Label>
+              <Label htmlFor="edit-note-tags">{t('notes.tagsOptional')}</Label>
               <Input
                 id="edit-note-tags"
-                placeholder="work, ideas, todo"
+                placeholder={t('notes.tagsPlaceholder')}
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
                 disabled={loading}
               />
-              <p className="text-xs text-gray-500">Separate with commas</p>
+              <p className="text-xs text-gray-500">{t('notes.separateWithCommas')}</p>
             </div>
           </div>
 
           <div className="flex gap-3 pt-4">
             <Button type="submit" disabled={loading} className="flex-1">
-              {loading ? 'Saving...' : 'Save Changes'}
+              {loading ? t('projects.saving') : t('projects.saveChanges')}
             </Button>
             <Button 
               type="button" 
@@ -187,7 +189,7 @@ export function EditNoteDialog({
               onClick={() => onOpenChange(false)}
               disabled={loading}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
           </div>
         </form>

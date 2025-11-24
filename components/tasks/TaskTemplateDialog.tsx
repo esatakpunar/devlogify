@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/select'
 import { createTaskTemplate } from '@/lib/supabase/queries/taskTemplates'
 import { toast } from 'sonner'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface TaskTemplateDialogProps {
   userId: string
@@ -39,6 +40,7 @@ interface TaskTemplateDialogProps {
 export function TaskTemplateDialog({ userId, onTemplateCreated, initialTask }: TaskTemplateDialogProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
+  const t = useTranslation()
   const [formData, setFormData] = useState({
     title: initialTask?.title || '',
     description: initialTask?.description || '',
@@ -74,7 +76,7 @@ export function TaskTemplateDialog({ userId, onTemplateCreated, initialTask }: T
         tags: [],
       })
 
-      toast.success('Template created successfully')
+      toast.success(t('tasks.templateCreatedSuccessfully'))
       setOpen(false)
       setFormData({
         title: '',
@@ -85,7 +87,7 @@ export function TaskTemplateDialog({ userId, onTemplateCreated, initialTask }: T
       onTemplateCreated?.()
     } catch (error: any) {
       console.error('Error creating template:', error)
-      toast.error(error.message || 'Failed to create template')
+      toast.error(error.message || t('tasks.failedToCreateTemplate'))
     } finally {
       setLoading(false)
     }
@@ -96,21 +98,21 @@ export function TaskTemplateDialog({ userId, onTemplateCreated, initialTask }: T
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <FileText className="w-4 h-4 mr-2" />
-          Save as Template
+          {t('tasks.saveAsTemplate')}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <form onSubmit={handleSubmit}>
           <DialogHeader>
-            <DialogTitle>Create Task Template</DialogTitle>
+            <DialogTitle>{t('tasks.createTaskTemplate')}</DialogTitle>
             <DialogDescription>
-              Save this task as a template for quick reuse
+              {t('tasks.saveTaskAsTemplateDescription')}
             </DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-4">
             <div>
-              <Label htmlFor="title">Title *</Label>
+              <Label htmlFor="title">{t('tasks.title')} *</Label>
               <Input
                 id="title"
                 value={formData.title}
@@ -120,7 +122,7 @@ export function TaskTemplateDialog({ userId, onTemplateCreated, initialTask }: T
             </div>
 
             <div>
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">{t('tasks.description')}</Label>
               <Textarea
                 id="description"
                 value={formData.description}
@@ -131,7 +133,7 @@ export function TaskTemplateDialog({ userId, onTemplateCreated, initialTask }: T
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="priority">Priority</Label>
+                <Label htmlFor="priority">{t('tasks.priority')}</Label>
                 <Select
                   value={formData.priority}
                   onValueChange={(value: 'low' | 'medium' | 'high') =>
@@ -142,21 +144,21 @@ export function TaskTemplateDialog({ userId, onTemplateCreated, initialTask }: T
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="low">Low</SelectItem>
-                    <SelectItem value="medium">Medium</SelectItem>
-                    <SelectItem value="high">High</SelectItem>
+                    <SelectItem value="low">{t('common.low')}</SelectItem>
+                    <SelectItem value="medium">{t('common.medium')}</SelectItem>
+                    <SelectItem value="high">{t('common.high')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               <div>
-                <Label htmlFor="estimated_duration">Estimated Duration (min)</Label>
+                <Label htmlFor="estimated_duration">{t('tasks.estimatedDuration')}</Label>
                 <Input
                   id="estimated_duration"
                   type="number"
                   value={formData.estimated_duration}
                   onChange={(e) => setFormData({ ...formData, estimated_duration: e.target.value })}
-                  placeholder="Optional"
+                  placeholder={t('common.optional')}
                 />
               </div>
             </div>
@@ -164,10 +166,10 @@ export function TaskTemplateDialog({ userId, onTemplateCreated, initialTask }: T
 
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={loading}>
-              {loading ? 'Creating...' : 'Create Template'}
+              {loading ? t('tasks.creating') : t('tasks.createTemplate')}
             </Button>
           </DialogFooter>
         </form>

@@ -24,6 +24,7 @@ import { EditTaskDialog } from './EditTaskDialog'
 import { AddManualTimeDialog } from './AddManualTimeDialog'
 import { useDraggable } from '@dnd-kit/core'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 type Task = {
   id: string
@@ -65,6 +66,7 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isTimeDialogOpen, setIsTimeDialogOpen] = useState(false)
   const { taskId, isRunning, elapsed, startTimer, stopTimer, formatTime } = useTimer()
+  const t = useTranslation()
 
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: task.id,
@@ -100,16 +102,16 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
   }
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this task?')) return
+    if (!confirm(t('tasks.areYouSureDeleteTask'))) return
     
     setLoading(true)
     try {
       await deleteTask(task.id)
       onTaskDeleted(task.id)
-      toast.success('Task deleted')
+      toast.success(t('tasks.taskDeleted'))
     } catch (error) {
       console.error('Failed to delete task:', error)
-      toast.error('Failed to delete task')
+      toast.error(t('tasks.failedToDeleteTask'))
     } finally {
       setLoading(false)
     }
@@ -117,7 +119,7 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
 
   const handleStartTimer = async () => {
     if (isRunning) {
-      toast.error('Please stop the current timer first')
+      toast.error(t('tasks.pleaseStopCurrentTimer'))
       return
     }
 
@@ -128,7 +130,7 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
       }
     } catch (error) {
       console.error('Failed to start timer:', error)
-      toast.error('Failed to start timer')
+      toast.error(t('tasks.failedToStartTimer'))
     }
   }
 
@@ -143,12 +145,12 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
       onTaskUpdated(updatedTask)
 
       const durationMinutes = Math.floor(elapsed / 60)
-      toast.success('Timer stopped', {
-        description: `Logged ${durationMinutes} minutes to "${task.title}"`,
+      toast.success(t('tasks.timerStopped'), {
+        description: t('tasks.loggedMinutes', { minutes: durationMinutes, title: task.title }),
       })
     } catch (error) {
       console.error('Failed to stop timer:', error)
-      toast.error('Failed to stop timer')
+      toast.error(t('tasks.failedToStopTimer'))
     } finally {
       setLoading(false)
     }
@@ -229,7 +231,7 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
             <DropdownMenuContent align="end">
               <DropdownMenuItem onClick={() => setIsTimeDialogOpen(true)}>
                 <Plus className="w-4 h-4 mr-2" />
-                Log Time
+                {t('tasks.logTime')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               {canMovePrevious && (
@@ -237,7 +239,7 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
                   localTask.status === 'done' ? 'in_progress' : 'todo'
                 )}>
                   <ArrowLeft className="w-4 h-4 mr-2" />
-                  Move to {localTask.status === 'done' ? 'In Progress' : 'To Do'}
+                  {t('tasks.moveTo')} {localTask.status === 'done' ? t('common.inProgress') : t('common.todo')}
                 </DropdownMenuItem>
               )}
               {canMoveNext && (
@@ -245,12 +247,12 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
                   localTask.status === 'todo' ? 'in_progress' : 'done'
                 )}>
                   <ArrowRight className="w-4 h-4 mr-2" />
-                  Move to {localTask.status === 'todo' ? 'In Progress' : 'Done'}
+                  {t('tasks.moveTo')} {localTask.status === 'todo' ? t('common.inProgress') : t('common.done')}
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleDelete} className="text-red-600">
-                Delete
+                {t('common.delete')}
               </DropdownMenuItem>
             </DropdownMenuContent>
             </DropdownMenu>
@@ -312,7 +314,7 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Badge variant="outline" className={`${priorityColors[localTask.priority]} font-medium text-xs px-2 py-1`}>
-              {localTask.priority}
+              {t(`common.${localTask.priority}`)}
             </Badge>
           </div>
           <span className="text-xs text-gray-400">

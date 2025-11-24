@@ -10,6 +10,7 @@ import { Card } from '@/components/ui/card'
 import { useTimerStore } from '@/lib/store/timerStore'
 import { updateTaskStatus } from '@/lib/supabase/queries/tasks'
 import { toast } from 'sonner'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface Task {
   id: string
@@ -34,6 +35,7 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
   const [localTasks, setLocalTasks] = useState<Task[]>(tasks)
   const [loadingTasks, setLoadingTasks] = useState<Set<string>>(new Set())
   const { isRunning, taskId: activeTaskId, startTimer } = useTimerStore()
+  const t = useTranslation()
 
   // Update local tasks when props change
   React.useEffect(() => {
@@ -52,23 +54,23 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
     const now = new Date()
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60))
     
-    if (diffInHours < 1) return 'Just now'
-    if (diffInHours < 24) return `${diffInHours}h ago`
+    if (diffInHours < 1) return t('common.justNow')
+    if (diffInHours < 24) return `${diffInHours}h ${t('common.ago')}`
     const diffInDays = Math.floor(diffInHours / 24)
-    return `${diffInDays}d ago`
+    return `${diffInDays}d ${t('common.ago')}`
   }
 
   const handleStartTimer = async (task: Task) => {
     if (isRunning) {
-      toast.error('Stop the current timer first')
+      toast.error(t('tasks.stopCurrentTimerFirst'))
       return
     }
 
     try {
       await startTimer(task.id, task.title, userId)
-      toast.success(`Started timer for "${task.title}"`)
+      toast.success(t('tasks.startedTimerFor', { title: task.title }))
     } catch (error) {
-      toast.error('Failed to start timer')
+      toast.error(t('tasks.failedToStartTimer'))
       console.error('Timer start error:', error)
     }
   }
@@ -81,13 +83,13 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
     
     try {
       await updateTaskStatus(taskId, 'done')
-      toast.success('Task marked as complete!')
+      toast.success(t('tasks.taskMarkedAsComplete'))
       // Refresh the page to update Today's Completed section
       router.refresh()
     } catch (error) {
       // Revert optimistic update on error
       setLocalTasks(tasks)
-      toast.error('Failed to mark task as complete')
+      toast.error(t('tasks.failedToMarkComplete'))
       console.error('Mark complete error:', error)
     } finally {
       setLoadingTasks(prev => {
@@ -101,11 +103,11 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
   if (localTasks.length === 0) {
     return (
       <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">Recent Tasks</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('dashboard.recentTasks')}</h3>
         <div className="text-center py-8 text-gray-500">
           <Clock className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-          <p>No incomplete tasks found</p>
-          <p className="text-sm">Create some tasks to get started!</p>
+          <p>{t('dashboard.noIncompleteTasks')}</p>
+          <p className="text-sm">{t('dashboard.createSomeTasks')}</p>
         </div>
       </Card>
     )
@@ -113,7 +115,7 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
 
   return (
     <Card className="p-6">
-      <h3 className="text-lg font-semibold mb-4">Recent Tasks</h3>
+      <h3 className="text-lg font-semibold mb-4">{t('dashboard.recentTasks')}</h3>
       <div className="space-y-3">
         {localTasks.map((task) => (
           <div
@@ -149,7 +151,7 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
             <div className="flex items-center gap-1 ml-3">
               {activeTaskId === task.id ? (
                 <Badge variant="default" className="text-xs">
-                  Running
+                  {t('common.running')}
                 </Badge>
               ) : (
                 <>
@@ -159,7 +161,7 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
                     onClick={() => handleStartTimer(task)}
                     disabled={isRunning || loadingTasks.has(task.id)}
                     className="h-8 w-8 p-0 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
-                    title="Start timer"
+                    title={t('timer.start')}
                   >
                     <Play className="w-4 h-4" />
                   </Button>
@@ -169,7 +171,7 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
                     onClick={() => handleMarkComplete(task.id)}
                     disabled={loadingTasks.has(task.id)}
                     className="h-8 w-8 p-0 hover:bg-green-100 dark:hover:bg-green-900/30 hover:text-green-600 dark:hover:text-green-400 transition-colors cursor-pointer"
-                    title="Mark as complete"
+                    title={t('tasks.taskMarkedAsComplete')}
                   >
                     <Check className="w-4 h-4" />
                   </Button>
@@ -184,7 +186,7 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
         <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
           <Link href="/projects">
             <Button variant="ghost" size="sm" className="w-full">
-              View all projects
+              {t('dashboard.viewAllProjects')}
             </Button>
           </Link>
         </div>

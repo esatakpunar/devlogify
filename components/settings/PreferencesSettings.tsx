@@ -10,15 +10,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { Moon, Sun, Monitor, Globe } from 'lucide-react'
+import { Moon, Sun, Monitor, Globe, Languages } from 'lucide-react'
 import { toast } from 'sonner'
 import { getProfile, updateProfile, createProfile, Profile } from '@/lib/supabase/queries/profiles'
+import { useLanguage } from '@/components/providers/LanguageProvider'
+import { useTranslation } from '@/lib/i18n/useTranslation'
+import { localeNames, localeFlags, type Locale } from '@/lib/i18n/config'
 
 interface PreferencesSettingsProps {
   userId: string
 }
 
 export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
+  const { locale, setLocale } = useLanguage()
+  const t = useTranslation()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system')
   const [notifications, setNotifications] = useState(true)
@@ -112,9 +117,20 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
       // Dispatch custom event to notify ThemeProvider (for same-tab updates)
       window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: newTheme } }))
       
-      toast.success('Theme updated')
+      toast.success(t('settings.themeUpdated'))
     } catch (error) {
-      toast.error('Failed to update theme')
+      toast.error(t('settings.updateFailed'))
+    }
+  }
+
+  const handleLanguageChange = async (value: string) => {
+    const newLocale = value as Locale
+    try {
+      await setLocale(newLocale)
+      await updateProfileSetting({ language: newLocale })
+      toast.success(t('settings.languageUpdated'))
+    } catch (error) {
+      toast.error(t('settings.updateFailed'))
     }
   }
 
@@ -125,9 +141,9 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
       await updateProfileSetting({ notifications_enabled: checked })
       // Also update localStorage for backward compatibility
       localStorage.setItem('notifications', checked.toString())
-      toast.success(checked ? 'Notifications enabled' : 'Notifications disabled')
+      toast.success(checked ? t('settings.notificationsEnabled') : t('settings.notificationsDisabled'))
     } catch (error) {
-      toast.error('Failed to update notifications')
+      toast.error(t('settings.updateFailed'))
     }
   }
 
@@ -138,9 +154,9 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
       await updateProfileSetting({ week_starts_on: value })
       // Also update localStorage for backward compatibility
       localStorage.setItem('weekStartsOn', value)
-      toast.success('Week start day updated')
+      toast.success(t('settings.weekStartUpdated'))
     } catch (error) {
-      toast.error('Failed to update week start day')
+      toast.error(t('settings.updateFailed'))
     }
   }
 
@@ -149,16 +165,16 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
     
     try {
       await updateProfileSetting({ timezone: value })
-      toast.success('Timezone updated')
+      toast.success(t('settings.timezoneUpdated'))
     } catch (error) {
-      toast.error('Failed to update timezone')
+      toast.error(t('settings.updateFailed'))
     }
   }
 
   if (initialLoading) {
     return (
       <div className="space-y-6">
-        {[...Array(4)].map((_, i) => (
+        {[...Array(5)].map((_, i) => (
           <div key={i} className="flex items-center justify-between">
             <div className="space-y-0.5">
               <div className="h-4 bg-gray-200 rounded animate-pulse w-24" />
@@ -173,12 +189,37 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
 
   return (
     <div className="space-y-6">
+      {/* Language */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-0.5">
+          <Label>{t('settings.language')}</Label>
+          <p className="text-sm text-gray-600">
+            {t('settings.languageDescription')}
+          </p>
+        </div>
+        <Select value={locale} onValueChange={handleLanguageChange} disabled={loading}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {(['tr', 'en', 'de', 'es'] as Locale[]).map((loc) => (
+              <SelectItem key={loc} value={loc}>
+                <div className="flex items-center gap-2">
+                  <span>{localeFlags[loc]}</span>
+                  {localeNames[loc]}
+                </div>
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
       {/* Theme */}
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
-          <Label>Theme</Label>
+          <Label>{t('settings.theme')}</Label>
           <p className="text-sm text-gray-600">
-            Choose your preferred theme
+            {t('settings.themeDescription')}
           </p>
         </div>
         <Select value={theme} onValueChange={handleThemeChange} disabled={loading}>
@@ -189,19 +230,19 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
             <SelectItem value="light">
               <div className="flex items-center gap-2">
                 <Sun className="w-4 h-4" />
-                Light
+                {t('settings.light')}
               </div>
             </SelectItem>
             <SelectItem value="dark">
               <div className="flex items-center gap-2">
                 <Moon className="w-4 h-4" />
-                Dark
+                {t('settings.dark')}
               </div>
             </SelectItem>
             <SelectItem value="system">
               <div className="flex items-center gap-2">
                 <Monitor className="w-4 h-4" />
-                System
+                {t('settings.system')}
               </div>
             </SelectItem>
           </SelectContent>
@@ -211,9 +252,9 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
       {/* Notifications */}
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
-          <Label>Notifications</Label>
+          <Label>{t('settings.notifications')}</Label>
           <p className="text-sm text-gray-600">
-            Receive notifications about your tasks
+            {t('settings.notificationsDescription')}
           </p>
         </div>
         <Switch
@@ -226,9 +267,9 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
       {/* Week Starts On */}
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
-          <Label>Week starts on</Label>
+          <Label>{t('settings.weekStartsOn')}</Label>
           <p className="text-sm text-gray-600">
-            Choose the first day of your week
+            {t('settings.weekStartsOnDescription')}
           </p>
         </div>
         <Select value={weekStartsOn} onValueChange={handleWeekStartChange} disabled={loading}>
@@ -236,8 +277,8 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="monday">Monday</SelectItem>
-            <SelectItem value="sunday">Sunday</SelectItem>
+            <SelectItem value="monday">{t('settings.monday')}</SelectItem>
+            <SelectItem value="sunday">{t('settings.sunday')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -245,9 +286,9 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
       {/* Timezone */}
       <div className="flex items-center justify-between">
         <div className="space-y-0.5">
-          <Label>Timezone</Label>
+          <Label>{t('settings.timezone')}</Label>
           <p className="text-sm text-gray-600">
-            Your local timezone for accurate time tracking
+            {t('settings.timezoneDescription')}
           </p>
         </div>
         <Select value={timezone} onValueChange={handleTimezoneChange} disabled={loading}>

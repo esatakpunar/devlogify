@@ -1,6 +1,7 @@
 'use client'
 
 import { Clock, CheckCircle2, TrendingUp, TrendingDown } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface WeeklySummaryProps {
   stats: {
@@ -17,6 +18,7 @@ interface WeeklySummaryProps {
 
 export function WeeklySummary({ stats }: WeeklySummaryProps) {
   const { currentWeek, lastWeek } = stats
+  const t = useTranslation()
 
   const currentHours = Math.floor(currentWeek.minutes / 60)
   const currentMins = currentWeek.minutes % 60
@@ -33,14 +35,14 @@ export function WeeklySummary({ stats }: WeeklySummaryProps) {
 
   return (
     <div className="bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg p-6 text-white">
-      <h2 className="text-xl font-semibold mb-6">This Week's Summary</h2>
+      <h2 className="text-xl font-semibold mb-6">{t('analytics.thisWeeksSummary')}</h2>
       
       <div className="grid gap-4 md:grid-cols-2">
         {/* Time Logged */}
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="w-5 h-5" />
-            <span className="text-sm font-medium">Time Logged</span>
+            <span className="text-sm font-medium">{t('analytics.timeLogged')}</span>
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold">
@@ -55,7 +57,7 @@ export function WeeklySummary({ stats }: WeeklySummaryProps) {
                 <TrendingDown className="w-4 h-4" />
               )}
               <span className="text-sm">
-                {Math.abs(timePercentage)}% {timeDiff >= 0 ? 'more' : 'less'} than last week
+                {Math.abs(timePercentage)}% {timeDiff >= 0 ? t('analytics.moreThanLastWeek') : t('analytics.lessThanLastWeek')}
               </span>
             </div>
           )}
@@ -65,11 +67,11 @@ export function WeeklySummary({ stats }: WeeklySummaryProps) {
         <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
           <div className="flex items-center gap-2 mb-2">
             <CheckCircle2 className="w-5 h-5" />
-            <span className="text-sm font-medium">Tasks Completed</span>
+            <span className="text-sm font-medium">{t('analytics.tasksCompleted')}</span>
           </div>
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold">{currentWeek.tasks}</span>
-            <span className="text-sm opacity-80">tasks</span>
+            <span className="text-sm opacity-80">{t('projects.tasks')}</span>
           </div>
           {lastWeek.tasks > 0 && (
             <div className="flex items-center gap-1 mt-2">
@@ -79,7 +81,7 @@ export function WeeklySummary({ stats }: WeeklySummaryProps) {
                 <TrendingDown className="w-4 h-4" />
               )}
               <span className="text-sm">
-                {Math.abs(taskPercentage)}% {taskDiff >= 0 ? 'more' : 'less'} than last week
+                {Math.abs(taskPercentage)}% {taskDiff >= 0 ? t('analytics.moreThanLastWeek') : t('analytics.lessThanLastWeek')}
               </span>
             </div>
           )}

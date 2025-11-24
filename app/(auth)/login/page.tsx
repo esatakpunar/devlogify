@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -16,6 +17,7 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
+  const t = useTranslation()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,9 +41,9 @@ export default function LoginPage() {
   return (
     <Card>
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
+        <CardTitle className="text-2xl font-bold">{t('auth.welcomeBack')}</CardTitle>
         <CardDescription>
-          Enter your email and password to sign in
+          {t('auth.enterEmailAndPassword')}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleLogin}>
@@ -52,11 +54,11 @@ export default function LoginPage() {
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t('auth.email')}</Label>
             <Input
               id="email"
               type="email"
-              placeholder="name@example.com"
+              placeholder={t('auth.emailPlaceholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -64,7 +66,7 @@ export default function LoginPage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{t('auth.password')}</Label>
             <Input
               id="password"
               type="password"
@@ -83,18 +85,18 @@ export default function LoginPage() {
               }}
               className="text-sm text-blue-600 hover:underline"
             >
-              Forgot password?
+              {t('auth.forgotPassword')}
             </button>
           </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign in'}
+            {loading ? t('auth.signingIn') : t('auth.signIn')}
           </Button>
           <p className="text-sm text-center text-gray-600">
-            Don't have an account?{' '}
+            {t('auth.dontHaveAccount')}{' '}
             <Link href="/signup" className="text-blue-600 hover:underline">
-              Sign up
+              {t('auth.signUp')}
             </Link>
           </p>
         </CardFooter>

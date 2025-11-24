@@ -22,6 +22,7 @@ import {
 import { updateTaskStatus, updateTasksOrder } from '@/lib/supabase/queries/tasks'
 import { logActivity } from '@/lib/supabase/queries/activities'
 import { toast } from 'sonner'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 type Task = {
   id: string
@@ -58,6 +59,7 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
   const [isAICreateDialogOpen, setIsAICreateDialogOpen] = useState(false)
   const [activeTask, setActiveTask] = useState<Task | null>(null)
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
+  const t = useTranslation()
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -159,12 +161,15 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
           }
         )
 
-        toast.success(`Task moved to ${newStatus.replace('_', ' ')}`)
+        const statusText = newStatus === 'todo' ? t('kanban.todo') : 
+                          newStatus === 'in_progress' ? t('kanban.inProgress') : 
+                          t('kanban.done')
+        toast.success(t('tasks.taskMarkedAsComplete'))
       } catch (error) {
         console.error('Failed to update task status:', error)
         // Revert optimistic update
         setTasks(tasks.map(t => t.id === activeId ? activeTask : t))
-        toast.error('Failed to move task')
+        toast.error(t('tasks.failedToUpdateTask'))
       }
     } else {
       // Same-column reordering is disabled to avoid multiple database requests
@@ -182,9 +187,9 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold">Tasks</h2>
+            <h2 className="text-lg font-semibold">{t('tasks.title')}</h2>
             <span className="text-sm text-gray-500">
-              {tasks.length} total
+              {tasks.length} {t('common.total') || 'total'}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -195,7 +200,7 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
                   onClick={() => setIsAICreateDialogOpen(true)}
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
-                  AI Create Tasks
+                  {t('kanban.createTasksWithAI')}
                 </Button>
                 <TaskGroupingButton 
                   projectId={projectId} 
@@ -213,27 +218,27 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
                   onClick={() => setUpgradeDialogOpen(true)}
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
-                  AI Create Tasks
+                  {t('kanban.createTasksWithAI')}
                 </Button>
                 <Button
                   variant="outline"
                   onClick={() => setUpgradeDialogOpen(true)}
                 >
                   <Sparkles className="w-4 h-4 mr-2" />
-                  Group Tasks
+                  {t('kanban.groupTasks')}
                 </Button>
               </>
             )}
             <Button onClick={() => setIsCreateDialogOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
-              New Task
+              {t('tasks.newTask')}
             </Button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <KanbanColumn
-            title="To Do"
+            title={t('kanban.todo')}
             status="todo"
             tasks={todoTasks}
             count={todoTasks.length}
@@ -242,7 +247,7 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
             onTaskDeleted={handleTaskDeleted}
           />
           <KanbanColumn
-            title="In Progress"
+            title={t('kanban.inProgress')}
             status="in_progress"
             tasks={inProgressTasks}
             count={inProgressTasks.length}
@@ -251,7 +256,7 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
             onTaskDeleted={handleTaskDeleted}
           />
           <KanbanColumn
-            title="Done"
+            title={t('kanban.done')}
             status="done"
             tasks={doneTasks}
             count={doneTasks.length}

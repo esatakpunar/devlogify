@@ -24,6 +24,7 @@ import { ProgressBar } from '@/components/ui/progress-bar'
 import { TimeProgressIndicator } from './TimeProgressIndicator'
 import { TaskTemplateDialog } from './TaskTemplateDialog'
 import { toast } from 'sonner'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 type Task = {
   id: string
@@ -62,6 +63,7 @@ export function EditTaskDialog({
   const [progress, setProgress] = useState(task.progress)
   const [tags, setTags] = useState(task.tags?.join(', ') || '')
   const [loading, setLoading] = useState(false)
+  const t = useTranslation()
 
   // Update state when task prop changes
   useEffect(() => {
@@ -97,11 +99,11 @@ export function EditTaskDialog({
       })
 
       onTaskUpdated(updatedTask)
-      toast.success('Task updated successfully')
+      toast.success(t('tasks.taskUpdatedSuccessfully'))
       onOpenChange(false)
     } catch (error: any) {
       console.error('Failed to update task:', error)
-      toast.error('Failed to update task')
+      toast.error(t('tasks.failedToUpdateTask'))
     } finally {
       setLoading(false)
     }
@@ -111,20 +113,20 @@ export function EditTaskDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>Edit Task</DialogTitle>
+          <DialogTitle>{t('tasks.editTask')}</DialogTitle>
           <DialogDescription>
-            Update your task details
+            {t('tasks.updateTaskDetails')}
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 min-w-0">
           <div className="space-y-2">
             <Label htmlFor="edit-task-title">
-              Task Title <span className="text-red-500">*</span>
+              {t('tasks.taskTitle')} <span className="text-red-500">*</span>
             </Label>
             <Input
               id="edit-task-title"
-              placeholder="What needs to be done?"
+              placeholder={t('tasks.whatNeedsToBeDone')}
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -133,10 +135,10 @@ export function EditTaskDialog({
           </div>
 
           <div className="space-y-2 min-w-0">
-            <Label htmlFor="edit-task-description">Description</Label>
+            <Label htmlFor="edit-task-description">{t('projects.description')}</Label>
             <Textarea
               id="edit-task-description"
-              placeholder="Add more details..."
+              placeholder={t('tasks.addMoreDetails')}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               disabled={loading}
@@ -146,7 +148,7 @@ export function EditTaskDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="edit-task-priority">Priority</Label>
+              <Label htmlFor="edit-task-priority">{t('tasks.priority')}</Label>
               <Select 
                 value={priority} 
                 onValueChange={(value: 'low' | 'medium' | 'high') => setPriority(value)}
@@ -156,15 +158,15 @@ export function EditTaskDialog({
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="low">Low</SelectItem>
-                  <SelectItem value="medium">Medium</SelectItem>
-                  <SelectItem value="high">High</SelectItem>
+                  <SelectItem value="low">{t('common.low')}</SelectItem>
+                  <SelectItem value="medium">{t('common.medium')}</SelectItem>
+                  <SelectItem value="high">{t('common.high')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="edit-task-duration">Estimated Time (min)</Label>
+              <Label htmlFor="edit-task-duration">{t('tasks.estimatedTime')}</Label>
               <Input
                 id="edit-task-duration"
                 type="number"
@@ -177,20 +179,20 @@ export function EditTaskDialog({
           </div>
 
           <div className="space-y-2 min-w-0">
-            <Label htmlFor="edit-task-tags">Tags (optional)</Label>
+            <Label htmlFor="edit-task-tags">{t('tasks.tags')}</Label>
             <Input
               id="edit-task-tags"
-              placeholder="api, frontend, bug (separate with commas)"
+              placeholder={t('tasks.tagsPlaceholder')}
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               disabled={loading}
             />
-            <p className="text-xs text-gray-500">Separate tags with commas</p>
+            <p className="text-xs text-gray-500">{t('tasks.separateTagsWithCommas')}</p>
           </div>
 
           {/* Progress Section */}
           <div className="space-y-3">
-            <Label>Progress</Label>
+            <Label>{t('tasks.progress')}</Label>
             <div className="space-y-3">
               {/* Interactive Progress Bar */}
               <div className="space-y-2">
@@ -202,13 +204,13 @@ export function EditTaskDialog({
                   onValueChange={handleProgressUpdate}
                 />
                 <div className="text-xs text-gray-500">
-                  Click on the progress bar to set progress
+                  {t('tasks.clickProgressBarToSet')}
                 </div>
               </div>
               
               {/* Time Progress Indicator */}
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div className="text-sm font-medium text-gray-700">Time Status</div>
+                <div className="text-sm font-medium text-gray-700">{t('tasks.timeStatus')}</div>
                 <TimeProgressIndicator
                   estimatedDuration={task.estimated_duration}
                   actualDuration={task.actual_duration}
@@ -220,7 +222,7 @@ export function EditTaskDialog({
 
           <div className="flex gap-3 pt-4">
             <Button type="submit" disabled={loading} className="flex-1">
-              {loading ? 'Saving...' : 'Save Changes'}
+              {loading ? t('projects.saving') : t('projects.saveChanges')}
             </Button>
             <Button 
               type="button" 
@@ -228,7 +230,7 @@ export function EditTaskDialog({
               onClick={() => onOpenChange(false)}
               disabled={loading}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <TaskTemplateDialog
               userId={userId}

@@ -2,17 +2,19 @@
 
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 export function ProjectsFilter() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const currentStatus = searchParams.get('status') || 'active'
+  const t = useTranslation()
 
   const filters = [
-    { label: 'All', value: 'all' },
-    { label: 'Active', value: 'active' },
-    { label: 'Completed', value: 'completed' },
-    { label: 'Archived', value: 'archived' },
+    { label: t('projects.filter.all'), value: 'all' },
+    { label: t('projects.filter.active'), value: 'active' },
+    { label: t('projects.filter.completed'), value: 'completed' },
+    { label: t('projects.filter.archived'), value: 'archived' },
   ]
 
   const handleFilterChange = (value: string) => {

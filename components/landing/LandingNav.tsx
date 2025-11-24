@@ -3,8 +3,11 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Code2 } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 export function LandingNav() {
+  const t = useTranslation()
+  
   return (
     <nav className="fixed top-0 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 z-50">
       <div className="container mx-auto max-w-6xl flex h-16 items-center justify-between px-4 md:px-6">
@@ -15,10 +18,10 @@ export function LandingNav() {
 
         <div className="flex items-center space-x-4">
           <Button variant="ghost" asChild>
-            <Link href="/login">Login</Link>
+            <Link href="/login">{t('auth.login')}</Link>
           </Button>
           <Button asChild>
-            <Link href="/signup">Sign Up</Link>
+            <Link href="/signup">{t('auth.signUp')}</Link>
           </Button>
         </div>
       </div>

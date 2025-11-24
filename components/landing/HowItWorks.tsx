@@ -2,35 +2,37 @@
 
 import { motion } from 'framer-motion'
 import { UserPlus, FolderPlus, Sparkles, TrendingUp } from 'lucide-react'
-
-const steps = [
-  {
-    icon: UserPlus,
-    title: 'Sign Up',
-    description: 'Create your free account in seconds. No credit card required.',
-    step: '01',
-  },
-  {
-    icon: FolderPlus,
-    title: 'Create Your First Project',
-    description: 'Set up your project and start organizing your development work.',
-    step: '02',
-  },
-  {
-    icon: Sparkles,
-    title: 'Track Your Progress',
-    description: 'Use kanban boards, notes, and timeline to document your journey.',
-    step: '03',
-  },
-  {
-    icon: TrendingUp,
-    title: 'Analyze & Grow',
-    description: 'Review analytics to understand your productivity and improve.',
-    step: '04',
-  },
-]
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 export function HowItWorks() {
+  const t = useTranslation()
+  
+  const steps = [
+    {
+      icon: UserPlus,
+      title: t('landing.howItWorks.signUp'),
+      description: t('landing.howItWorks.signUpDescription'),
+      step: '01',
+    },
+    {
+      icon: FolderPlus,
+      title: t('landing.howItWorks.createFirstProject'),
+      description: t('landing.howItWorks.createFirstProjectDescription'),
+      step: '02',
+    },
+    {
+      icon: Sparkles,
+      title: t('landing.howItWorks.trackProgress'),
+      description: t('landing.howItWorks.trackProgressDescription'),
+      step: '03',
+    },
+    {
+      icon: TrendingUp,
+      title: t('landing.howItWorks.analyzeGrow'),
+      description: t('landing.howItWorks.analyzeGrowDescription'),
+      step: '04',
+    },
+  ]
   return (
     <section className="py-20 px-4 bg-muted/30">
       <div className="container mx-auto max-w-6xl">
@@ -42,10 +44,10 @@ export function HowItWorks() {
           className="text-center space-y-4 mb-16"
         >
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold">
-            How It Works
+            {t('landing.howItWorks.title')}
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Get started with Devlogify in four simple steps and transform how you track your development work.
+            {t('landing.howItWorks.description')}
           </p>
         </motion.div>
 

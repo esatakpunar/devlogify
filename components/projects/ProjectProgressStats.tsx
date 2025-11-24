@@ -4,6 +4,7 @@ import { ProgressBar } from '@/components/ui/progress-bar'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 type Task = {
   id: string
@@ -24,6 +25,8 @@ interface ProjectProgressStatsProps {
 }
 
 export function ProjectProgressStats({ tasks }: ProjectProgressStatsProps) {
+  const t = useTranslation()
+  
   // Calculate overall project progress
   const overallProgress = tasks.length > 0 
     ? Math.round(tasks.reduce((sum, task) => sum + task.progress, 0) / tasks.length)
@@ -54,13 +57,13 @@ export function ProjectProgressStats({ tasks }: ProjectProgressStatsProps) {
       {/* Overall Progress */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">Overall Progress</CardTitle>
+          <CardTitle className="text-sm font-medium text-gray-600">{t('projects.overallProgress')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             <ProgressBar value={overallProgress} showPercentage size="lg" />
             <div className="text-xs text-gray-500">
-              {completedTasks} of {tasks.length} tasks completed
+              {t('projects.tasksCompleted', { completed: completedTasks, total: tasks.length })}
             </div>
           </div>
         </CardContent>
@@ -69,7 +72,7 @@ export function ProjectProgressStats({ tasks }: ProjectProgressStatsProps) {
       {/* Progress Distribution */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">Progress Distribution</CardTitle>
+          <CardTitle className="text-sm font-medium text-gray-600">{t('projects.progressDistribution')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
@@ -88,14 +91,14 @@ export function ProjectProgressStats({ tasks }: ProjectProgressStatsProps) {
       {/* Status Distribution */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">Status Distribution</CardTitle>
+          <CardTitle className="text-sm font-medium text-gray-600">{t('projects.statusDistribution')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             {Object.entries(statusDistribution).map(([status, count]) => (
               <div key={status} className="flex items-center justify-between">
-                <span className="text-xs text-gray-600 capitalize">
-                  {status.replace('_', ' ')}
+                <span className="text-xs text-gray-600">
+                  {status === 'todo' ? t('common.todo') : status === 'in_progress' ? t('common.inProgress') : t('common.done')}
                 </span>
                 <Badge 
                   variant="outline" 
@@ -117,25 +120,25 @@ export function ProjectProgressStats({ tasks }: ProjectProgressStatsProps) {
       {/* Time Statistics */}
       <Card>
         <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">Time Statistics</CardTitle>
+          <CardTitle className="text-sm font-medium text-gray-600">{t('projects.timeStatistics')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-600">Estimated</span>
-              <span className="text-xs font-medium">{totalEstimatedTime}m</span>
+              <span className="text-xs text-gray-600">{t('projects.estimated')}</span>
+              <span className="text-xs font-medium">{totalEstimatedTime}{t('common.min')}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-600">Actual</span>
-              <span className="text-xs font-medium">{totalActualTime}m</span>
+              <span className="text-xs text-gray-600">{t('projects.actual')}</span>
+              <span className="text-xs font-medium">{totalActualTime}{t('common.min')}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-600">Difference</span>
+              <span className="text-xs text-gray-600">{t('projects.difference')}</span>
               <span className={cn(
                 'text-xs font-medium',
                 totalActualTime > totalEstimatedTime ? 'text-red-600' : 'text-green-600'
               )}>
-                {totalActualTime > totalEstimatedTime ? '+' : ''}{totalActualTime - totalEstimatedTime}m
+                {totalActualTime > totalEstimatedTime ? '+' : ''}{totalActualTime - totalEstimatedTime}{t('common.min')}
               </span>
             </div>
           </div>

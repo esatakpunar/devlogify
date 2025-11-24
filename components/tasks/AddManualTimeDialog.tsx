@@ -16,6 +16,7 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
 import { Clock } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface AddManualTimeDialogProps {
   open: boolean
@@ -38,6 +39,7 @@ export function AddManualTimeDialog({
   const [minutes, setMinutes] = useState('')
   const [note, setNote] = useState('')
   const [loading, setLoading] = useState(false)
+  const t = useTranslation()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -45,7 +47,7 @@ export function AddManualTimeDialog({
     const totalMinutes = (parseInt(hours || '0') * 60) + parseInt(minutes || '0')
 
     if (totalMinutes <= 0) {
-      toast.error('Please enter a valid time')
+      toast.error(t('timeLogging.pleaseEnterValidTime'))
       return
     }
 
@@ -71,8 +73,8 @@ export function AddManualTimeDialog({
       )
 
       onTimeAdded(totalMinutes)
-      toast.success('Time logged successfully', {
-        description: `Added ${totalMinutes} minutes to "${taskTitle}"`,
+      toast.success(t('timeLogging.timeLoggedSuccessfully'), {
+        description: t('timeLogging.addedMinutesTo', { minutes: totalMinutes, title: taskTitle }),
       })
 
       // Reset form
@@ -82,7 +84,7 @@ export function AddManualTimeDialog({
       onOpenChange(false)
     } catch (error: any) {
       console.error('Failed to add time:', error)
-      toast.error('Failed to log time')
+      toast.error(t('timeLogging.failedToLogTime'))
     } finally {
       setLoading(false)
     }
@@ -92,16 +94,16 @@ export function AddManualTimeDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[450px]">
         <DialogHeader>
-          <DialogTitle>Log Time Manually</DialogTitle>
+          <DialogTitle>{t('timeLogging.logTimeManually')}</DialogTitle>
           <DialogDescription>
-            Add time spent on: <span className="font-medium text-gray-900">{taskTitle}</span>
+            {t('timeLogging.addTimeSpentOn')} <span className="font-medium text-gray-900">{taskTitle}</span>
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="hours">Hours</Label>
+              <Label htmlFor="hours">{t('timeLogging.hours')}</Label>
               <Input
                 id="hours"
                 type="number"
@@ -114,7 +116,7 @@ export function AddManualTimeDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="minutes">Minutes</Label>
+              <Label htmlFor="minutes">{t('timeLogging.minutes')}</Label>
               <Input
                 id="minutes"
                 type="number"
@@ -129,10 +131,10 @@ export function AddManualTimeDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="note">Note (optional)</Label>
+            <Label htmlFor="note">{t('timeLogging.noteOptional')}</Label>
             <Textarea
               id="note"
-              placeholder="What did you work on?"
+              placeholder={t('timeLogging.whatDidYouWorkOn')}
               value={note}
               onChange={(e) => setNote(e.target.value)}
               rows={3}
@@ -143,7 +145,7 @@ export function AddManualTimeDialog({
           <div className="flex gap-3 pt-4">
             <Button type="submit" disabled={loading} className="flex-1">
               <Clock className="w-4 h-4 mr-2" />
-              {loading ? 'Logging...' : 'Log Time'}
+              {loading ? t('timeLogging.logging') : t('timeLogging.logTime')}
             </Button>
             <Button 
               type="button" 
@@ -151,7 +153,7 @@ export function AddManualTimeDialog({
               onClick={() => onOpenChange(false)}
               disabled={loading}
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
           </div>
         </form>
