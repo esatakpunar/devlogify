@@ -256,6 +256,35 @@ export type Database = {
           updated_at?: string
         }
       }
+      activity_logs: {
+        Row: {
+          id: string
+          user_id: string
+          project_id: string | null
+          task_id: string | null
+          action_type: string
+          metadata: Record<string, any>
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          project_id?: string | null
+          task_id?: string | null
+          action_type: string
+          metadata?: Record<string, any>
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          user_id?: string
+          project_id?: string | null
+          task_id?: string | null
+          action_type?: string
+          metadata?: Record<string, any>
+          created_at?: string
+        }
+      }
     }
   }
 }
