@@ -90,6 +90,7 @@ export type Database = {
           actual_duration: number
           progress: number
           order_index: number
+          tags: string[] | null
           completed_at: string | null
           created_at: string
           updated_at: string
@@ -106,6 +107,7 @@ export type Database = {
           actual_duration?: number
           progress?: number
           order_index?: number
+          tags?: string[] | null
           completed_at?: string | null
           created_at?: string
           updated_at?: string
@@ -122,6 +124,7 @@ export type Database = {
           actual_duration?: number
           progress?: number
           order_index?: number
+          tags?: string[] | null
           completed_at?: string | null
           created_at?: string
           updated_at?: string
