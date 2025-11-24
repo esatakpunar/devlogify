@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { ProfileSettings } from '@/components/settings/ProfileSettings'
 import { PreferencesSettings } from '@/components/settings/PreferencesSettings'
 import { AccountSettings } from '@/components/settings/AccountSettings'
+import { PremiumSettings } from '@/components/settings/PremiumSettings'
 import { Separator } from '@/components/ui/separator'
 
 export default async function SettingsPage() {
@@ -36,8 +37,16 @@ export default async function SettingsPage() {
 
       <Separator />
 
+      {/* Premium Section */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
+        <h2 className="text-xl font-semibold mb-4">Premium Features</h2>
+        <PremiumSettings userId={user.id} />
+      </div>
+
+      <Separator />
+
       {/* Account Section */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
         <h2 className="text-xl font-semibold mb-4">Account</h2>
         <AccountSettings user={user} />
       </div>

@@ -16,6 +16,7 @@ import { toast } from 'sonner'
 import { formatDistanceToNow } from 'date-fns'
 import { EditNoteDialog } from './EditNoteDialog'
 import { AICreateTasksDialog } from '@/components/tasks/AICreateTasksDialog'
+import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 import Link from 'next/link'
 import { usePremium } from '@/lib/hooks/usePremium'
 
@@ -53,6 +54,7 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
   const [loading, setLoading] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false)
+  const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
 
   const handleTogglePin = async () => {
     setLoading(true)
@@ -142,15 +144,19 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                {isPremium && (
-                  <>
-                    <DropdownMenuItem onClick={() => setIsAIDialogOpen(true)}>
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Create Tasks from Note
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                  </>
-                )}
+                <DropdownMenuItem 
+                  onClick={() => {
+                    if (isPremium) {
+                      setIsAIDialogOpen(true)
+                    } else {
+                      setUpgradeDialogOpen(true)
+                    }
+                  }}
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Create Tasks from Note
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
                   <Edit className="w-4 h-4 mr-2" />
                   Edit
@@ -207,13 +213,22 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
       />
 
       {/* AI Create Tasks Dialog */}
-      <AICreateTasksDialog
-        open={isAIDialogOpen}
-        onOpenChange={setIsAIDialogOpen}
-        projects={projects}
-        userId={userId}
-        initialNote={note}
-        onTasksCreated={onTasksCreated}
+      {isPremium && (
+        <AICreateTasksDialog
+          open={isAIDialogOpen}
+          onOpenChange={setIsAIDialogOpen}
+          projects={projects}
+          userId={userId}
+          initialNote={note}
+          onTasksCreated={onTasksCreated}
+        />
+      )}
+
+      {/* Upgrade Dialog */}
+      <UpgradeDialog
+        open={upgradeDialogOpen}
+        onOpenChange={setUpgradeDialogOpen}
+        feature="AI Task Generation from Notes"
       />
     </>
   )

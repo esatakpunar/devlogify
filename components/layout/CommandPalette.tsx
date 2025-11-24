@@ -15,6 +15,7 @@ import { getProjects } from '@/lib/supabase/queries/projects'
 import { getRecentIncompleteTasks } from '@/lib/supabase/queries/tasks'
 import { getNotes } from '@/lib/supabase/queries/notes'
 import { AICreateTasksDialog } from '@/components/tasks/AICreateTasksDialog'
+import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 import { FolderKanban, FileText, CheckSquare, Sparkles, Plus, Search } from 'lucide-react'
 import { usePremium } from '@/lib/hooks/usePremium'
 
@@ -32,6 +33,7 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
   const [notes, setNotes] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
   const [aiDialogOpen, setAiDialogOpen] = useState(false)
+  const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
 
   useEffect(() => {
     if (open) {
@@ -78,9 +80,13 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
       } else if (type === 'project') {
         router.push('/projects/new')
       } else if (type === 'ai-task') {
-        // Open AI Create Tasks Dialog
+        // Open AI Create Tasks Dialog or Upgrade Dialog
         onOpenChange(false) // Close command palette first
-        setAiDialogOpen(true)
+        if (isPremium) {
+          setAiDialogOpen(true)
+        } else {
+          setUpgradeDialogOpen(true)
+        }
       }
       return
     }
@@ -124,12 +130,10 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
 
         {/* Quick Actions */}
         <CommandGroup heading="Quick Actions">
-          {isPremium && (
-            <CommandItem value="create:ai-task" onSelect={handleSelect}>
-              <Sparkles className="mr-2 h-4 w-4" />
-              <span>Create Tasks with AI</span>
-            </CommandItem>
-          )}
+          <CommandItem value="create:ai-task" onSelect={handleSelect}>
+            <Sparkles className="mr-2 h-4 w-4" />
+            <span>Create Tasks with AI</span>
+          </CommandItem>
           <CommandItem value="create:task" onSelect={handleSelect}>
             <Plus className="mr-2 h-4 w-4" />
             <span>Create New Task</span>
@@ -242,15 +246,24 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
     </CommandDialog>
     
     {/* AI Create Tasks Dialog - Outside CommandDialog to avoid nested dialogs */}
-    <AICreateTasksDialog
-      open={aiDialogOpen}
-      onOpenChange={setAiDialogOpen}
-      projects={projects}
-      userId={userId}
-      onTasksCreated={() => {
-        // Reload data after tasks are created
-        loadData()
-      }}
+    {isPremium && (
+      <AICreateTasksDialog
+        open={aiDialogOpen}
+        onOpenChange={setAiDialogOpen}
+        projects={projects}
+        userId={userId}
+        onTasksCreated={() => {
+          // Reload data after tasks are created
+          loadData()
+        }}
+      />
+    )}
+
+    {/* Upgrade Dialog */}
+    <UpgradeDialog
+      open={upgradeDialogOpen}
+      onOpenChange={setUpgradeDialogOpen}
+      feature="AI Task Creation"
     />
   </>
   )

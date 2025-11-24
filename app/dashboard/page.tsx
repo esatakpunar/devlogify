@@ -13,6 +13,7 @@ import { QuickTimerCard } from '@/components/dashboard/QuickTimerCard'
 import { TaskSuggestions } from '@/components/dashboard/TaskSuggestions'
 import { DailyStandup } from '@/components/dashboard/DailyStandup'
 import { PomodoroTimer } from '@/components/timer/PomodoroTimer'
+import { AIFeaturesPromo } from '@/components/dashboard/AIFeaturesPromo'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -124,6 +125,7 @@ export default async function DashboardPage() {
           <PomodoroTimer />
           <QuickTimerCard userId={user.id} />
           <PinnedProjects projects={pinnedProjects || []} userId={user.id} />
+          <AIFeaturesPromo userId={user.id} />
           <TaskSuggestions userId={user.id} />
         </div>
       </div>

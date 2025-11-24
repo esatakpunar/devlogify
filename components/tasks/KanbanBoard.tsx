@@ -8,6 +8,7 @@ import { TaskGroupingButton } from './TaskGroupingButton'
 import { Button } from '@/components/ui/button'
 import { Plus, Sparkles } from 'lucide-react'
 import { usePremium } from '@/lib/hooks/usePremium'
+import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 import {
   DndContext,
   DragEndEvent,
@@ -56,6 +57,7 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isAICreateDialogOpen, setIsAICreateDialogOpen] = useState(false)
   const [activeTask, setActiveTask] = useState<Task | null>(null)
+  const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -186,7 +188,7 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
             </span>
           </div>
           <div className="flex items-center gap-2">
-            {isPremium && (
+            {isPremium ? (
               <>
                 <Button
                   variant="outline"
@@ -203,6 +205,23 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
                     window.location.reload()
                   }}
                 />
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => setUpgradeDialogOpen(true)}
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  AI Create Tasks
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setUpgradeDialogOpen(true)}
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Group Tasks
+                </Button>
               </>
             )}
             <Button onClick={() => setIsCreateDialogOpen(true)}>
@@ -256,6 +275,12 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
           projects={project ? [project] : [{ id: projectId, title: 'Current Project', color: '#3b82f6' }]}
           userId={userId}
           onTasksCreated={handleTasksCreated}
+        />
+
+        <UpgradeDialog
+          open={upgradeDialogOpen}
+          onOpenChange={setUpgradeDialogOpen}
+          feature="AI Task Features"
         />
       </div>
 

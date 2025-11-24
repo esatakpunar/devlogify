@@ -3,8 +3,10 @@ import { redirect } from 'next/navigation'
 import { LandingNav } from '@/components/landing/LandingNav'
 import { Hero } from '@/components/landing/Hero'
 import { Features } from '@/components/landing/Features'
+import { AIFeatures } from '@/components/landing/AIFeatures'
 import { HowItWorks } from '@/components/landing/HowItWorks'
 import { Testimonials } from '@/components/landing/Testimonials'
+import { Pricing } from '@/components/landing/Pricing'
 import { CTA } from '@/components/landing/CTA'
 import { Footer } from '@/components/landing/Footer'
 
@@ -41,7 +43,9 @@ export default async function Home({ searchParams }: HomeProps) {
       <main className="flex-1">
         <Hero />
         <Features />
+        <AIFeatures />
         <HowItWorks />
+        <Pricing />
         <Testimonials />
         <CTA />
       </main>

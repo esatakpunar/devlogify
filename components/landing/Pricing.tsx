@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Check } from 'lucide-react'
+import { Check, Sparkles } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 const plans = [
@@ -17,6 +17,7 @@ const plans = [
       '1 GB storage',
       'Timeline view',
     ],
+    aiFeatures: [],
     cta: 'Get Started',
     popular: false,
   },
@@ -32,6 +33,13 @@ const plans = [
       'Custom integrations',
       'Team collaboration (up to 5)',
       'Export functionality',
+    ],
+    aiFeatures: [
+      'AI Task Suggestions',
+      'Daily Standup Summary',
+      'AI Task Generation',
+      'Smart Task Grouping',
+      'AI Tag Suggestions',
     ],
     cta: 'Start Free Trial',
     popular: true,
@@ -49,6 +57,11 @@ const plans = [
       'Custom branding',
       'API access',
       'SSO authentication',
+    ],
+    aiFeatures: [
+      'All AI Features from Pro',
+      'Team-wide AI insights',
+      'Advanced AI analytics',
     ],
     cta: 'Contact Sales',
     popular: false,
@@ -124,6 +137,23 @@ export function Pricing() {
                       <span className="text-sm">{feature}</span>
                     </div>
                   ))}
+                  
+                  {plan.aiFeatures && plan.aiFeatures.length > 0 && (
+                    <>
+                      <div className="pt-4 border-t">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Sparkles className="h-4 w-4 text-purple-600" />
+                          <span className="text-sm font-semibold text-purple-600">AI Features</span>
+                        </div>
+                        {plan.aiFeatures.map((feature) => (
+                          <div key={feature} className="flex items-start gap-3 mb-2">
+                            <Check className="h-5 w-5 text-purple-600 shrink-0 mt-0.5" />
+                            <span className="text-sm">{feature}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
             </motion.div>
