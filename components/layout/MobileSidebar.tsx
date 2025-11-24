@@ -12,7 +12,7 @@ export function MobileSidebar({ open, onOpenChange }: MobileSidebarProps) {
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent side="left" className="p-0 w-64">
-        <Sidebar />
+        <Sidebar onLinkClick={() => onOpenChange(false)} />
       </SheetContent>
     </Sheet>
   )
