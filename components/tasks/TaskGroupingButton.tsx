@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Layers } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { TaskGroupingDialog } from './TaskGroupingDialog'
+import { usePremium } from '@/lib/hooks/usePremium'
 
 interface TaskGroupingButtonProps {
   projectId: string
@@ -12,7 +13,13 @@ interface TaskGroupingButtonProps {
 }
 
 export function TaskGroupingButton({ projectId, userId, onTasksUpdated }: TaskGroupingButtonProps) {
+  const { isPremium } = usePremium(userId)
   const [dialogOpen, setDialogOpen] = useState(false)
+
+  // Don't show button if user is not premium
+  if (!isPremium) {
+    return null
+  }
 
   return (
     <>

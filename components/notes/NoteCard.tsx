@@ -17,6 +17,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { EditNoteDialog } from './EditNoteDialog'
 import { AICreateTasksDialog } from '@/components/tasks/AICreateTasksDialog'
 import Link from 'next/link'
+import { usePremium } from '@/lib/hooks/usePremium'
 
 interface Note {
   id: string
@@ -48,6 +49,7 @@ interface NoteCardProps {
 }
 
 export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted, onTasksCreated }: NoteCardProps) {
+  const { isPremium } = usePremium(userId)
   const [loading, setLoading] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false)
@@ -140,11 +142,15 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
-                <DropdownMenuItem onClick={() => setIsAIDialogOpen(true)}>
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Create Tasks from Note
-                </DropdownMenuItem>
-                <DropdownMenuSeparator />
+                {isPremium && (
+                  <>
+                    <DropdownMenuItem onClick={() => setIsAIDialogOpen(true)}>
+                      <Sparkles className="w-4 h-4 mr-2" />
+                      Create Tasks from Note
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
                 <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
                   <Edit className="w-4 h-4 mr-2" />
                   Edit

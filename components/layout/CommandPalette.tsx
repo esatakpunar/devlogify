@@ -16,6 +16,7 @@ import { getRecentIncompleteTasks } from '@/lib/supabase/queries/tasks'
 import { getNotes } from '@/lib/supabase/queries/notes'
 import { AICreateTasksDialog } from '@/components/tasks/AICreateTasksDialog'
 import { FolderKanban, FileText, CheckSquare, Sparkles, Plus, Search } from 'lucide-react'
+import { usePremium } from '@/lib/hooks/usePremium'
 
 interface CommandPaletteProps {
   open: boolean
@@ -24,6 +25,7 @@ interface CommandPaletteProps {
 }
 
 export function CommandPalette({ open, onOpenChange, userId }: CommandPaletteProps) {
+  const { isPremium } = usePremium(userId)
   const router = useRouter()
   const [projects, setProjects] = useState<any[]>([])
   const [tasks, setTasks] = useState<any[]>([])
@@ -122,10 +124,12 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
 
         {/* Quick Actions */}
         <CommandGroup heading="Quick Actions">
-          <CommandItem value="create:ai-task" onSelect={handleSelect}>
-            <Sparkles className="mr-2 h-4 w-4" />
-            <span>Create Tasks with AI</span>
-          </CommandItem>
+          {isPremium && (
+            <CommandItem value="create:ai-task" onSelect={handleSelect}>
+              <Sparkles className="mr-2 h-4 w-4" />
+              <span>Create Tasks with AI</span>
+            </CommandItem>
+          )}
           <CommandItem value="create:task" onSelect={handleSelect}>
             <Plus className="mr-2 h-4 w-4" />
             <span>Create New Task</span>

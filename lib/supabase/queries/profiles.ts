@@ -9,6 +9,7 @@ export type Profile = {
   theme: 'light' | 'dark' | 'system'
   notifications_enabled: boolean
   week_starts_on: 'monday' | 'sunday'
+  is_premium: boolean
   created_at: string
   updated_at: string
 }

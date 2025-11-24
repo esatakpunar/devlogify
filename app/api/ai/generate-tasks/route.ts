@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { generateTasksFromNotes } from '@/lib/ai/gemini'
+import { checkIsPremium } from '@/lib/utils/premium'
 
 export async function POST(request: NextRequest) {
   try {
@@ -12,6 +13,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      )
+    }
+
+    // Check premium status
+    const isPremium = await checkIsPremium(user.id, supabase)
+    if (!isPremium) {
+      return NextResponse.json(
+        { error: 'Premium subscription required to use AI features' },
+        { status: 403 }
       )
     }
 

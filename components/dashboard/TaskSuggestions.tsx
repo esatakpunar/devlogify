@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { AICreateTasksDialog } from '@/components/tasks/AICreateTasksDialog'
 import { getProjects } from '@/lib/supabase/queries/projects'
+import { usePremium } from '@/lib/hooks/usePremium'
 
 interface TaskSuggestion {
   title: string
@@ -22,6 +23,7 @@ interface TaskSuggestionsProps {
 }
 
 export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
+  const { isPremium, loading: premiumLoading } = usePremium(userId)
   const [suggestions, setSuggestions] = useState<TaskSuggestion[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -32,12 +34,12 @@ export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
 
   useEffect(() => {
     // Prevent double loading
-    if (!hasLoadedRef.current) {
+    if (!hasLoadedRef.current && isPremium && !premiumLoading) {
       hasLoadedRef.current = true
       loadSuggestions()
       loadProjects()
     }
-  }, [userId])
+  }, [userId, isPremium, premiumLoading])
 
   const loadSuggestions = async () => {
     setLoading(true)
@@ -93,6 +95,15 @@ export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
       default:
         return 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
     }
+  }
+
+  // Don't show component if user is not premium
+  if (premiumLoading) {
+    return null
+  }
+
+  if (!isPremium) {
+    return null
   }
 
   if (loading) {

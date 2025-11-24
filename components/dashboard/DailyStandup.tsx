@@ -5,6 +5,7 @@ import { Calendar, RefreshCw, Loader2, CheckCircle2, Clock, Lightbulb } from 'lu
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { usePremium } from '@/lib/hooks/usePremium'
 
 interface StandupSummary {
   yesterday: {
@@ -25,13 +26,16 @@ interface DailyStandupProps {
 }
 
 export function DailyStandup({ userId }: DailyStandupProps) {
+  const { isPremium, loading: premiumLoading } = usePremium(userId)
   const [summary, setSummary] = useState<StandupSummary | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    loadStandup()
-  }, [userId])
+    if (isPremium && !premiumLoading) {
+      loadStandup()
+    }
+  }, [userId, isPremium, premiumLoading])
 
   const loadStandup = async () => {
     setLoading(true)
@@ -53,6 +57,15 @@ export function DailyStandup({ userId }: DailyStandupProps) {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Don't show component if user is not premium
+  if (premiumLoading) {
+    return null
+  }
+
+  if (!isPremium) {
+    return null
   }
 
   if (loading && !summary) {

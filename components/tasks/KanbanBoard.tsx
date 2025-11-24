@@ -7,6 +7,7 @@ import { AICreateTasksDialog } from './AICreateTasksDialog'
 import { TaskGroupingButton } from './TaskGroupingButton'
 import { Button } from '@/components/ui/button'
 import { Plus, Sparkles } from 'lucide-react'
+import { usePremium } from '@/lib/hooks/usePremium'
 import {
   DndContext,
   DragEndEvent,
@@ -50,6 +51,7 @@ interface KanbanBoardProps {
 }
 
 export function KanbanBoard({ projectId, initialTasks, userId, project }: KanbanBoardProps) {
+  const { isPremium } = usePremium(userId)
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isAICreateDialogOpen, setIsAICreateDialogOpen] = useState(false)
@@ -184,21 +186,25 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setIsAICreateDialogOpen(true)}
-            >
-              <Sparkles className="w-4 h-4 mr-2" />
-              AI Create Tasks
-            </Button>
-            <TaskGroupingButton 
-              projectId={projectId} 
-              userId={userId}
-              onTasksUpdated={() => {
-                // Refresh tasks by reloading the page data
-                window.location.reload()
-              }}
-            />
+            {isPremium && (
+              <>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsAICreateDialogOpen(true)}
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  AI Create Tasks
+                </Button>
+                <TaskGroupingButton 
+                  projectId={projectId} 
+                  userId={userId}
+                  onTasksUpdated={() => {
+                    // Refresh tasks by reloading the page data
+                    window.location.reload()
+                  }}
+                />
+              </>
+            )}
             <Button onClick={() => setIsCreateDialogOpen(true)}>
               <Plus className="w-4 h-4 mr-2" />
               New Task

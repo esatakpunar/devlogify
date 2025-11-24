@@ -4,6 +4,7 @@ import { generateStandupSummary } from '@/lib/ai/standupSummary'
 import { getActivitiesByDateRange } from '@/lib/supabase/queries/activities'
 import { getTasks } from '@/lib/supabase/queries/tasks'
 import { getProjects } from '@/lib/supabase/queries/projects'
+import { checkIsPremium } from '@/lib/utils/premium'
 
 export async function GET(request: NextRequest) {
   try {
@@ -15,6 +16,15 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 401 }
+      )
+    }
+
+    // Check premium status
+    const isPremium = await checkIsPremium(user.id, supabase)
+    if (!isPremium) {
+      return NextResponse.json(
+        { error: 'Premium subscription required to use AI features' },
+        { status: 403 }
       )
     }
 
