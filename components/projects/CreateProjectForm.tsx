@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { createProject } from '@/lib/supabase/queries/projects'
+import { createProject, getProjectCount } from '@/lib/supabase/queries/projects'
 import { logProjectCreated } from '@/lib/supabase/queries/activities'
+import { usePremium } from '@/lib/hooks/usePremium'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -16,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 import { ArrowLeft, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -39,8 +41,20 @@ export function CreateProjectForm() {
   const [status, setStatus] = useState<'active' | 'archived' | 'completed'>('active')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
+  const { isPremium, loading: premiumLoading } = usePremium(userId || undefined)
+
+  // Get user ID on mount
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (user) {
+        setUserId(user.id)
+      }
+    })
+  }, [supabase])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,6 +65,17 @@ export function CreateProjectForm() {
       const { data: { user } } = await supabase.auth.getUser()
 
       if (!user) throw new Error('Not authenticated')
+
+      // Check premium status and project limit for free users
+      // If premium status is still loading, check project count to be safe
+      if (premiumLoading || !isPremium) {
+        const projectCount = await getProjectCount(user.id)
+        if (projectCount >= 3 && !isPremium) {
+          setLoading(false)
+          setShowUpgradeDialog(true)
+          return
+        }
+      }
 
       const newProject = await createProject({
         user_id: user.id,
@@ -74,20 +99,21 @@ export function CreateProjectForm() {
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <Link href="/projects">
-          <Button variant="ghost" size="sm" className="mb-4">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Projects
-          </Button>
-        </Link>
-        <h1 className="text-3xl font-bold">Create New Project</h1>
-        <p className="text-gray-600 mt-1">
-          Start a new project to organize and track your work
-        </p>
-      </div>
+    <>
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
+          <Link href="/projects">
+            <Button variant="ghost" size="sm" className="mb-4">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Projects
+            </Button>
+          </Link>
+          <h1 className="text-3xl font-bold">Create New Project</h1>
+          <p className="text-gray-600 mt-1">
+            Start a new project to organize and track your work
+          </p>
+        </div>
 
       {/* Form */}
       <form onSubmit={handleSubmit} className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
@@ -177,5 +203,11 @@ export function CreateProjectForm() {
         </div>
       </form>
     </div>
+    <UpgradeDialog 
+      open={showUpgradeDialog} 
+      onOpenChange={setShowUpgradeDialog}
+      feature="Unlimited Projects"
+    />
+    </>
   )
 }

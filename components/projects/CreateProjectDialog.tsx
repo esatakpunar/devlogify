@@ -3,8 +3,9 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { createProject } from '@/lib/supabase/queries/projects'
+import { createProject, getProjectCount } from '@/lib/supabase/queries/projects'
 import { logProjectCreated } from '@/lib/supabase/queries/activities'
+import { usePremium } from '@/lib/hooks/usePremium'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -23,6 +24,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
+import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -57,8 +59,10 @@ export function CreateProjectDialog({
   const [status, setStatus] = useState<'active' | 'archived' | 'completed'>('active')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showUpgradeDialog, setShowUpgradeDialog] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+  const { isPremium, loading: premiumLoading } = usePremium(userId)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -66,6 +70,17 @@ export function CreateProjectDialog({
     setError(null)
 
     try {
+      // Check premium status and project limit for free users
+      // If premium status is still loading, check project count to be safe
+      if (premiumLoading || !isPremium) {
+        const projectCount = await getProjectCount(userId)
+        if (projectCount >= 3 && !isPremium) {
+          setLoading(false)
+          setShowUpgradeDialog(true)
+          return
+        }
+      }
+
       const newProject = await createProject({
         user_id: userId,
         title,
@@ -113,14 +128,15 @@ export function CreateProjectDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>Create New Project</DialogTitle>
-          <DialogDescription>
-            Start a new project to organize and track your work
-          </DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={handleOpenChange}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Create New Project</DialogTitle>
+            <DialogDescription>
+              Start a new project to organize and track your work
+            </DialogDescription>
+          </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 min-w-0">
           {error && (
@@ -213,6 +229,12 @@ export function CreateProjectDialog({
         </form>
       </DialogContent>
     </Dialog>
+    <UpgradeDialog 
+      open={showUpgradeDialog} 
+      onOpenChange={setShowUpgradeDialog}
+      feature="Unlimited Projects"
+    />
+    </>
   )
 }
 

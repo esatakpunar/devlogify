@@ -54,10 +54,14 @@ export function UpgradeDialog({ open, onOpenChange, feature }: UpgradeDialogProp
               <Sparkles className="w-6 h-6 text-white" />
             </div>
             <div>
-              <DialogTitle className="text-2xl">Unlock AI Features</DialogTitle>
-              <DialogDescription className="text-base mt-1">
-                Upgrade to Premium to access powerful AI-powered features
-              </DialogDescription>
+            <DialogTitle className="text-2xl">
+              {feature === 'Unlimited Projects' ? 'Upgrade to Premium' : 'Unlock AI Features'}
+            </DialogTitle>
+            <DialogDescription className="text-base mt-1">
+              {feature === 'Unlimited Projects' 
+                ? 'Upgrade to Premium to create unlimited projects and access all features'
+                : 'Upgrade to Premium to access powerful AI-powered features'}
+            </DialogDescription>
             </div>
           </div>
         </DialogHeader>
@@ -66,7 +70,15 @@ export function UpgradeDialog({ open, onOpenChange, feature }: UpgradeDialogProp
           {feature && (
             <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800 rounded-lg p-4">
               <p className="text-sm font-medium text-purple-900 dark:text-purple-200">
-                🔒 This feature requires Premium: <span className="font-semibold">{feature}</span>
+                {feature === 'Unlimited Projects' ? (
+                  <>
+                    🔒 Free plan is limited to <span className="font-semibold">3 projects</span>. Upgrade to Premium for <span className="font-semibold">unlimited projects</span>.
+                  </>
+                ) : (
+                  <>
+                    🔒 This feature requires Premium: <span className="font-semibold">{feature}</span>
+                  </>
+                )}
               </p>
             </div>
           )}
@@ -99,6 +111,7 @@ export function UpgradeDialog({ open, onOpenChange, feature }: UpgradeDialogProp
               <div>
                 <h4 className="font-semibold text-sm mb-1">What you get with Premium:</h4>
                 <ul className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
+                  <li>• Unlimited projects</li>
                   <li>• All AI-powered features unlocked</li>
                   <li>• Unlimited AI task suggestions</li>
                   <li>• Daily standup summaries</li>
