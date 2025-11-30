@@ -80,6 +80,24 @@
       "aiTaskGenerationDescription": "Create tasks from notes",
       "smartGrouping": "Smart Grouping",
       "smartGroupingDescription": "Organize tasks with AI"
+    },
+    "dailyStandup": {
+      "title": "Today's Standup",
+      "yesterday": "Yesterday",
+      "today": "Today",
+      "insights": "Insights",
+      "noActivitiesRecorded": "No activities recorded",
+      "noTasksPlanned": "No tasks planned",
+      "highlights": "Highlights:",
+      "priorities": "Priorities:",
+      "failedToLoad": "Failed to load standup"
+    },
+    "taskSuggestions": {
+      "title": "AI Task Suggestions",
+      "failedToLoad": "Failed to load suggestions",
+      "noSuggestionsAvailable": "No suggestions available",
+      "createTasksToGetSuggestions": "Create some tasks to get AI-powered suggestions",
+      "showingSuggestions": "Showing 5 of {count} suggestions"
     }
   },
   "settings": {
@@ -231,7 +249,37 @@
     "failedToCreateTemplate": "Failed to create template",
     "title": "Title",
     "description": "Description",
-    "estimatedDuration": "Estimated Duration (min)"
+    "estimatedDuration": "Estimated Duration (min)",
+    "aiCreateTasks": {
+      "title": "AI-Powered Task Creation",
+      "description": "Convert your meeting notes or text into structured tasks using AI",
+      "project": "Project",
+      "selectProject": "Select a project",
+      "inputNotes": "Input Notes",
+      "previewTasks": "Preview Tasks",
+      "notesOrText": "Notes or Text",
+      "notesPlaceholder": "Paste your meeting notes, to-do items, or any text here...\n\nExample:\n- Review the new design mockups\n- Update the API documentation\n- Schedule team meeting for next week",
+      "aiWillAnalyze": "The AI will analyze your text and extract actionable tasks",
+      "generateTasks": "Generate Tasks",
+      "generatingTasks": "Generating Tasks...",
+      "noTasksGenerated": "No tasks generated yet. Go to the Input Notes tab to generate tasks.",
+      "reviewAndEdit": "Review and edit the generated tasks before creating them",
+      "addTask": "Add Task",
+      "taskNumber": "Task {number}",
+      "taskTitle": "Task title",
+      "provideContext": "Provide context, steps, or important details...",
+      "createTasks": "Create {count} Task(s)",
+      "creatingTasks": "Creating Tasks...",
+      "pleaseEnterNotes": "Please enter some notes or text",
+      "pleaseSelectProject": "Please select a project",
+      "failedToGenerate": "Failed to generate tasks. Please try again.",
+      "noTasksToCreate": "No tasks to create",
+      "allTasksMustHaveTitleAndDescription": "All tasks must have both a title and description",
+      "failedToCreate": "Failed to create tasks",
+      "successfullyCreated": "Successfully created {count} task(s)",
+      "noTasksExtracted": "No tasks could be extracted from the notes",
+      "generatedTasks": "Generated {count} task(s)"
+    }
   },
   "notes": {
     "title": "Notes",

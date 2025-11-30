@@ -80,6 +80,24 @@
       "aiTaskGenerationDescription": "Crea tareas desde notas",
       "smartGrouping": "Agrupación Inteligente",
       "smartGroupingDescription": "Organiza tareas con IA"
+    },
+    "dailyStandup": {
+      "title": "Reunión de Hoy",
+      "yesterday": "Ayer",
+      "today": "Hoy",
+      "insights": "Perspectivas",
+      "noActivitiesRecorded": "No se registraron actividades",
+      "noTasksPlanned": "No hay tareas planificadas",
+      "highlights": "Destacados:",
+      "priorities": "Prioridades:",
+      "failedToLoad": "Error al cargar la reunión"
+    },
+    "taskSuggestions": {
+      "title": "Sugerencias de Tareas con IA",
+      "failedToLoad": "Error al cargar sugerencias",
+      "noSuggestionsAvailable": "No hay sugerencias disponibles",
+      "createTasksToGetSuggestions": "Crea algunas tareas para obtener sugerencias impulsadas por IA",
+      "showingSuggestions": "Mostrando 5 de {count} sugerencias"
     }
   },
   "settings": {
@@ -231,7 +249,37 @@
     "failedToCreateTemplate": "Error al crear plantilla",
     "title": "Título",
     "description": "Descripción",
-    "estimatedDuration": "Duración Estimada (min)"
+    "estimatedDuration": "Duración Estimada (min)",
+    "aiCreateTasks": {
+      "title": "Creación de Tareas Impulsada por IA",
+      "description": "Convierte tus notas de reunión o texto en tareas estructuradas usando IA",
+      "project": "Proyecto",
+      "selectProject": "Selecciona un proyecto",
+      "inputNotes": "Ingresar Notas",
+      "previewTasks": "Vista Previa de Tareas",
+      "notesOrText": "Notas o Texto",
+      "notesPlaceholder": "Pega tus notas de reunión, elementos de tareas pendientes o cualquier texto aquí...\n\nEjemplo:\n- Revisar los nuevos mockups de diseño\n- Actualizar la documentación de la API\n- Programar reunión de equipo para la próxima semana",
+      "aiWillAnalyze": "La IA analizará tu texto y extraerá tareas accionables",
+      "generateTasks": "Generar Tareas",
+      "generatingTasks": "Generando Tareas...",
+      "noTasksGenerated": "Aún no se han generado tareas. Ve a la pestaña Ingresar Notas para generar tareas.",
+      "reviewAndEdit": "Revisa y edita las tareas generadas antes de crearlas",
+      "addTask": "Agregar Tarea",
+      "taskNumber": "Tarea {number}",
+      "taskTitle": "Título de la tarea",
+      "provideContext": "Proporciona contexto, pasos o detalles importantes...",
+      "createTasks": "Crear {count} Tarea(s)",
+      "creatingTasks": "Creando Tareas...",
+      "pleaseEnterNotes": "Por favor ingresa algunas notas o texto",
+      "pleaseSelectProject": "Por favor selecciona un proyecto",
+      "failedToGenerate": "Error al generar tareas. Por favor intenta de nuevo.",
+      "noTasksToCreate": "No hay tareas para crear",
+      "allTasksMustHaveTitleAndDescription": "Todas las tareas deben tener tanto un título como una descripción",
+      "failedToCreate": "Error al crear tareas",
+      "successfullyCreated": "Se crearon exitosamente {count} tarea(s)",
+      "noTasksExtracted": "No se pudieron extraer tareas de las notas",
+      "generatedTasks": "Se generaron {count} tarea(s)"
+    }
   },
   "notes": {
     "title": "Notas",

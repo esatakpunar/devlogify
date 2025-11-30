@@ -28,6 +28,7 @@ import { Badge } from '@/components/ui/badge'
 import { Sparkles, Loader2, Trash2, Plus, CheckCircle2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface Project {
   id: string
@@ -69,6 +70,7 @@ export function AICreateTasksDialog({
   initialSuggestion,
   onTasksCreated,
 }: AICreateTasksDialogProps) {
+  const t = useTranslation()
   const [notesInput, setNotesInput] = useState('')
   const [selectedProjectId, setSelectedProjectId] = useState<string>('')
   const [isGenerating, setIsGenerating] = useState(false)
@@ -110,12 +112,12 @@ export function AICreateTasksDialog({
 
   const handleGenerateTasks = async () => {
     if (!notesInput.trim()) {
-      setError('Please enter some notes or text')
+      setError(t('tasks.aiCreateTasks.pleaseEnterNotes'))
       return
     }
 
     if (!selectedProjectId) {
-      setError('Please select a project')
+      setError(t('tasks.aiCreateTasks.pleaseSelectProject'))
       return
     }
 
@@ -134,7 +136,7 @@ export function AICreateTasksDialog({
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to generate tasks')
+        throw new Error(errorData.error || t('tasks.aiCreateTasks.failedToGenerate'))
       }
 
       const data = await response.json()
@@ -150,14 +152,14 @@ export function AICreateTasksDialog({
       setActiveTab('preview')
       
       if (tasksWithIds.length === 0) {
-        toast.info('No tasks could be extracted from the notes')
+        toast.info(t('tasks.aiCreateTasks.noTasksExtracted'))
       } else {
-        toast.success(`Generated ${tasksWithIds.length} task(s)`)
+        toast.success(t('tasks.aiCreateTasks.generatedTasks', { count: tasksWithIds.length }))
       }
     } catch (err: any) {
       console.error('Error generating tasks:', err)
-      setError(err.message || 'Failed to generate tasks. Please try again.')
-      toast.error(err.message || 'Failed to generate tasks')
+      setError(err.message || t('tasks.aiCreateTasks.failedToGenerate'))
+      toast.error(err.message || t('tasks.aiCreateTasks.failedToGenerate'))
     } finally {
       setIsGenerating(false)
     }
@@ -186,19 +188,19 @@ export function AICreateTasksDialog({
 
   const handleCreateTasks = async () => {
     if (tasks.length === 0) {
-      setError('No tasks to create')
+      setError(t('tasks.aiCreateTasks.noTasksToCreate'))
       return
     }
 
     if (!selectedProjectId) {
-      setError('Please select a project')
+      setError(t('tasks.aiCreateTasks.pleaseSelectProject'))
       return
     }
 
     // Validate all tasks have titles and descriptions
-    const invalidTasks = tasks.filter(t => !t.title.trim() || !t.description?.trim())
+    const invalidTasks = tasks.filter(task => !task.title.trim() || !task.description?.trim())
     if (invalidTasks.length > 0) {
-      setError('All tasks must have both a title and description')
+      setError(t('tasks.aiCreateTasks.allTasksMustHaveTitleAndDescription'))
       return
     }
 
@@ -234,7 +236,7 @@ export function AICreateTasksDialog({
         )
       }
 
-      toast.success(`Successfully created ${createdTasks.length} task(s)`)
+      toast.success(t('tasks.aiCreateTasks.successfullyCreated', { count: createdTasks.length }))
       
       if (onTasksCreated) {
         onTasksCreated(createdTasks)
@@ -247,8 +249,8 @@ export function AICreateTasksDialog({
       onOpenChange(false)
     } catch (err: any) {
       console.error('Error creating tasks:', err)
-      setError(err.message || 'Failed to create tasks')
-      toast.error(err.message || 'Failed to create tasks')
+      setError(err.message || t('tasks.aiCreateTasks.failedToCreate'))
+      toast.error(err.message || t('tasks.aiCreateTasks.failedToCreate'))
     } finally {
       setIsCreating(false)
     }
@@ -260,10 +262,10 @@ export function AICreateTasksDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-purple-600" />
-            AI-Powered Task Creation
+            {t('tasks.aiCreateTasks.title')}
           </DialogTitle>
           <DialogDescription>
-            Convert your meeting notes or text into structured tasks using AI
+            {t('tasks.aiCreateTasks.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -277,7 +279,7 @@ export function AICreateTasksDialog({
           {/* Project Selection */}
           <div className="space-y-2">
             <Label htmlFor="project-select">
-              Project <span className="text-red-500">*</span>
+              {t('tasks.aiCreateTasks.project')} <span className="text-red-500">*</span>
             </Label>
             <Select
               value={selectedProjectId}
@@ -285,7 +287,7 @@ export function AICreateTasksDialog({
               disabled={isGenerating || isCreating}
             >
               <SelectTrigger id="project-select">
-                <SelectValue placeholder="Select a project" />
+                <SelectValue placeholder={t('tasks.aiCreateTasks.selectProject')} />
               </SelectTrigger>
               <SelectContent>
                 {projects.map((project) => (
@@ -305,20 +307,20 @@ export function AICreateTasksDialog({
 
           <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'input' | 'preview')}>
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="input">Input Notes</TabsTrigger>
+              <TabsTrigger value="input">{t('tasks.aiCreateTasks.inputNotes')}</TabsTrigger>
               <TabsTrigger value="preview" disabled={tasks.length === 0}>
-                Preview Tasks {tasks.length > 0 && `(${tasks.length})`}
+                {t('tasks.aiCreateTasks.previewTasks')} {tasks.length > 0 && `(${tasks.length})`}
               </TabsTrigger>
             </TabsList>
 
             <TabsContent value="input" className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="notes-input">
-                  Notes or Text <span className="text-red-500">*</span>
+                  {t('tasks.aiCreateTasks.notesOrText')} <span className="text-red-500">*</span>
                 </Label>
                 <Textarea
                   id="notes-input"
-                  placeholder="Paste your meeting notes, to-do items, or any text here...&#10;&#10;Example:&#10;- Review the new design mockups&#10;- Update the API documentation&#10;- Schedule team meeting for next week"
+                  placeholder={t('tasks.aiCreateTasks.notesPlaceholder')}
                   value={notesInput}
                   onChange={(e) => setNotesInput(e.target.value)}
                   rows={10}
@@ -326,7 +328,7 @@ export function AICreateTasksDialog({
                   className="font-mono text-sm"
                 />
                 <p className="text-xs text-gray-500">
-                  The AI will analyze your text and extract actionable tasks
+                  {t('tasks.aiCreateTasks.aiWillAnalyze')}
                 </p>
               </div>
 
@@ -338,12 +340,12 @@ export function AICreateTasksDialog({
                 {isGenerating ? (
                   <>
                     <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Generating Tasks...
+                    {t('tasks.aiCreateTasks.generatingTasks')}
                   </>
                 ) : (
                   <>
                     <Sparkles className="w-4 h-4 mr-2" />
-                    Generate Tasks
+                    {t('tasks.aiCreateTasks.generateTasks')}
                   </>
                 )}
               </Button>
@@ -352,13 +354,13 @@ export function AICreateTasksDialog({
             <TabsContent value="preview" className="space-y-4">
               {tasks.length === 0 ? (
                 <div className="text-center py-8 text-gray-500">
-                  No tasks generated yet. Go to the Input Notes tab to generate tasks.
+                  {t('tasks.aiCreateTasks.noTasksGenerated')}
                 </div>
               ) : (
                 <>
                   <div className="flex items-center justify-between">
                     <p className="text-sm text-gray-600">
-                      Review and edit the generated tasks before creating them
+                      {t('tasks.aiCreateTasks.reviewAndEdit')}
                     </p>
                     <Button
                       onClick={handleAddTask}
@@ -367,7 +369,7 @@ export function AICreateTasksDialog({
                       disabled={isCreating}
                     >
                       <Plus className="w-4 h-4 mr-1" />
-                      Add Task
+                      {t('tasks.aiCreateTasks.addTask')}
                     </Button>
                   </div>
 
@@ -377,7 +379,7 @@ export function AICreateTasksDialog({
                         <div className="space-y-3">
                           <div className="flex items-start justify-between">
                             <span className="text-xs font-semibold text-gray-500">
-                              Task {index + 1}
+                              {t('tasks.aiCreateTasks.taskNumber', { number: index + 1 })}
                             </span>
                             <Button
                               onClick={() => handleDeleteTask(task.id)}
@@ -392,22 +394,22 @@ export function AICreateTasksDialog({
 
                           <div className="space-y-2">
                             <div>
-                              <Label className="text-xs">Title *</Label>
+                              <Label className="text-xs">{t('tasks.title')} *</Label>
                               <Input
                                 value={task.title}
                                 onChange={(e) => handleTaskChange(task.id, 'title', e.target.value)}
-                                placeholder="Task title"
+                                placeholder={t('tasks.aiCreateTasks.taskTitle')}
                                 disabled={isCreating}
                                 className="mt-1"
                               />
                             </div>
 
                             <div>
-                              <Label className="text-xs">Description <span className="text-red-500">*</span></Label>
+                              <Label className="text-xs">{t('tasks.description')} <span className="text-red-500">*</span></Label>
                               <Textarea
                                 value={task.description || ''}
                                 onChange={(e) => handleTaskChange(task.id, 'description', e.target.value)}
-                                placeholder="Provide context, steps, or important details..."
+                                placeholder={t('tasks.aiCreateTasks.provideContext')}
                                 rows={3}
                                 disabled={isCreating}
                                 className="mt-1"
@@ -417,7 +419,7 @@ export function AICreateTasksDialog({
 
                             <div className="grid grid-cols-2 gap-3">
                               <div>
-                                <Label className="text-xs">Priority</Label>
+                                <Label className="text-xs">{t('tasks.priority')}</Label>
                                 <Select
                                   value={task.priority}
                                   onValueChange={(value: 'low' | 'medium' | 'high') =>
@@ -429,15 +431,15 @@ export function AICreateTasksDialog({
                                     <SelectValue />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="low">Low</SelectItem>
-                                    <SelectItem value="medium">Medium</SelectItem>
-                                    <SelectItem value="high">High</SelectItem>
+                                    <SelectItem value="low">{t('common.low')}</SelectItem>
+                                    <SelectItem value="medium">{t('common.medium')}</SelectItem>
+                                    <SelectItem value="high">{t('common.high')}</SelectItem>
                                   </SelectContent>
                                 </Select>
                               </div>
 
                               <div>
-                                <Label className="text-xs">Estimated Duration (min)</Label>
+                                <Label className="text-xs">{t('tasks.estimatedDuration')}</Label>
                                 <Input
                                   type="number"
                                   value={task.estimated_duration || ''}
@@ -464,18 +466,18 @@ export function AICreateTasksDialog({
                   <div className="flex gap-3 pt-4 border-t">
                     <Button
                       onClick={handleCreateTasks}
-                      disabled={tasks.length === 0 || isCreating || tasks.some(t => !t.title.trim() || !t.description?.trim())}
+                      disabled={tasks.length === 0 || isCreating || tasks.some(task => !task.title.trim() || !task.description?.trim())}
                       className="flex-1"
                     >
                       {isCreating ? (
                         <>
                           <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Creating Tasks...
+                          {t('tasks.aiCreateTasks.creatingTasks')}
                         </>
                       ) : (
                         <>
                           <CheckCircle2 className="w-4 h-4 mr-2" />
-                          Create {tasks.length} Task(s)
+                          {t('tasks.aiCreateTasks.createTasks', { count: tasks.length })}
                         </>
                       )}
                     </Button>
@@ -487,7 +489,7 @@ export function AICreateTasksDialog({
                       }}
                       disabled={isCreating}
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </Button>
                   </div>
                 </>

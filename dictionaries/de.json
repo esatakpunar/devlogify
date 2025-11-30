@@ -80,6 +80,24 @@
       "aiTaskGenerationDescription": "Erstellen Sie Aufgaben aus Notizen",
       "smartGrouping": "Intelligente Gruppierung",
       "smartGroupingDescription": "Organisieren Sie Aufgaben mit KI"
+    },
+    "dailyStandup": {
+      "title": "Heutiges Standup",
+      "yesterday": "Gestern",
+      "today": "Heute",
+      "insights": "Einblicke",
+      "noActivitiesRecorded": "Keine Aktivitäten aufgezeichnet",
+      "noTasksPlanned": "Keine Aufgaben geplant",
+      "highlights": "Highlights:",
+      "priorities": "Prioritäten:",
+      "failedToLoad": "Standup konnte nicht geladen werden"
+    },
+    "taskSuggestions": {
+      "title": "KI-Aufgabenvorschläge",
+      "failedToLoad": "Vorschläge konnten nicht geladen werden",
+      "noSuggestionsAvailable": "Keine Vorschläge verfügbar",
+      "createTasksToGetSuggestions": "Erstellen Sie einige Aufgaben, um KI-gestützte Vorschläge zu erhalten",
+      "showingSuggestions": "Zeige 5 von {count} Vorschlägen"
     }
   },
   "settings": {
@@ -232,7 +250,37 @@
     "failedToCreateTemplate": "Vorlage konnte nicht erstellt werden",
     "title": "Titel",
     "description": "Beschreibung",
-    "estimatedDuration": "Geschätzte Dauer (Min)"
+    "estimatedDuration": "Geschätzte Dauer (Min)",
+    "aiCreateTasks": {
+      "title": "KI-gestützte Aufgabenerstellung",
+      "description": "Konvertieren Sie Ihre Besprechungsnotizen oder Texte mit KI in strukturierte Aufgaben",
+      "project": "Projekt",
+      "selectProject": "Wählen Sie ein Projekt",
+      "inputNotes": "Notizen eingeben",
+      "previewTasks": "Aufgaben Vorschau",
+      "notesOrText": "Notizen oder Text",
+      "notesPlaceholder": "Fügen Sie hier Ihre Besprechungsnotizen, To-do-Listen oder beliebigen Text ein...\n\nBeispiel:\n- Neue Design-Mockups überprüfen\n- API-Dokumentation aktualisieren\n- Team-Meeting für nächste Woche planen",
+      "aiWillAnalyze": "Die KI analysiert Ihren Text und extrahiert umsetzbare Aufgaben",
+      "generateTasks": "Aufgaben generieren",
+      "generatingTasks": "Aufgaben werden generiert...",
+      "noTasksGenerated": "Noch keine Aufgaben generiert. Gehen Sie zum Tab 'Notizen eingeben', um Aufgaben zu generieren.",
+      "reviewAndEdit": "Überprüfen und bearbeiten Sie die generierten Aufgaben, bevor Sie sie erstellen",
+      "addTask": "Aufgabe hinzufügen",
+      "taskNumber": "Aufgabe {number}",
+      "taskTitle": "Aufgabentitel",
+      "provideContext": "Geben Sie Kontext, Schritte oder wichtige Details an...",
+      "createTasks": "{count} Aufgabe(n) erstellen",
+      "creatingTasks": "Aufgaben werden erstellt...",
+      "pleaseEnterNotes": "Bitte geben Sie einige Notizen oder Text ein",
+      "pleaseSelectProject": "Bitte wählen Sie ein Projekt aus",
+      "failedToGenerate": "Aufgaben konnten nicht generiert werden. Bitte versuchen Sie es erneut.",
+      "noTasksToCreate": "Keine Aufgaben zum Erstellen",
+      "allTasksMustHaveTitleAndDescription": "Alle Aufgaben müssen sowohl einen Titel als auch eine Beschreibung haben",
+      "failedToCreate": "Aufgaben konnten nicht erstellt werden",
+      "successfullyCreated": "{count} Aufgabe(n) erfolgreich erstellt",
+      "noTasksExtracted": "Es konnten keine Aufgaben aus den Notizen extrahiert werden",
+      "generatedTasks": "{count} Aufgabe(n) generiert"
+    }
   },
   "notes": {
     "title": "Notizen",

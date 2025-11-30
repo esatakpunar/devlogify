@@ -80,6 +80,24 @@
       "aiTaskGenerationDescription": "Notlardan görev oluşturun",
       "smartGrouping": "Akıllı Gruplama",
       "smartGroupingDescription": "AI ile görevleri organize edin"
+    },
+    "dailyStandup": {
+      "title": "Bugünün Durumu",
+      "yesterday": "Dün",
+      "today": "Bugün",
+      "insights": "İçgörüler",
+      "noActivitiesRecorded": "Kaydedilen aktivite yok",
+      "noTasksPlanned": "Planlanan görev yok",
+      "highlights": "Öne Çıkanlar:",
+      "priorities": "Öncelikler:",
+      "failedToLoad": "Durum yüklenemedi"
+    },
+    "taskSuggestions": {
+      "title": "AI Görev Önerileri",
+      "failedToLoad": "Öneriler yüklenemedi",
+      "noSuggestionsAvailable": "Öneri mevcut değil",
+      "createTasksToGetSuggestions": "AI destekli öneriler almak için görevler oluşturun",
+      "showingSuggestions": "{count} öneriden 5'i gösteriliyor"
     }
   },
   "settings": {
@@ -231,7 +249,37 @@
     "failedToCreateTemplate": "Şablon oluşturulamadı",
     "title": "Başlık",
     "description": "Açıklama",
-    "estimatedDuration": "Tahmini Süre (dk)"
+    "estimatedDuration": "Tahmini Süre (dk)",
+    "aiCreateTasks": {
+      "title": "AI Destekli Görev Oluşturma",
+      "description": "Toplantı notlarınızı veya metinlerinizi AI kullanarak yapılandırılmış görevlere dönüştürün",
+      "project": "Proje",
+      "selectProject": "Bir proje seçin",
+      "inputNotes": "Not Girişi",
+      "previewTasks": "Görev Önizleme",
+      "notesOrText": "Notlar veya Metin",
+      "notesPlaceholder": "Toplantı notlarınızı, yapılacaklar listesini veya herhangi bir metni buraya yapıştırın...\n\nÖrnek:\n- Yeni tasarım mockup'larını incele\n- API dokümantasyonunu güncelle\n- Gelecek hafta için ekip toplantısı planla",
+      "aiWillAnalyze": "AI metninizi analiz edecek ve eyleme dönüştürülebilir görevler çıkaracak",
+      "generateTasks": "Görev Oluştur",
+      "generatingTasks": "Görevler Oluşturuluyor...",
+      "noTasksGenerated": "Henüz görev oluşturulmadı. Görev oluşturmak için Not Girişi sekmesine gidin.",
+      "reviewAndEdit": "Oluşturmadan önce oluşturulan görevleri gözden geçirin ve düzenleyin",
+      "addTask": "Görev Ekle",
+      "taskNumber": "Görev {number}",
+      "taskTitle": "Görev başlığı",
+      "provideContext": "Bağlam, adımlar veya önemli detaylar sağlayın...",
+      "createTasks": "{count} Görev Oluştur",
+      "creatingTasks": "Görevler Oluşturuluyor...",
+      "pleaseEnterNotes": "Lütfen bazı notlar veya metin girin",
+      "pleaseSelectProject": "Lütfen bir proje seçin",
+      "failedToGenerate": "Görevler oluşturulamadı. Lütfen tekrar deneyin.",
+      "noTasksToCreate": "Oluşturulacak görev yok",
+      "allTasksMustHaveTitleAndDescription": "Tüm görevlerin hem başlığı hem de açıklaması olmalıdır",
+      "failedToCreate": "Görevler oluşturulamadı",
+      "successfullyCreated": "{count} görev başarıyla oluşturuldu",
+      "noTasksExtracted": "Notlardan görev çıkarılamadı",
+      "generatedTasks": "{count} görev oluşturuldu"
+    }
   },
   "notes": {
     "title": "Notlar",

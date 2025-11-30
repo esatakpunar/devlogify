@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { AICreateTasksDialog } from '@/components/tasks/AICreateTasksDialog'
 import { getProjects } from '@/lib/supabase/queries/projects'
 import { usePremium } from '@/lib/hooks/usePremium'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface TaskSuggestion {
   title: string
@@ -23,6 +24,7 @@ interface TaskSuggestionsProps {
 }
 
 export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
+  const t = useTranslation()
   const { isPremium, loading: premiumLoading } = usePremium(userId)
   const [suggestions, setSuggestions] = useState<TaskSuggestion[]>([])
   const [loading, setLoading] = useState(false)
@@ -50,14 +52,14 @@ export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
       
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to load suggestions')
+        throw new Error(errorData.error || t('dashboard.taskSuggestions.failedToLoad'))
       }
 
       const data = await response.json()
       setSuggestions(data.suggestions || [])
     } catch (err: any) {
       console.error('Error loading suggestions:', err)
-      setError(err.message || 'Failed to load suggestions')
+      setError(err.message || t('dashboard.taskSuggestions.failedToLoad'))
     } finally {
       setLoading(false)
     }
@@ -111,7 +113,7 @@ export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
       <Card className="p-6">
         <div className="flex items-center gap-2 mb-4">
           <Sparkles className="w-5 h-5 text-purple-600" />
-          <h3 className="text-lg font-semibold">AI Task Suggestions</h3>
+          <h3 className="text-lg font-semibold">{t('dashboard.taskSuggestions.title')}</h3>
         </div>
         <div className="flex items-center justify-center py-8">
           <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
@@ -125,12 +127,12 @@ export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
       <Card className="p-6">
         <div className="flex items-center gap-2 mb-4">
           <Sparkles className="w-5 h-5 text-purple-600" />
-          <h3 className="text-lg font-semibold">AI Task Suggestions</h3>
+          <h3 className="text-lg font-semibold">{t('dashboard.taskSuggestions.title')}</h3>
         </div>
         <div className="text-center py-8">
           <p className="text-sm text-gray-500 mb-4">{error}</p>
           <Button variant="outline" size="sm" onClick={loadSuggestions}>
-            Try Again
+            {t('common.tryAgain')}
           </Button>
         </div>
       </Card>
@@ -142,12 +144,12 @@ export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
       <Card className="p-6">
         <div className="flex items-center gap-2 mb-4">
           <Sparkles className="w-5 h-5 text-purple-600" />
-          <h3 className="text-lg font-semibold">AI Task Suggestions</h3>
+          <h3 className="text-lg font-semibold">{t('dashboard.taskSuggestions.title')}</h3>
         </div>
         <div className="text-center py-8 text-gray-500">
           <Lightbulb className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-          <p className="text-sm">No suggestions available</p>
-          <p className="text-xs mt-1">Create some tasks to get AI-powered suggestions</p>
+          <p className="text-sm">{t('dashboard.taskSuggestions.noSuggestionsAvailable')}</p>
+          <p className="text-xs mt-1">{t('dashboard.taskSuggestions.createTasksToGetSuggestions')}</p>
         </div>
       </Card>
     )
@@ -158,10 +160,10 @@ export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Sparkles className="w-5 h-5 text-purple-600" />
-          <h3 className="text-lg font-semibold">AI Task Suggestions</h3>
+          <h3 className="text-lg font-semibold">{t('dashboard.taskSuggestions.title')}</h3>
         </div>
         <Button variant="ghost" size="sm" onClick={loadSuggestions} disabled={loading}>
-          Refresh
+          {t('common.refresh')}
         </Button>
       </div>
 
@@ -194,11 +196,11 @@ export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
             </div>
             <div className="flex items-center gap-2">
               <Badge className={getPriorityColor(suggestion.priority)}>
-                {suggestion.priority}
+                {t(`common.${suggestion.priority}`)}
               </Badge>
               {suggestion.estimated_duration && (
                 <span className="text-xs text-gray-500">
-                  ~{suggestion.estimated_duration} min
+                  ~{suggestion.estimated_duration} {t('common.min')}
                 </span>
               )}
             </div>
@@ -209,7 +211,7 @@ export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
       {suggestions.length > 5 && (
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
           <p className="text-xs text-gray-500 text-center">
-            Showing 5 of {suggestions.length} suggestions
+            {t('dashboard.taskSuggestions.showingSuggestions', { count: suggestions.length })}
           </p>
         </div>
       )}
