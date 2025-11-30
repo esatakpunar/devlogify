@@ -160,7 +160,7 @@ Return ONLY valid JSON, no additional text or markdown formatting.`
 
           // Collect all existing tags from tasks in this group
           const groupExistingTags = new Set<string>()
-          groupTasks.forEach(task => {
+          groupTasks.forEach((task: Task) => {
             if (task.tags && Array.isArray(task.tags)) {
               task.tags.forEach(tag => {
                 groupExistingTags.add(tag.toLowerCase().trim())
