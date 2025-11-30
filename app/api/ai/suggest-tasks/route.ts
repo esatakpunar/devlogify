@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { generateTaskSuggestions } from '@/lib/ai/taskSuggestions'
 import { getTasks } from '@/lib/supabase/queries/tasks'
 import { getProjects } from '@/lib/supabase/queries/projects'
-import { checkIsPremium } from '@/lib/utils/premium'
+import { checkIsPremium, getUserLocale } from '@/lib/utils/premium'
 
 export async function GET(request: NextRequest) {
   try {
@@ -43,8 +43,11 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Get user's language preference
+    const locale = await getUserLocale(user.id, supabase)
+
     // Generate suggestions
-    const suggestions = await generateTaskSuggestions(allTasks)
+    const suggestions = await generateTaskSuggestions(allTasks, locale)
 
     return NextResponse.json({ suggestions })
   } catch (error: any) {

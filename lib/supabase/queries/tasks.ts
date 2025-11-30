@@ -103,7 +103,12 @@ export async function updateTaskStatus(id: string, status: 'todo' | 'in_progress
   
   const updates: TaskUpdate = {
     status,
-    ...(status === 'done' ? { completed_at: new Date().toISOString() } : { completed_at: null })
+    ...(status === 'done' 
+      ? { 
+          completed_at: new Date().toISOString(),
+          progress: 100
+        } 
+      : { completed_at: null })
   }
 
   const { data, error } = await supabase

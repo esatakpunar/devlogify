@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { KanbanColumn } from './KanbanColumn'
 import { CreateTaskDialog } from './CreateTaskDialog'
 import { AICreateTasksDialog } from './AICreateTasksDialog'
@@ -50,9 +50,24 @@ interface KanbanBoardProps {
   initialTasks: Task[]
   userId: string
   project?: Project
+  onTaskCreated?: (task: Task) => void
+  onTasksCreated?: (tasks: Task[]) => void
+  onTaskUpdated?: (task: Task) => void
+  onTaskDeleted?: (taskId: string) => void
+  onTasksChange?: (tasks: Task[]) => void
 }
 
-export function KanbanBoard({ projectId, initialTasks, userId, project }: KanbanBoardProps) {
+export function KanbanBoard({ 
+  projectId, 
+  initialTasks, 
+  userId, 
+  project,
+  onTaskCreated,
+  onTasksCreated,
+  onTaskUpdated,
+  onTaskDeleted,
+  onTasksChange
+}: KanbanBoardProps) {
   const { isPremium } = usePremium(userId)
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
@@ -60,6 +75,11 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
   const [activeTask, setActiveTask] = useState<Task | null>(null)
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
   const t = useTranslation()
+
+  // Sync with parent when initialTasks change
+  useEffect(() => {
+    setTasks(initialTasks)
+  }, [initialTasks])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -73,20 +93,33 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
   const inProgressTasks = tasks.filter(t => t.status === 'in_progress')
   const doneTasks = tasks.filter(t => t.status === 'done')
 
+  const updateTasks = (newTasks: Task[]) => {
+    setTasks(newTasks)
+    onTasksChange?.(newTasks)
+  }
+
   const handleTaskCreated = (newTask: Task) => {
-    setTasks([...tasks, newTask])
+    const updatedTasks = [...tasks, newTask]
+    updateTasks(updatedTasks)
+    onTaskCreated?.(newTask)
   }
 
   const handleTasksCreated = (newTasks: Task[]) => {
-    setTasks([...tasks, ...newTasks])
+    const updatedTasks = [...tasks, ...newTasks]
+    updateTasks(updatedTasks)
+    onTasksCreated?.(newTasks)
   }
 
   const handleTaskUpdated = (updatedTask: Task) => {
-    setTasks(tasks.map(t => t.id === updatedTask.id ? updatedTask : t))
+    const updatedTasks = tasks.map(t => t.id === updatedTask.id ? updatedTask : t)
+    updateTasks(updatedTasks)
+    onTaskUpdated?.(updatedTask)
   }
 
   const handleTaskDeleted = (taskId: string) => {
-    setTasks(tasks.filter(t => t.id !== taskId))
+    const updatedTasks = tasks.filter(t => t.id !== taskId)
+    updateTasks(updatedTasks)
+    onTaskDeleted?.(taskId)
   }
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -112,12 +145,18 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
 
       if (activeTask.status !== overTask.status) {
         // Moving to different column
-        setTasks(tasks.map(task => {
+        const updatedTasks = tasks.map(task => {
           if (task.id === activeId) {
-            return { ...task, status: overTask.status as 'todo' | 'in_progress' | 'done' }
+            const newStatus = overTask.status as 'todo' | 'in_progress' | 'done'
+            return { 
+              ...task, 
+              status: newStatus,
+              ...(newStatus === 'done' ? { progress: 100 } : {})
+            }
           }
           return task
-        }))
+        })
+        updateTasks(updatedTasks)
       }
     }
   }
@@ -142,8 +181,13 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
 
       try {
         // Optimistically update the UI
-        const updatedTask = { ...activeTask, status: newStatus }
-        setTasks(tasks.map(t => t.id === activeId ? updatedTask : t))
+        const updatedTask = { 
+          ...activeTask, 
+          status: newStatus,
+          ...(newStatus === 'done' ? { progress: 100 } : {})
+        }
+        const updatedTasks = tasks.map(t => t.id === activeId ? updatedTask : t)
+        updateTasks(updatedTasks)
 
         // Update in database
         await updateTaskStatus(activeId, newStatus)
@@ -168,7 +212,8 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
       } catch (error) {
         console.error('Failed to update task status:', error)
         // Revert optimistic update
-        setTasks(tasks.map(t => t.id === activeId ? activeTask : t))
+        const revertedTasks = tasks.map(t => t.id === activeId ? activeTask : t)
+        updateTasks(revertedTasks)
         toast.error(t('tasks.failedToUpdateTask'))
       }
     } else {
@@ -185,55 +230,57 @@ export function KanbanBoard({ projectId, initialTasks, userId, project }: Kanban
       onDragEnd={handleDragEnd}
     >
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold">{t('tasks.title')}</h2>
-            <span className="text-sm text-gray-500">
-              {tasks.length} {t('common.total') || 'total'}
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            {isPremium ? (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsAICreateDialogOpen(true)}
-                >
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  {t('kanban.createTasksWithAI')}
-                </Button>
-                <TaskGroupingButton 
-                  projectId={projectId} 
-                  userId={userId}
-                  onTasksUpdated={() => {
-                    // Refresh tasks by reloading the page data
-                    window.location.reload()
-                  }}
-                />
-              </>
-            ) : (
-              <>
-                <Button
-                  variant="outline"
-                  onClick={() => setUpgradeDialogOpen(true)}
-                >
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  {t('kanban.createTasksWithAI')}
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() => setUpgradeDialogOpen(true)}
-                >
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  {t('kanban.groupTasks')}
-                </Button>
-              </>
-            )}
-            <Button onClick={() => setIsCreateDialogOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              {t('tasks.newTask')}
-            </Button>
-          </div>
+        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+          {isPremium ? (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setIsAICreateDialogOpen(true)}
+                className="flex-1 sm:flex-initial"
+              >
+                <Sparkles className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">{t('kanban.createTasksWithAI')}</span>
+              </Button>
+              <TaskGroupingButton 
+                projectId={projectId} 
+                userId={userId}
+                onTasksUpdated={() => {
+                  // Refresh tasks by reloading the page data
+                  window.location.reload()
+                }}
+              />
+            </>
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setUpgradeDialogOpen(true)}
+                className="flex-1 sm:flex-initial"
+              >
+                <Sparkles className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">{t('kanban.createTasksWithAI')}</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setUpgradeDialogOpen(true)}
+                className="flex-1 sm:flex-initial"
+              >
+                <Sparkles className="w-4 h-4 sm:mr-2" />
+                <span className="hidden sm:inline">{t('kanban.groupTasks')}</span>
+              </Button>
+            </>
+          )}
+          <Button 
+            size="sm"
+            onClick={() => setIsCreateDialogOpen(true)}
+            className="flex-1 sm:flex-initial"
+          >
+            <Plus className="w-4 h-4 sm:mr-2" />
+            {t('tasks.newTask')}
+          </Button>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

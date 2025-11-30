@@ -26,11 +26,25 @@ export interface StandupSummary {
 }
 
 /**
+ * Get language name from locale code
+ */
+function getLanguageName(locale: string): string {
+  const languageMap: Record<string, string> = {
+    'tr': 'Turkish',
+    'en': 'English',
+    'de': 'German',
+    'es': 'Spanish',
+  }
+  return languageMap[locale] || 'English'
+}
+
+/**
  * Generate daily standup summary
  */
 export async function generateStandupSummary(
   yesterdayActivities: Activity[],
-  todayTasks: Task[]
+  todayTasks: Task[],
+  locale: string = 'en'
 ): Promise<StandupSummary> {
   // Format yesterday's activities
   const yesterdaySummary = yesterdayActivities
@@ -61,7 +75,12 @@ export async function generateStandupSummary(
     })
     .join('\n')
 
-  const prompt = `You are a productivity assistant. Generate a daily standup summary based on the following information:
+  const languageName = getLanguageName(locale)
+  const languageInstruction = locale !== 'en' 
+    ? `\n\nIMPORTANT: All responses (completed items, planned items, priorities, insights, and any text) must be in ${languageName}.`
+    : ''
+
+  const prompt = `You are a productivity assistant. Generate a daily standup summary based on the following information:${languageInstruction}
 
 YESTERDAY'S ACTIVITIES:
 ${yesterdaySummary || 'No activities recorded'}

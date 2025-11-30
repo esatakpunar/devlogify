@@ -179,7 +179,7 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Layers className="w-5 h-5" />
@@ -213,9 +213,9 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
         )}
 
         {!loading && !error && groups.length > 0 && (
-          <div className="space-y-4">
+          <div className="flex flex-col flex-1 min-h-0">
             {/* Selection controls */}
-            <div className="flex items-center justify-between pb-2 border-b">
+            <div className="flex items-center justify-between pb-2 border-b flex-shrink-0">
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600 dark:text-gray-400">
                   {t('kanban.groupsSelected', { selected: selectedGroups.size, total: groups.length })}
@@ -242,59 +242,61 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
             </div>
 
             {/* Groups */}
-            {groups.map((group) => {
-              const isSelected = selectedGroups.has(group.id)
-              return (
-                <Card 
-                  key={group.id} 
-                  className={`p-4 cursor-pointer transition-all ${
-                    isSelected ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : ''
-                  }`}
-                  onClick={() => toggleGroupSelection(group.id)}
-                >
-                  <div className="flex items-start gap-3">
-                    <Checkbox
-                      checked={isSelected}
-                      onCheckedChange={() => toggleGroupSelection(group.id)}
-                      onClick={(e) => e.stopPropagation()}
-                      className="mt-1"
-                    />
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between mb-2">
-                        <h4 className="font-semibold mb-1">{group.name}</h4>
+            <div className="space-y-4 mt-4 overflow-y-auto flex-1 min-h-0">
+              {groups.map((group) => {
+                const isSelected = selectedGroups.has(group.id)
+                return (
+                  <Card 
+                    key={group.id} 
+                    className={`p-4 cursor-pointer transition-all ${
+                      isSelected ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : ''
+                    }`}
+                    onClick={() => toggleGroupSelection(group.id)}
+                  >
+                    <div className="flex items-start gap-3">
+                      <Checkbox
+                        checked={isSelected}
+                        onCheckedChange={() => toggleGroupSelection(group.id)}
+                        onClick={(e) => e.stopPropagation()}
+                        className="mt-1"
+                      />
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between mb-2">
+                          <h4 className="font-semibold mb-1">{group.name}</h4>
+                        </div>
+                        {group.reason && (
+                          <p className="text-xs text-gray-500 mb-2">{group.reason}</p>
+                        )}
+                        <div className="flex flex-wrap gap-1 mb-2">
+                          {group.suggestedTags.map((tag, index) => (
+                            <Badge key={index} variant="secondary" className="text-xs">
+                              <Tag className="w-3 h-3 mr-1" />
+                              {tag}
+                            </Badge>
+                          ))}
+                        </div>
+                        <p className="text-xs text-gray-500">
+                          {group.tasks.length} {group.tasks.length === 1 ? t('common.task') : t('common.tasks')}
+                        </p>
                       </div>
-                      {group.reason && (
-                        <p className="text-xs text-gray-500 mb-2">{group.reason}</p>
-                      )}
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {group.suggestedTags.map((tag, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs">
-                            <Tag className="w-3 h-3 mr-1" />
-                            {tag}
-                          </Badge>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-800">
+                      <div className="space-y-1">
+                        {group.tasks.map((task) => (
+                          <div key={task.id} className="text-sm text-gray-700 dark:text-gray-300">
+                            • {task.title}
+                          </div>
                         ))}
                       </div>
-                      <p className="text-xs text-gray-500">
-                        {group.tasks.length} {group.tasks.length === 1 ? t('common.task') : t('common.tasks')}
-                      </p>
                     </div>
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-800">
-                    <div className="space-y-1">
-                      {group.tasks.map((task) => (
-                        <div key={task.id} className="text-sm text-gray-700 dark:text-gray-300">
-                          • {task.title}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </Card>
-              )
-            })}
+                  </Card>
+                )
+              })}
+            </div>
           </div>
         )}
 
-        <div className="flex justify-between items-center gap-2 pt-4 border-t">
+        <div className="flex justify-between items-center gap-2 pt-4 border-t flex-shrink-0">
           <div className="flex gap-2">
             {!loading && !error && groups.length > 0 && selectedGroups.size > 0 && (
               <Button 

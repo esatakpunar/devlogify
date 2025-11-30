@@ -236,3 +236,124 @@
 .dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
   background: rgb(107 114 128);
 }
+
+/* Progress Slider Styles */
+.progress-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+
+.progress-slider::-webkit-slider-thumb {
+  appearance: none;
+  height: 22px;
+  width: 22px;
+  border-radius: 50%;
+  background: var(--progress-color, #3b82f6);
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+  margin-top: -7px; /* Center thumb on track: (22px thumb - 8px track) / 2 = 7px */
+  position: relative;
+}
+
+.progress-slider::-moz-range-thumb {
+  height: 22px;
+  width: 22px;
+  border-radius: 50%;
+  background: var(--progress-color, #3b82f6);
+  cursor: pointer;
+  border: 2px solid #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s, background 0.3s;
+  /* Firefox centers thumb automatically, but we can adjust track height */
+}
+
+.progress-slider::-webkit-slider-track {
+  background: linear-gradient(
+    to right,
+    var(--progress-color, #3b82f6) 0%,
+    var(--progress-color, #3b82f6) var(--progress-value, 0%),
+    #e5e7eb var(--progress-value, 0%),
+    #e5e7eb 100%
+  );
+  height: 8px;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.progress-slider::-moz-range-track {
+  background: #e5e7eb;
+  height: 8px;
+  border-radius: 4px;
+  /* Ensure track is centered vertically */
+}
+
+/* Firefox progress fill */
+.progress-slider::-moz-range-progress {
+  background: var(--progress-color, #3b82f6);
+  height: 8px;
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+/* Progress color based on value */
+.progress-slider {
+  --progress-color: #3b82f6;
+}
+
+.progress-slider[value] {
+  --value: attr(value);
+}
+
+.progress-slider:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.dark .progress-slider::-webkit-slider-track {
+  background: rgb(55 65 81);
+}
+
+.dark .progress-slider::-moz-range-track {
+  background: rgb(55 65 81);
+}
+
+/* Progress Slider with Ticks */
+.progress-slider-ticks {
+  position: relative;
+}
+
+.progress-slider-ticks::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  pointer-events: none;
+}
+
+/* Tick marks */
+.progress-slider-ticks::-webkit-slider-runnable-track {
+  background: linear-gradient(
+    to right,
+    #3b82f6 0%,
+    #3b82f6 calc((var(--value) / 100) * 100%),
+    #e5e7eb calc((var(--value) / 100) * 100%),
+    #e5e7eb 100%
+  );
+}
+
+/* Thumb label tooltip effect */
+.progress-slider:hover::-webkit-slider-thumb {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.progress-slider:hover::-moz-range-thumb {
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}

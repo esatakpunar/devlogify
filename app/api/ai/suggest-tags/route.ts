@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { generateTagSuggestions } from '@/lib/ai/taskGrouping'
 import { getTasks } from '@/lib/supabase/queries/tasks'
 import { getProjects } from '@/lib/supabase/queries/projects'
-import { checkIsPremium } from '@/lib/utils/premium'
+import { checkIsPremium, getUserLocale } from '@/lib/utils/premium'
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,8 +43,11 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Get user's language preference
+    const locale = await getUserLocale(user.id, supabase)
+
     // Generate tag suggestions
-    const suggestions = await generateTagSuggestions(tasks)
+    const suggestions = await generateTagSuggestions(tasks, locale)
 
     return NextResponse.json({ suggestions })
   } catch (error: any) {

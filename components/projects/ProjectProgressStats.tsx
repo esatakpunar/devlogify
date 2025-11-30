@@ -1,7 +1,6 @@
 'use client'
 
 import { ProgressBar } from '@/components/ui/progress-bar'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
 import { useTranslation } from '@/lib/i18n/useTranslation'
@@ -27,18 +26,17 @@ interface ProjectProgressStatsProps {
 export function ProjectProgressStats({ tasks }: ProjectProgressStatsProps) {
   const t = useTranslation()
   
-  // Calculate overall project progress
+  // Calculate overall project progress based on task status
+  // done: 100%, in_progress: 50%, todo: 0%
   const overallProgress = tasks.length > 0 
-    ? Math.round(tasks.reduce((sum, task) => sum + task.progress, 0) / tasks.length)
+    ? Math.round(
+        tasks.reduce((sum, task) => {
+          if (task.status === 'done') return sum + 100
+          if (task.status === 'in_progress') return sum + 50
+          return sum + 0
+        }, 0) / tasks.length
+      )
     : 0
-
-  // Calculate progress distribution
-  const progressDistribution = {
-    '0-25%': tasks.filter(t => t.progress >= 0 && t.progress <= 25).length,
-    '26-50%': tasks.filter(t => t.progress >= 26 && t.progress <= 50).length,
-    '51-75%': tasks.filter(t => t.progress >= 51 && t.progress <= 75).length,
-    '76-100%': tasks.filter(t => t.progress >= 76 && t.progress <= 100).length,
-  }
 
   // Calculate status distribution
   const statusDistribution = {
@@ -47,103 +45,51 @@ export function ProjectProgressStats({ tasks }: ProjectProgressStatsProps) {
     done: tasks.filter(t => t.status === 'done').length,
   }
 
-  // Calculate time statistics
-  const totalEstimatedTime = tasks.reduce((sum, task) => sum + (task.estimated_duration || 0), 0)
-  const totalActualTime = tasks.reduce((sum, task) => sum + task.actual_duration, 0)
   const completedTasks = tasks.filter(t => t.status === 'done').length
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {/* Overall Progress */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">{t('projects.overallProgress')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <ProgressBar value={overallProgress} showPercentage size="lg" />
-            <div className="text-xs text-gray-500">
-              {t('projects.tasksCompleted', { completed: completedTasks, total: tasks.length })}
-            </div>
+    <div className="rounded-lg border bg-card p-4 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+        {/* Overall Progress */}
+        <div className="flex-1 min-w-0 w-full sm:w-auto">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-muted-foreground">{t('projects.overallProgress')}</span>
+            <span className="text-lg font-semibold text-foreground">{overallProgress}%</span>
           </div>
-        </CardContent>
-      </Card>
+          <ProgressBar value={overallProgress} size="sm" />
+          <div className="text-xs text-muted-foreground mt-1.5">
+            {completedTasks} / {tasks.length} {t('projects.tasks') || 'tasks'}
+          </div>
+        </div>
 
-      {/* Progress Distribution */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">{t('projects.progressDistribution')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {Object.entries(progressDistribution).map(([range, count]) => (
-              <div key={range} className="flex items-center justify-between">
-                <span className="text-xs text-gray-600">{range}</span>
-                <Badge variant="outline" className="text-xs">
-                  {count}
-                </Badge>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+        {/* Divider */}
+        <div className="hidden sm:block w-px h-12 bg-border" />
 
-      {/* Status Distribution */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">{t('projects.statusDistribution')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {Object.entries(statusDistribution).map(([status, count]) => (
-              <div key={status} className="flex items-center justify-between">
-                <span className="text-xs text-gray-600">
-                  {status === 'todo' ? t('common.todo') : status === 'in_progress' ? t('common.inProgress') : t('common.done')}
-                </span>
-                <Badge 
-                  variant="outline" 
-                  className={cn(
-                    'text-xs',
-                    status === 'todo' && 'bg-gray-100 text-gray-700',
-                    status === 'in_progress' && 'bg-blue-100 text-blue-700',
-                    status === 'done' && 'bg-green-100 text-green-700'
-                  )}
-                >
-                  {count}
-                </Badge>
-              </div>
-            ))}
+        {/* Status Distribution */}
+        <div className="flex items-center gap-4 sm:gap-6">
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-gray-400" />
+            <span className="text-xs text-muted-foreground">{t('common.todo')}</span>
+            <Badge variant="outline" className="text-xs font-medium min-w-[2rem] justify-center">
+              {statusDistribution.todo}
+            </Badge>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Time Statistics */}
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle className="text-sm font-medium text-gray-600">{t('projects.timeStatistics')}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-600">{t('projects.estimated')}</span>
-              <span className="text-xs font-medium">{totalEstimatedTime}{t('common.min')}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-600">{t('projects.actual')}</span>
-              <span className="text-xs font-medium">{totalActualTime}{t('common.min')}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-xs text-gray-600">{t('projects.difference')}</span>
-              <span className={cn(
-                'text-xs font-medium',
-                totalActualTime > totalEstimatedTime ? 'text-red-600' : 'text-green-600'
-              )}>
-                {totalActualTime > totalEstimatedTime ? '+' : ''}{totalActualTime - totalEstimatedTime}{t('common.min')}
-              </span>
-            </div>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-blue-500" />
+            <span className="text-xs text-muted-foreground">{t('common.inProgress')}</span>
+            <Badge variant="outline" className="text-xs font-medium min-w-[2rem] justify-center bg-blue-50 text-blue-700 border-blue-200">
+              {statusDistribution.in_progress}
+            </Badge>
           </div>
-        </CardContent>
-      </Card>
+          <div className="flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-green-500" />
+            <span className="text-xs text-muted-foreground">{t('common.done')}</span>
+            <Badge variant="outline" className="text-xs font-medium min-w-[2rem] justify-center bg-green-50 text-green-700 border-green-200">
+              {statusDistribution.done}
+            </Badge>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

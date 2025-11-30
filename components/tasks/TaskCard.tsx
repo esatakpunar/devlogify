@@ -62,6 +62,7 @@ const statusStyles = {
 
 export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCardProps) {
   const [loading, setLoading] = useState(false)
+  const [timerLoading, setTimerLoading] = useState(false)
   const [localTask, setLocalTask] = useState(task)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isTimeDialogOpen, setIsTimeDialogOpen] = useState(false)
@@ -117,7 +118,8 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
     }
   }
 
-  const handleStartTimer = async () => {
+  const handleStartTimer = async (e: React.MouseEvent) => {
+    e.stopPropagation()
     if (isRunning) {
       toast.error(t('tasks.pleaseStopCurrentTimer'))
       return
@@ -134,8 +136,9 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
     }
   }
 
-  const handleStopTimer = async () => {
-    setLoading(true)
+  const handleStopTimer = async (e: React.MouseEvent) => {
+    e.stopPropagation()
+    setTimerLoading(true)
     try {
       await stopTimer(userId)
 
@@ -152,7 +155,7 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
       console.error('Failed to stop timer:', error)
       toast.error(t('tasks.failedToStopTimer'))
     } finally {
-      setLoading(false)
+      setTimerLoading(false)
     }
   }
 
@@ -183,9 +186,9 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
         ref={setNodeRef}
         style={style}
         className={cn(
-          "border rounded-lg p-4 hover:shadow-lg transition-all duration-200 cursor-pointer group",
+          "border rounded-lg p-3 hover:shadow-md transition-all duration-200 cursor-pointer group",
           statusStyles[localTask.status],
-          isTimerActive && 'border-l-4 border-l-blue-500 shadow-blue-100 shadow-lg',
+          isTimerActive && 'border-l-4 border-l-blue-500 shadow-blue-100 shadow-md',
           isDragging && 'opacity-50 border-dashed border-2'
         )}
         onClick={() => setIsEditDialogOpen(true)}
@@ -193,65 +196,86 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
         {...attributes}
       >
         {/* Header */}
-        <div className="flex items-start justify-between mb-3">
+        <div className="flex items-start justify-between mb-2">
           <div className="flex-1 min-w-0">
-            <h4 className="font-semibold text-sm line-clamp-2 group-hover:text-blue-600 transition-colors">
+            <h4 className="font-semibold text-sm line-clamp-1 group-hover:text-blue-600 transition-colors">
               {localTask.title}
             </h4>
           </div>
-          <div className="flex items-center gap-1 ml-2">
+          <div className="flex items-center gap-1 ml-2 flex-shrink-0">
             {/* Timer Button */}
             {localTask.status !== 'done' && (
               <Button 
                 size="icon" 
                 variant={isTimerActive ? "default" : "ghost"}
-                className={`h-7 w-7 transition-all ${isTimerActive ? 'bg-blue-500 hover:bg-blue-600' : 'hover:bg-blue-50'}`}
-                onClick={isTimerActive ? handleStopTimer : handleStartTimer}
-                disabled={loading || (isRunning && !isTimerActive)}
+                className={`h-6 w-6 transition-all ${isTimerActive ? 'bg-blue-500 hover:bg-blue-600' : 'hover:bg-blue-50'}`}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  if (isTimerActive) {
+                    handleStopTimer(e)
+                  } else {
+                    handleStartTimer(e)
+                  }
+                }}
+                disabled={timerLoading || (isRunning && !isTimerActive)}
               >
-                {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
+                {timerLoading ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
                 ) : isTimerActive ? (
-                  <Square className="h-4 w-4" />
+                  <Square className="h-3.5 w-3.5" />
                 ) : (
-                  <Play className="h-4 w-4" />
+                  <Play className="h-3.5 w-3.5" />
                 )}
               </Button>
             )}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7 hover:bg-gray-100" disabled={loading}>
-                  {loading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <MoreVertical className="h-4 w-4" />
-                  )}
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-6 w-6 hover:bg-gray-100" 
+                  disabled={loading}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <MoreVertical className="h-3.5 w-3.5" />
                 </Button>
               </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setIsTimeDialogOpen(true)}>
+            <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
+              <DropdownMenuItem onClick={(e) => {
+                e.stopPropagation()
+                setIsTimeDialogOpen(true)
+              }}>
                 <Plus className="w-4 h-4 mr-2" />
                 {t('tasks.logTime')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               {canMovePrevious && (
-                <DropdownMenuItem onClick={() => handleStatusChange(
-                  localTask.status === 'done' ? 'in_progress' : 'todo'
-                )}>
+                <DropdownMenuItem onClick={(e) => {
+                  e.stopPropagation()
+                  handleStatusChange(
+                    localTask.status === 'done' ? 'in_progress' : 'todo'
+                  )
+                }}>
                   <ArrowLeft className="w-4 h-4 mr-2" />
                   {t('tasks.moveTo')} {localTask.status === 'done' ? t('common.inProgress') : t('common.todo')}
                 </DropdownMenuItem>
               )}
               {canMoveNext && (
-                <DropdownMenuItem onClick={() => handleStatusChange(
-                  localTask.status === 'todo' ? 'in_progress' : 'done'
-                )}>
+                <DropdownMenuItem onClick={(e) => {
+                  e.stopPropagation()
+                  handleStatusChange(
+                    localTask.status === 'todo' ? 'in_progress' : 'done'
+                  )
+                }}>
                   <ArrowRight className="w-4 h-4 mr-2" />
                   {t('tasks.moveTo')} {localTask.status === 'todo' ? t('common.inProgress') : t('common.done')}
                 </DropdownMenuItem>
               )}
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+              <DropdownMenuItem onClick={(e) => {
+                e.stopPropagation()
+                handleDelete()
+              }} className="text-red-600">
                 {t('common.delete')}
               </DropdownMenuItem>
             </DropdownMenuContent>
@@ -261,63 +285,66 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
 
         {/* Description */}
         {localTask.description && (
-          <p className="text-xs text-gray-600 mb-3 line-clamp-2 leading-relaxed">
+          <p className="text-xs text-gray-600 mb-2 line-clamp-1 leading-snug">
             {localTask.description}
           </p>
         )}
 
-        {/* Progress Section */}
-        <div className="mb-3 space-y-2">
-          {/* Progress Bar */}
-          <div title="Click anywhere on card to view task details">
+        {/* Progress Bar - Only show if progress > 0 */}
+        {localTask.progress > 0 && (
+          <div className="mb-2" title="Click anywhere on card to view task details">
             <ProgressBar value={localTask.progress} showPercentage size="sm" />
           </div>
+        )}
 
-          {/* Time Progress Indicator */}
-          <div className="flex items-center justify-between">
-            <TimeProgressIndicator
-              estimatedDuration={localTask.estimated_duration}
-              actualDuration={localTask.actual_duration}
-              size="sm"
-            />
-            {localTask.estimated_duration && !localTask.actual_duration && (
-              <div className="flex items-center gap-1 text-xs text-gray-500">
-                <Clock className="w-3 h-3" />
-                <span>{localTask.estimated_duration}m</span>
-              </div>
-            )}
-            {localTask.actual_duration > 0 && (
-              <div className={`flex items-center gap-1 text-xs font-medium ${
+        {/* Footer - Combined: Time, Priority, Tags */}
+        <div className="flex items-center justify-between gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {/* Time Info */}
+            {localTask.actual_duration > 0 ? (
+              <div className={`flex items-center gap-0.5 text-[10px] font-medium ${
                 isOverTime ? 'text-red-600' : 'text-blue-600'
               }`}>
                 <Clock className="w-3 h-3" />
                 <span>{localTask.actual_duration}m</span>
-                {isOverTime && <span className="text-red-500">⚠️</span>}
+                {isOverTime && <span className="ml-0.5">⚠️</span>}
               </div>
+            ) : localTask.estimated_duration ? (
+              <div className="flex items-center gap-0.5 text-[10px] text-gray-500">
+                <Clock className="w-3 h-3" />
+                <span>{localTask.estimated_duration}m</span>
+              </div>
+            ) : null}
+            
+            {/* Priority */}
+            {(localTask.actual_duration > 0 || localTask.estimated_duration) && (
+              <span className="text-gray-300">•</span>
             )}
-          </div>
-        </div>
-
-        {/* Tags */}
-        {localTask.tags && localTask.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1 mb-3">
-            {localTask.tags.map((tag, index) => (
-              <Badge key={index} variant="secondary" className="text-xs">
-                <Tag className="w-3 h-3 mr-1" />
-                {tag}
-              </Badge>
-            ))}
-          </div>
-        )}
-
-        {/* Footer */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Badge variant="outline" className={`${priorityColors[localTask.priority]} font-medium text-xs px-2 py-1`}>
+            <Badge variant="outline" className={`${priorityColors[localTask.priority]} font-medium text-[10px] px-1.5 py-0.5 h-5`}>
               {t(`common.${localTask.priority}`)}
             </Badge>
+            
+            {/* Tags */}
+            {localTask.tags && localTask.tags.length > 0 && (
+              <>
+                <span className="text-gray-300">•</span>
+                <div className="flex items-center gap-1 flex-wrap">
+                  {localTask.tags.slice(0, 4).map((tag, index) => (
+                    <Badge key={index} variant="secondary" className="text-[10px] px-1.5 py-0.5 h-5">
+                      <Tag className="w-2.5 h-2.5 mr-0.5" />
+                      {tag}
+                    </Badge>
+                  ))}
+                  {localTask.tags.length > 4 && (
+                    <span className="text-[10px] text-gray-500">+{localTask.tags.length - 4}</span>
+                  )}
+                </div>
+              </>
+            )}
           </div>
-          <span className="text-xs text-gray-400">
+          
+          {/* Created Date */}
+          <span className="text-[10px] text-gray-400 whitespace-nowrap">
             {formatDistanceToNow(new Date(localTask.created_at), { addSuffix: true })}
           </span>
         </div>
@@ -328,7 +355,6 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted }: TaskCar
         open={isEditDialogOpen}
         onOpenChange={setIsEditDialogOpen}
         task={localTask}
-        userId={userId}
         onTaskUpdated={handleTaskUpdated}
       />
 

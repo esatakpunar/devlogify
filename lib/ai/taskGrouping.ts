@@ -20,23 +20,56 @@ export interface TagSuggestion {
 }
 
 /**
+ * Get language name from locale code
+ */
+function getLanguageName(locale: string): string {
+  const languageMap: Record<string, string> = {
+    'tr': 'Turkish',
+    'en': 'English',
+    'de': 'German',
+    'es': 'Spanish',
+  }
+  return languageMap[locale] || 'English'
+}
+
+/**
  * Generate task groups using AI
  */
-export async function generateTaskGroups(tasks: Task[]): Promise<TaskGroup[]> {
+export async function generateTaskGroups(tasks: Task[], locale: string = 'en'): Promise<TaskGroup[]> {
   if (tasks.length === 0) {
     return []
   }
 
+  // Collect all existing tags to avoid duplicates
+  const allExistingTags = new Set<string>()
+  tasks.forEach(task => {
+    if (task.tags && Array.isArray(task.tags)) {
+      task.tags.forEach(tag => allExistingTags.add(tag.toLowerCase().trim()))
+    }
+  })
+
   const taskSummary = tasks
     .map((task, index) => {
-      return `${index + 1}. ${task.title}${task.description ? ` - ${task.description}` : ''} (ID: ${task.id}, Priority: ${task.priority}, Status: ${task.status})`
+      const existingTags = task.tags && Array.isArray(task.tags) && task.tags.length > 0
+        ? ` [Existing Tags: ${task.tags.join(', ')}]`
+        : ''
+      return `${index + 1}. ${task.title}${task.description ? ` - ${task.description}` : ''}${existingTags} (ID: ${task.id}, Priority: ${task.priority}, Status: ${task.status})`
     })
     .join('\n')
 
-  const prompt = `You are a task management assistant. Analyze the following tasks and group similar ones together.
+  const existingTagsList = Array.from(allExistingTags).length > 0
+    ? `\n\nIMPORTANT - Existing Tags (DO NOT suggest these again):\n${Array.from(allExistingTags).join(', ')}\n`
+    : ''
+
+  const languageName = getLanguageName(locale)
+  const languageInstruction = locale !== 'en' 
+    ? `\n\nIMPORTANT: All responses (group names, reasons, suggested tags, and any text) must be in ${languageName}. Do not use English unless the user's existing tasks are in English.`
+    : ''
+
+  const prompt = `You are a task management assistant. Analyze the following tasks and group similar ones together.${languageInstruction}
 
 Tasks:
-${taskSummary}
+${taskSummary}${existingTagsList}
 
 Return a JSON object with the following structure:
 {
@@ -61,11 +94,15 @@ IMPORTANT:
 - task_ids must be the NUMERIC INDEX (1, 2, 3...) from the task list above, NOT the task ID
 - The first task in the list is index 1, second is index 2, etc.
 - Only use task indices that exist in the list (1 to ${tasks.length})
+- DO NOT suggest tags that already exist on tasks (see existing tags list above)
+- When suggesting tags for a group, only suggest NEW tags that are not already present on the tasks in that group
+- Compare tag names case-insensitively (e.g., "API" and "api" are the same)
 
 Guidelines:
 - Group tasks that are related by topic, technology, or workflow
 - Each task can belong to multiple groups
 - Suggest meaningful tags that would help with filtering
+- Only suggest tags that are NOT already present on the tasks
 - Confidence should be between 0 and 1
 - Aim for 3-8 groups maximum
 - Focus on actionable groupings
@@ -121,11 +158,27 @@ Return ONLY valid JSON, no additional text or markdown formatting.`
             console.warn(`Group "${group.name}" has no valid tasks after mapping`)
           }
 
+          // Collect all existing tags from tasks in this group
+          const groupExistingTags = new Set<string>()
+          groupTasks.forEach(task => {
+            if (task.tags && Array.isArray(task.tags)) {
+              task.tags.forEach(tag => {
+                groupExistingTags.add(tag.toLowerCase().trim())
+              })
+            }
+          })
+
+          // Filter out tags that already exist on any task in the group
+          const suggestedTags = (group.suggested_tags || []).filter((tag: string) => {
+            const normalizedTag = tag.toLowerCase().trim()
+            return !groupExistingTags.has(normalizedTag)
+          })
+
           return {
             id: `group-${index}`,
             name: group.name,
             tasks: groupTasks,
-            suggestedTags: group.suggested_tags || [],
+            suggestedTags,
             reason: group.reason || '',
           }
         }).filter(group => group.tasks.length > 0) // Remove groups with no valid tasks
@@ -156,25 +209,37 @@ Return ONLY valid JSON, no additional text or markdown formatting.`
 /**
  * Generate tag suggestions for tasks
  */
-export async function generateTagSuggestions(tasks: Task[]): Promise<TagSuggestion[]> {
+export async function generateTagSuggestions(tasks: Task[], locale: string = 'en'): Promise<TagSuggestion[]> {
   if (tasks.length === 0) {
     return []
   }
 
   // Use the same grouping logic but focus on tags
-  const groups = await generateTaskGroups(tasks)
+  const groups = await generateTaskGroups(tasks, locale)
   
-  // Extract tag suggestions from groups
+  // Extract tag suggestions from groups, filtering out existing tags
   const tagMap = new Map<string, Set<string>>()
 
   groups.forEach((group) => {
     group.suggestedTags.forEach((tag) => {
-      if (!tagMap.has(tag)) {
-        tagMap.set(tag, new Set())
-      }
-      group.tasks.forEach((task) => {
-        tagMap.get(tag)!.add(task.id)
+      // Check if this tag already exists on any task in the group
+      const normalizedTag = tag.toLowerCase().trim()
+      const hasExistingTag = group.tasks.some(task => {
+        if (task.tags && Array.isArray(task.tags)) {
+          return task.tags.some(existingTag => existingTag.toLowerCase().trim() === normalizedTag)
+        }
+        return false
       })
+
+      // Only add if tag doesn't already exist
+      if (!hasExistingTag) {
+        if (!tagMap.has(tag)) {
+          tagMap.set(tag, new Set())
+        }
+        group.tasks.forEach((task) => {
+          tagMap.get(tag)!.add(task.id)
+        })
+      }
     })
   })
 

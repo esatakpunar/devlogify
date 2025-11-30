@@ -20,11 +20,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { ProgressBar } from '@/components/ui/progress-bar'
 import { TimeProgressIndicator } from './TimeProgressIndicator'
-import { TaskTemplateDialog } from './TaskTemplateDialog'
+import { Slider } from '@/components/ui/slider'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { cn } from '@/lib/utils'
 
 type Task = {
   id: string
@@ -45,7 +45,6 @@ interface EditTaskDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   task: Task
-  userId: string
   onTaskUpdated: (task: Task) => void
 }
 
@@ -53,7 +52,6 @@ export function EditTaskDialog({
   open, 
   onOpenChange, 
   task, 
-  userId,
   onTaskUpdated 
 }: EditTaskDialogProps) {
   const [title, setTitle] = useState(task.title)
@@ -76,7 +74,9 @@ export function EditTaskDialog({
   }, [task])
 
   const handleProgressUpdate = (newProgress: number) => {
-    setProgress(newProgress)
+    // Clamp between 0 and 100
+    const clampedProgress = Math.max(0, Math.min(100, newProgress))
+    setProgress(clampedProgress)
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -192,19 +192,34 @@ export function EditTaskDialog({
 
           {/* Progress Section */}
           <div className="space-y-3">
-            <Label>{t('tasks.progress')}</Label>
-            <div className="space-y-3">
-              {/* Interactive Progress Bar */}
+            <Label className="text-sm font-medium text-gray-700">
+              {t('tasks.progress')} % {progress}
+            </Label>
+            <div className="space-y-4">
+              {/* Radix Slider */}
               <div className="space-y-2">
-                <ProgressBar 
-                  value={progress} 
-                  showPercentage 
-                  size="md" 
-                  interactive={true}
-                  onValueChange={handleProgressUpdate}
+                <Slider
+                  value={[progress]}
+                  onValueChange={(values) => handleProgressUpdate(values[0])}
+                  min={0}
+                  max={100}
+                  step={20}
+                  disabled={loading}
+                  className={cn(
+                    "w-full",
+                    progress <= 30 && "text-red-500 [&>div>div]:bg-red-500",
+                    progress > 30 && progress <= 70 && "text-amber-500 [&>div>div]:bg-amber-500",
+                    progress > 70 && "text-green-500 [&>div>div]:bg-green-500"
+                  )}
                 />
-                <div className="text-xs text-gray-500">
-                  {t('tasks.clickProgressBarToSet')}
+                {/* Tick marks */}
+                <div className="flex justify-between px-1 text-xs text-gray-400">
+                  <span>0%</span>
+                  <span>20%</span>
+                  <span>40%</span>
+                  <span>60%</span>
+                  <span>80%</span>
+                  <span>100%</span>
                 </div>
               </div>
               
@@ -232,15 +247,6 @@ export function EditTaskDialog({
             >
               {t('common.cancel')}
             </Button>
-            <TaskTemplateDialog
-              userId={userId}
-              initialTask={{
-                title,
-                description: description || null,
-                priority,
-                estimated_duration: estimatedDuration ? parseInt(estimatedDuration) : null,
-              }}
-            />
           </div>
         </form>
       </DialogContent>

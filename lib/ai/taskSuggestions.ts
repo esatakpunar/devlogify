@@ -16,9 +16,22 @@ export interface TaskSuggestion {
 }
 
 /**
+ * Get language name from locale code
+ */
+function getLanguageName(locale: string): string {
+  const languageMap: Record<string, string> = {
+    'tr': 'Turkish',
+    'en': 'English',
+    'de': 'German',
+    'es': 'Spanish',
+  }
+  return languageMap[locale] || 'English'
+}
+
+/**
  * Generate task suggestions based on existing tasks
  */
-export async function generateTaskSuggestions(tasks: Task[]): Promise<TaskSuggestion[]> {
+export async function generateTaskSuggestions(tasks: Task[], locale: string = 'en'): Promise<TaskSuggestion[]> {
   if (tasks.length === 0) {
     return []
   }
@@ -30,7 +43,12 @@ export async function generateTaskSuggestions(tasks: Task[]): Promise<TaskSugges
     })
     .join('\n')
 
-  const prompt = `You are a task management assistant. Analyze the following existing tasks and suggest new tasks that:
+  const languageName = getLanguageName(locale)
+  const languageInstruction = locale !== 'en' 
+    ? `\n\nIMPORTANT: All responses (task titles, descriptions, reasons, and any text) must be in ${languageName}. Do not use English unless the user's existing tasks are in English.`
+    : ''
+
+  const prompt = `You are a task management assistant. Analyze the following existing tasks and suggest new tasks that:${languageInstruction}
 1. Are related to or follow logically from existing tasks
 2. Fill gaps in the workflow
 3. Are dependencies or prerequisites that might be missing

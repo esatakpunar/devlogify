@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { generateTaskGroups } from '@/lib/ai/taskGrouping'
 import { getTasks } from '@/lib/supabase/queries/tasks'
 import { getProjects } from '@/lib/supabase/queries/projects'
-import { checkIsPremium } from '@/lib/utils/premium'
+import { checkIsPremium, getUserLocale } from '@/lib/utils/premium'
 
 export async function POST(request: NextRequest) {
   try {
@@ -45,8 +45,14 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Filter out done tasks - only group todo and in_progress tasks
+    tasks = tasks.filter(task => task.status !== 'done')
+
+    // Get user's language preference
+    const locale = await getUserLocale(user.id, supabase)
+
     // Generate groups
-    const groups = await generateTaskGroups(tasks)
+    const groups = await generateTaskGroups(tasks, locale)
 
     return NextResponse.json({ groups })
   } catch (error: any) {

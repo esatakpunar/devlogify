@@ -75,14 +75,32 @@ async function generateWithRetry(
 }
 
 /**
+ * Get language name from locale code
+ */
+function getLanguageName(locale: string): string {
+  const languageMap: Record<string, string> = {
+    'tr': 'Turkish',
+    'en': 'English',
+    'de': 'German',
+    'es': 'Spanish',
+  }
+  return languageMap[locale] || 'English'
+}
+
+/**
  * Converts notes/text into structured tasks using Google Gemini Pro
  */
-export async function generateTasksFromNotes(notes: string): Promise<AITask[]> {
+export async function generateTasksFromNotes(notes: string, locale: string = 'en'): Promise<AITask[]> {
   if (!GEMINI_API_KEY) {
     throw new Error('GEMINI_API_KEY is not configured. Please set it in your environment variables.')
   }
 
-  const prompt = `You are a task management assistant. Analyze the following meeting notes or text and extract meaningful, actionable tasks. Group related small actions into larger, cohesive tasks.
+  const languageName = getLanguageName(locale)
+  const languageInstruction = locale !== 'en' 
+    ? `\n\nIMPORTANT: All responses (task titles, descriptions, and any text) must be in ${languageName}. Do not use English unless the user's input is in English.`
+    : ''
+
+  const prompt = `You are a task management assistant. Analyze the following meeting notes or text and extract meaningful, actionable tasks. Group related small actions into larger, cohesive tasks.${languageInstruction}
 
 Notes:
 ${notes}

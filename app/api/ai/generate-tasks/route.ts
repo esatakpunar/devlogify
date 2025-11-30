@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { generateTasksFromNotes } from '@/lib/ai/gemini'
-import { checkIsPremium } from '@/lib/utils/premium'
+import { checkIsPremium, getUserLocale } from '@/lib/utils/premium'
 
 export async function POST(request: NextRequest) {
   try {
@@ -44,8 +44,11 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // Get user's language preference
+    const locale = await getUserLocale(user.id, supabase)
+
     // Generate tasks using AI
-    const tasks = await generateTasksFromNotes(notes)
+    const tasks = await generateTasksFromNotes(notes, locale)
 
     return NextResponse.json({ tasks })
   } catch (error: any) {

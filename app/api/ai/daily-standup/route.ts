@@ -4,7 +4,7 @@ import { generateStandupSummary } from '@/lib/ai/standupSummary'
 import { getActivitiesByDateRange } from '@/lib/supabase/queries/activities'
 import { getTasks } from '@/lib/supabase/queries/tasks'
 import { getProjects } from '@/lib/supabase/queries/projects'
-import { checkIsPremium } from '@/lib/utils/premium'
+import { checkIsPremium, getUserLocale } from '@/lib/utils/premium'
 
 export async function GET(request: NextRequest) {
   try {
@@ -58,10 +58,14 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // Get user's language preference
+    const locale = await getUserLocale(user.id, supabase)
+
     // Generate standup summary
     const summary = await generateStandupSummary(
       yesterdayActivities || [],
-      todayTasks
+      todayTasks,
+      locale
     )
 
     return NextResponse.json({ summary })
