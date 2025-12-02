@@ -40,8 +40,8 @@ export function AdvancedFilters<T extends TaskFilter | ProjectFilter | NoteFilte
   const [showSaveDialog, setShowSaveDialog] = useState(false)
   const savedFilters = getSavedFilters().filter(f => f.type === type)
 
-  const handleQuickFilter = (quickFilter: () => T) => {
-    onFilterChange(quickFilter())
+  const handleQuickFilter = (quickFilter: () => TaskFilter | ProjectFilter | NoteFilter) => {
+    onFilterChange(quickFilter() as T)
     setOpen(false)
   }
 
