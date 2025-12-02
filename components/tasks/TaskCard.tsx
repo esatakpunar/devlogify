@@ -224,10 +224,10 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
     
     // Apply drag listeners if not read-only and not clicking on interactive elements
     const target = e.target as HTMLElement
-    if (!readOnly && !target.closest('button') && !target.closest('[role="menuitem"]')) {
+    if (!readOnly && listeners && !target.closest('button') && !target.closest('[role="menuitem"]')) {
       // Use a small delay to allow click to register first
       const timer = setTimeout(() => {
-        if (listeners.onPointerDown && !hasMoved) {
+        if (listeners?.onPointerDown && !hasMoved) {
           listeners.onPointerDown(e as any)
         }
       }, 10)
