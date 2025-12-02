@@ -106,28 +106,28 @@ export function AdvancedFilters<T extends TaskFilter | ProjectFilter | NoteFilte
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleQuickFilter(quickFilters.tasks.todayCompleted)}
+                    onClick={() => handleQuickFilter(quickFilters.tasks.todayCompleted as () => TaskFilter | ProjectFilter | NoteFilter)}
                   >
                     Today Completed
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleQuickFilter(quickFilters.tasks.thisWeek)}
+                    onClick={() => handleQuickFilter(quickFilters.tasks.thisWeek as () => TaskFilter | ProjectFilter | NoteFilter)}
                   >
                     This Week
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleQuickFilter(quickFilters.tasks.highPriority)}
+                    onClick={() => handleQuickFilter(quickFilters.tasks.highPriority as () => TaskFilter | ProjectFilter | NoteFilter)}
                   >
                     High Priority
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleQuickFilter(quickFilters.tasks.inProgress)}
+                    onClick={() => handleQuickFilter(quickFilters.tasks.inProgress as () => TaskFilter | ProjectFilter | NoteFilter)}
                   >
                     In Progress
                   </Button>
