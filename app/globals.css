@@ -563,3 +563,12 @@
   margin-top: 1rem;
   margin-bottom: 1rem;
 }
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}

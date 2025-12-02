@@ -38,7 +38,14 @@
     "done": "Done",
     "total": "total",
     "tryAgain": "Try Again",
-    "refresh": "Refresh"
+    "refresh": "Refresh",
+    "retry": "Retry",
+    "reloadPage": "Reload Page",
+    "goHome": "Go Home",
+    "somethingWentWrong": "Something went wrong",
+    "errorDetails": "Error Details (Development Only)",
+    "draftSaved": "Draft saved",
+    "anUnexpectedErrorOccurred": "An unexpected error occurred. Please try refreshing the page."
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -165,6 +172,20 @@
     "failedToDeleteProject": "Failed to delete project",
     "noStatusProjects": "No {status} projects yet",
     "getStartedByCreating": "Get started by creating your first project to track your work",
+    "noStatusProjectsDescription": "No {status} projects found. Create a new project to get started.",
+    "titleValidationMin": "Title must be at least 3 characters",
+    "titleValidationMax": "Title must be less than 100 characters",
+    "fixErrorsBeforeSubmit": "Please fix the errors before submitting",
+    "exampleProjectsTitle": "Example projects to get you started:",
+    "exampleProjectWebApp": "Web App Development",
+    "exampleProjectMarketing": "Marketing Campaign",
+    "exampleProjectProduct": "Product Ideas",
+    "emptyStateTips": {
+      "organizeWork": "Organize your work into projects for better tracking",
+      "trackTime": "Track time spent on each project",
+      "setGoals": "Set project goals and milestones",
+      "collaborate": "Collaborate by sharing projects with your team"
+    },
     "dangerZone": "Danger Zone",
     "irreversibleActions": "Irreversible and destructive actions",
     "deleteProject": "Delete Project",
@@ -730,5 +751,24 @@
     "downloadAsCSV": "Download as CSV",
     "failedToExportJSON": "Failed to export JSON",
     "failedToExportCSV": "Failed to export CSV"
+  },
+  "commandPalette": {
+    "placeholder": "Type a command or search...",
+    "noResults": "No results found.",
+    "quickActions": "Quick Actions",
+    "navigation": "Navigation",
+    "createTasksWithAI": "Create Tasks with AI",
+    "createNewTask": "Create New Task",
+    "createNewNote": "Create New Note",
+    "createNewProject": "Create New Project",
+    "goToDashboard": "Go to Dashboard",
+    "goToProjects": "Go to Projects",
+    "goToNotes": "Go to Notes",
+    "goToAnalytics": "Go to Analytics",
+    "goToTimeline": "Go to Timeline",
+    "goToSettings": "Go to Settings",
+    "projects": "Projects",
+    "recentTasks": "Recent Tasks",
+    "recentNotes": "Recent Notes"
   }
 }

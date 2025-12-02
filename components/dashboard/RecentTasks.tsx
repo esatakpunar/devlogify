@@ -11,6 +11,7 @@ import { useTimerStore } from '@/lib/store/timerStore'
 import { updateTaskStatus } from '@/lib/supabase/queries/tasks'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { formatSupabaseError, isRetryableError } from '@/lib/utils/errorHandler'
 
 interface Task {
   id: string
@@ -69,8 +70,15 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
     try {
       await startTimer(task.id, task.title, userId)
       toast.success(t('tasks.startedTimerFor', { title: task.title }))
-    } catch (error) {
-      toast.error(t('tasks.failedToStartTimer'))
+    } catch (error: any) {
+      const errorMessage = formatSupabaseError(error)
+      const retryable = isRetryableError(error)
+      toast.error(errorMessage, {
+        action: retryable ? {
+          label: t('common.retry'),
+          onClick: () => handleStartTimer(task)
+        } : undefined
+      })
       console.error('Timer start error:', error)
     }
   }
@@ -86,10 +94,17 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
       toast.success(t('tasks.taskMarkedAsComplete'))
       // Refresh the page to update Today's Completed section
       router.refresh()
-    } catch (error) {
+    } catch (error: any) {
       // Revert optimistic update on error
       setLocalTasks(tasks)
-      toast.error(t('tasks.failedToMarkComplete'))
+      const errorMessage = formatSupabaseError(error)
+      const retryable = isRetryableError(error)
+      toast.error(errorMessage, {
+        action: retryable ? {
+          label: t('common.retry'),
+          onClick: () => handleMarkComplete(taskId)
+        } : undefined
+      })
       console.error('Mark complete error:', error)
     } finally {
       setLoadingTasks(prev => {

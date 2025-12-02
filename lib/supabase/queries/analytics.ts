@@ -45,57 +45,58 @@ export async function getWeeklyStats(userId: string) {
   const supabase = await createServerClient()
   const { weekStartUTC, weekEndUTC, timezone } = await getWeekBoundaries(userId)
   
-  // Bu haftanın süreleri
-  const { data: currentWeekEntries } = await supabase
-    .from('time_entries')
-    .select('duration')
-    .eq('user_id', userId)
-    .gte('started_at', weekStartUTC.toISOString())
-    .lte('started_at', weekEndUTC.toISOString())
-    .not('duration', 'is', null)
-
-  const currentWeekMinutes = currentWeekEntries?.reduce((sum, entry) => sum + (entry.duration || 0), 0) || 0
-
-  // Geçen haftanın süreleri
+  // Calculate last week boundaries
   const lastWeekStartUTC = subWeeks(weekStartUTC, 1)
   const lastWeekEndUTC = subWeeks(weekEndUTC, 1)
   
-  const { data: lastWeekEntries } = await supabase
-    .from('time_entries')
-    .select('duration')
-    .eq('user_id', userId)
-    .gte('started_at', lastWeekStartUTC.toISOString())
-    .lte('started_at', lastWeekEndUTC.toISOString())
-    .not('duration', 'is', null)
+  // Parallel queries for all weekly stats
+  const [
+    currentWeekEntriesResult,
+    lastWeekEntriesResult,
+    currentWeekTasksResult,
+    lastWeekTasksResult
+  ] = await Promise.all([
+    supabase
+      .from('time_entries')
+      .select('duration')
+      .eq('user_id', userId)
+      .gte('started_at', weekStartUTC.toISOString())
+      .lte('started_at', weekEndUTC.toISOString())
+      .not('duration', 'is', null),
+    supabase
+      .from('time_entries')
+      .select('duration')
+      .eq('user_id', userId)
+      .gte('started_at', lastWeekStartUTC.toISOString())
+      .lte('started_at', lastWeekEndUTC.toISOString())
+      .not('duration', 'is', null),
+    supabase
+      .from('tasks')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('status', 'done')
+      .gte('completed_at', weekStartUTC.toISOString())
+      .lte('completed_at', weekEndUTC.toISOString()),
+    supabase
+      .from('tasks')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('status', 'done')
+      .gte('completed_at', lastWeekStartUTC.toISOString())
+      .lte('completed_at', lastWeekEndUTC.toISOString())
+  ])
 
-  const lastWeekMinutes = lastWeekEntries?.reduce((sum, entry) => sum + (entry.duration || 0), 0) || 0
-
-  // Bu haftanın tamamlanan taskları
-  const { count: currentWeekTasks } = await supabase
-    .from('tasks')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .eq('status', 'done')
-    .gte('completed_at', weekStartUTC.toISOString())
-    .lte('completed_at', weekEndUTC.toISOString())
-
-  // Geçen haftanın tamamlanan taskları
-  const { count: lastWeekTasks } = await supabase
-    .from('tasks')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .eq('status', 'done')
-    .gte('completed_at', lastWeekStartUTC.toISOString())
-    .lte('completed_at', lastWeekEndUTC.toISOString())
+  const currentWeekMinutes = currentWeekEntriesResult.data?.reduce((sum, entry) => sum + (entry.duration || 0), 0) || 0
+  const lastWeekMinutes = lastWeekEntriesResult.data?.reduce((sum, entry) => sum + (entry.duration || 0), 0) || 0
 
   return {
     currentWeek: {
       minutes: currentWeekMinutes,
-      tasks: currentWeekTasks || 0,
+      tasks: currentWeekTasksResult.count || 0,
     },
     lastWeek: {
       minutes: lastWeekMinutes,
-      tasks: lastWeekTasks || 0,
+      tasks: lastWeekTasksResult.count || 0,
     },
   }
 }
@@ -233,28 +234,28 @@ export async function getTodayStats(userId: string) {
   const dayStartUTC = fromZonedTime(dayStart, timezone)
   const dayEndUTC = fromZonedTime(dayEnd, timezone)
 
-  // Today's completed tasks count
-  const { count: tasksCount } = await supabase
-    .from('tasks')
-    .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
-    .eq('status', 'done')
-    .gte('completed_at', dayStartUTC.toISOString())
-    .lte('completed_at', dayEndUTC.toISOString())
+  // Parallel queries for today's stats
+  const [tasksResult, timeEntriesResult] = await Promise.all([
+    supabase
+      .from('tasks')
+      .select('*', { count: 'exact', head: true })
+      .eq('user_id', userId)
+      .eq('status', 'done')
+      .gte('completed_at', dayStartUTC.toISOString())
+      .lte('completed_at', dayEndUTC.toISOString()),
+    supabase
+      .from('time_entries')
+      .select('duration')
+      .eq('user_id', userId)
+      .gte('started_at', dayStartUTC.toISOString())
+      .lte('started_at', dayEndUTC.toISOString())
+      .not('duration', 'is', null)
+  ])
 
-  // Today's time entries
-  const { data: timeEntries } = await supabase
-    .from('time_entries')
-    .select('duration')
-    .eq('user_id', userId)
-    .gte('started_at', dayStartUTC.toISOString())
-    .lte('started_at', dayEndUTC.toISOString())
-    .not('duration', 'is', null)
-
-  const totalMinutes = timeEntries?.reduce((sum, entry) => sum + (entry.duration || 0), 0) || 0
+  const totalMinutes = timeEntriesResult.data?.reduce((sum, entry) => sum + (entry.duration || 0), 0) || 0
 
   return {
-    tasksCompleted: tasksCount || 0,
+    tasksCompleted: tasksResult.count || 0,
     totalMinutes,
   }
 }

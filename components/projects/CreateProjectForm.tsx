@@ -21,6 +21,7 @@ import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 import { ArrowLeft, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 const COLORS = [
   '#6366f1', // Indigo
@@ -34,6 +35,8 @@ const COLORS = [
   '#3b82f6', // Blue
 ]
 
+const DRAFT_KEY = 'create-project-draft'
+
 export function CreateProjectForm() {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
@@ -43,9 +46,12 @@ export function CreateProjectForm() {
   const [error, setError] = useState<string | null>(null)
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
+  const [titleError, setTitleError] = useState<string | null>(null)
+  const [draftSaved, setDraftSaved] = useState(false)
   const router = useRouter()
   const supabase = createClient()
   const { isPremium, loading: premiumLoading } = usePremium(userId || undefined)
+  const t = useTranslation()
 
   // Get user ID on mount
   useEffect(() => {
@@ -56,8 +62,64 @@ export function CreateProjectForm() {
     })
   }, [supabase])
 
+  // Load draft on mount
+  useEffect(() => {
+    try {
+      const draft = localStorage.getItem(DRAFT_KEY)
+      if (draft) {
+        const parsed = JSON.parse(draft)
+        setTitle(parsed.title || '')
+        setDescription(parsed.description || '')
+        setColor(parsed.color || COLORS[0])
+        setStatus(parsed.status || 'active')
+      }
+    } catch (error) {
+      console.error('Failed to load draft:', error)
+    }
+  }, [])
+
+  // Auto-save draft
+  useEffect(() => {
+    if (title || description) {
+      const draft = {
+        title,
+        description,
+        color,
+        status,
+      }
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft))
+        setDraftSaved(true)
+        const timer = setTimeout(() => setDraftSaved(false), 2000)
+        return () => clearTimeout(timer)
+      } catch (error) {
+        console.error('Failed to save draft:', error)
+      }
+    }
+  }, [title, description, color, status])
+
+  // Real-time validation
+  useEffect(() => {
+    if (title.trim().length === 0) {
+      setTitleError(null)
+    } else if (title.trim().length < 3) {
+      setTitleError(t('projects.titleValidationMin'))
+    } else if (title.trim().length > 100) {
+      setTitleError(t('projects.titleValidationMax'))
+    } else {
+      setTitleError(null)
+    }
+  }, [title, t])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Validate before submit
+    if (titleError || !title.trim() || title.trim().length < 3) {
+      setError(t('projects.fixErrorsBeforeSubmit'))
+      return
+    }
+    
     setLoading(true)
     setError(null)
 
@@ -88,6 +150,9 @@ export function CreateProjectForm() {
       // Activity log ekle
       await logProjectCreated(user.id, newProject.id, title)
 
+      // Clear draft on success
+      localStorage.removeItem(DRAFT_KEY)
+      
       toast.success('Project created successfully!')
       router.push(`/projects/${newProject.id}`)
       router.refresh()
@@ -124,9 +189,16 @@ export function CreateProjectForm() {
         )}
 
         <div className="space-y-2">
-          <Label htmlFor="title">
-            Project Name <span className="text-red-500">*</span>
-          </Label>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="title">
+              Project Name <span className="text-red-500">*</span>
+            </Label>
+            {draftSaved && (
+              <span className="text-xs text-gray-500 dark:text-gray-400">
+                {t('common.draftSaved')}
+              </span>
+            )}
+          </div>
           <Input
             id="title"
             placeholder="My Awesome Project"
@@ -134,7 +206,11 @@ export function CreateProjectForm() {
             onChange={(e) => setTitle(e.target.value)}
             required
             disabled={loading}
+            className={titleError ? 'border-red-500' : ''}
           />
+          {titleError && (
+            <p className="text-xs text-red-600 dark:text-red-400">{titleError}</p>
+          )}
         </div>
 
         <div className="space-y-2">

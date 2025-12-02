@@ -5,10 +5,10 @@ import { NoteCard } from './NoteCard'
 import { CreateNoteDialog } from './CreateNoteDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, Search } from 'lucide-react'
-import { StickyNote } from 'lucide-react'
+import { Plus, Search, StickyNote } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 interface Note {
   id: string
@@ -88,21 +88,20 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
 
       {/* Notes Grid */}
       {filteredNotes.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-8 sm:py-12 px-4 bg-white rounded-lg border border-gray-200">
-          <StickyNote className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mb-3 sm:mb-4" />
-          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2 text-center">
-            {searchQuery ? t('notesList.noNotesFound') : t('notes.noNotes')}
-          </h3>
-          <p className="text-sm sm:text-base text-gray-600 mb-4 text-center">
-            {searchQuery ? t('notesList.tryDifferentSearch') : t('notesList.startCapturingIdeas')}
-          </p>
-          {!searchQuery && (
-            <Button onClick={() => setIsCreateDialogOpen(true)}>
-              <Plus className="w-4 h-4 mr-2" />
-              {t('notes.createNote')}
-            </Button>
-          )}
-        </div>
+        <EmptyState
+          icon={StickyNote}
+          title={searchQuery ? t('notesList.noNotesFound') : t('notes.noNotes')}
+          description={searchQuery ? t('notesList.tryDifferentSearch') : t('notesList.startCapturingIdeas')}
+          actionLabel={!searchQuery ? t('notes.createNote') : undefined}
+          onAction={!searchQuery ? () => setIsCreateDialogOpen(true) : undefined}
+          tips={!searchQuery ? [
+            'Capture ideas, meeting notes, and thoughts',
+            'Use tags to organize your notes',
+            'Pin important notes for quick access',
+            'Link notes to projects for better organization'
+          ] : undefined}
+          variant={searchQuery ? 'minimal' : 'default'}
+        />
       ) : (
         <>
           {/* Pinned Notes */}

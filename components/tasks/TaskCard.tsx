@@ -20,6 +20,7 @@ import { logActivity } from '@/lib/supabase/queries/activities'
 import { useTimer } from '@/lib/hooks/useTimer'
 import { formatDistanceToNow } from 'date-fns'
 import { toast } from 'sonner'
+import { formatSupabaseError, isRetryableError } from '@/lib/utils/errorHandler'
 import { EditTaskDialog } from './EditTaskDialog'
 import { AddManualTimeDialog } from './AddManualTimeDialog'
 import { useDraggable } from '@dnd-kit/core'
@@ -94,6 +95,12 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
   const handleStatusChange = async (newStatus: 'todo' | 'in_progress' | 'done') => {
     if (readOnly || !onTaskUpdated) return
     
+    // Optimistic update
+    const previousTask = { ...localTask }
+    const optimisticTask = { ...localTask, status: newStatus }
+    setLocalTask(optimisticTask)
+    onTaskUpdated(optimisticTask)
+    
     setLoading(true)
     try {
       const updatedTask = await updateTaskStatus(task.id, newStatus)
@@ -105,15 +112,28 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
         task.id,
         newStatus === 'done' ? 'task_completed' : 'task_status_changed',
         { 
-          old_status: localTask.status,
+          old_status: previousTask.status,
           new_status: newStatus,
           task_title: localTask.title
         }
       )
       
-      onTaskUpdated(updatedTask)
+      // Update with real data
       setLocalTask(updatedTask)
-    } catch (error) {
+      onTaskUpdated(updatedTask)
+    } catch (error: any) {
+      // Revert optimistic update on error
+      setLocalTask(previousTask)
+      onTaskUpdated(previousTask)
+      
+      const errorMessage = formatSupabaseError(error)
+      const retryable = isRetryableError(error)
+      toast.error(errorMessage, {
+        action: retryable ? {
+          label: t('common.retry'),
+          onClick: () => handleStatusChange(newStatus)
+        } : undefined
+      })
       console.error('Failed to update task:', error)
     } finally {
       setLoading(false)
@@ -125,14 +145,31 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
     
     if (!confirm(t('tasks.areYouSureDeleteTask'))) return
     
+    // Optimistic update - remove from UI immediately
+    const previousTask = { ...localTask }
+    onTaskDeleted(task.id)
+    
     setLoading(true)
     try {
       await deleteTask(task.id)
-      onTaskDeleted(task.id)
       toast.success(t('tasks.taskDeleted'))
-    } catch (error) {
+    } catch (error: any) {
+      // Revert optimistic update on error
+      // Note: We can't easily restore the task in the list, so we'll just show an error
+      const errorMessage = formatSupabaseError(error)
+      const retryable = isRetryableError(error)
+      toast.error(errorMessage, {
+        action: retryable ? {
+          label: t('common.retry'),
+          onClick: () => handleDelete()
+        } : undefined,
+        duration: 5000
+      })
       console.error('Failed to delete task:', error)
-      toast.error(t('tasks.failedToDeleteTask'))
+      
+      // Try to restore task in parent (if parent supports it)
+      // This is a best-effort approach
+      onTaskUpdated?.(previousTask)
     } finally {
       setLoading(false)
     }
