@@ -45,7 +45,9 @@
     "somethingWentWrong": "Etwas ist schief gelaufen",
     "errorDetails": "Fehlerdetails (Nur Entwicklung)",
     "draftSaved": "Entwurf gespeichert",
-    "anUnexpectedErrorOccurred": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie, die Seite zu aktualisieren."
+    "anUnexpectedErrorOccurred": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie, die Seite zu aktualisieren.",
+    "collapse": "Einklappen",
+    "expand": "Ausklappen"
   },
   "nav": {
     "dashboard": "Dashboard",

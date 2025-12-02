@@ -74,8 +74,8 @@ export function NotificationSettings({ userId }: NotificationSettingsProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
+    <div className="space-y-4">
+      <div className="pb-4 border-b border-gray-200 dark:border-gray-800">
         <h3 className="text-lg font-semibold">Notifications</h3>
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
           Configure browser and in-app notifications
@@ -83,8 +83,8 @@ export function NotificationSettings({ userId }: NotificationSettingsProps) {
       </div>
 
       {/* Permission */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+      <div className="space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
           <div>
             <p className="font-medium">Browser Notifications</p>
             <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -101,6 +101,7 @@ export function NotificationSettings({ userId }: NotificationSettingsProps) {
               variant="outline"
               onClick={handleRequestPermission}
               disabled={permission.denied}
+              className="w-full sm:w-auto"
             >
               {permission.denied ? 'Denied' : 'Request Permission'}
             </Button>
@@ -108,16 +109,16 @@ export function NotificationSettings({ userId }: NotificationSettingsProps) {
         </div>
 
         {/* Enable Notifications */}
-        <div className="flex items-center justify-between p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
           <div className="flex items-center gap-3">
             {localPreferences.enabled ? (
-              <Bell className="w-5 h-5 text-blue-600" />
+              <Bell className="w-5 h-5 text-blue-600 dark:text-blue-400" />
             ) : (
               <BellOff className="w-5 h-5 text-gray-400" />
             )}
             <div>
               <Label htmlFor="enable-notifications">Enable Notifications</Label>
-              <p className="text-xs text-gray-500">Turn on all notifications</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Turn on all notifications</p>
             </div>
           </div>
           <Switch
@@ -136,10 +137,10 @@ export function NotificationSettings({ userId }: NotificationSettingsProps) {
         {/* Notification Types */}
         {localPreferences.enabled && permission.granted && (
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 py-2 border-b border-gray-200 dark:border-gray-800 last:border-0">
               <div>
                 <Label>Task Reminders</Label>
-                <p className="text-xs text-gray-500">Remind about long-running tasks</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Remind about long-running tasks</p>
               </div>
               <Switch
                 checked={localPreferences.taskReminders}
@@ -149,10 +150,10 @@ export function NotificationSettings({ userId }: NotificationSettingsProps) {
               />
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 py-2 border-b border-gray-200 dark:border-gray-800 last:border-0">
               <div>
                 <Label>Daily Summary</Label>
-                <p className="text-xs text-gray-500">Daily productivity summary</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Daily productivity summary</p>
               </div>
               <Switch
                 checked={localPreferences.dailySummary}
@@ -162,10 +163,10 @@ export function NotificationSettings({ userId }: NotificationSettingsProps) {
               />
             </div>
 
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 py-2">
               <div>
                 <Label>Weekly Summary</Label>
-                <p className="text-xs text-gray-500">Weekly productivity summary</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Weekly productivity summary</p>
               </div>
               <Switch
                 checked={localPreferences.weeklySummary}
@@ -180,10 +181,10 @@ export function NotificationSettings({ userId }: NotificationSettingsProps) {
         {/* Quiet Hours */}
         {localPreferences.enabled && permission.granted && (
           <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 pb-3 border-b border-gray-200 dark:border-gray-800">
               <div>
                 <Label>Quiet Hours</Label>
-                <p className="text-xs text-gray-500">Disable notifications during these hours</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Disable notifications during these hours</p>
               </div>
               <Switch
                 checked={localPreferences.quietHours.enabled}
@@ -197,7 +198,7 @@ export function NotificationSettings({ userId }: NotificationSettingsProps) {
             </div>
 
             {localPreferences.quietHours.enabled && (
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3">
                 <div>
                   <Label>Start Time</Label>
                   <Input
@@ -221,13 +222,14 @@ export function NotificationSettings({ userId }: NotificationSettingsProps) {
 
         {/* Test Notification */}
         {localPreferences.enabled && permission.granted && (
-          <Button
-            variant="outline"
-            onClick={handleTestNotification}
-            className="w-full"
-          >
-            Send Test Notification
-          </Button>
+          <div className="flex justify-end">
+            <Button
+              variant="outline"
+              onClick={handleTestNotification}
+            >
+              Send Test Notification
+            </Button>
+          </div>
         )}
       </div>
     </div>

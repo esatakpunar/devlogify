@@ -192,8 +192,8 @@ export function DataExportImport({ userId }: DataExportImportProps) {
   }
 
   return (
-    <div className="space-y-6">
-      <div>
+    <div className="space-y-5">
+      <div className="pb-4 border-b border-gray-200 dark:border-gray-800">
         <h3 className="text-lg font-semibold">Data Export & Import</h3>
         <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
           Export your data for backup or import previously exported data
@@ -201,10 +201,10 @@ export function DataExportImport({ userId }: DataExportImportProps) {
       </div>
 
       {/* Export Section */}
-      <div className="space-y-4">
+      <div className="space-y-4 pb-5 border-b border-gray-200 dark:border-gray-800">
         <div>
           <h4 className="font-medium mb-3">Export Data</h4>
-          <div className="space-y-3 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
             <div className="flex items-center space-x-2">
               <Checkbox
                 id="export-projects"
@@ -236,12 +236,12 @@ export function DataExportImport({ userId }: DataExportImportProps) {
               <Label htmlFor="export-notes">Include Notes</Label>
             </div>
           </div>
-          <div className="flex gap-2 mt-4">
-            <Button onClick={handleExport} disabled={exporting}>
+          <div className="flex flex-col sm:flex-row gap-2 mt-4">
+            <Button onClick={handleExport} disabled={exporting} className="flex-1 sm:flex-initial">
               <Download className="w-4 h-4 mr-2" />
               {exporting ? 'Exporting...' : 'Export JSON'}
             </Button>
-            <Button variant="outline" onClick={handleExportCSV} disabled={exporting}>
+            <Button variant="outline" onClick={handleExportCSV} disabled={exporting} className="flex-1 sm:flex-initial">
               <FileText className="w-4 h-4 mr-2" />
               Export Analytics CSV
             </Button>
@@ -251,9 +251,9 @@ export function DataExportImport({ userId }: DataExportImportProps) {
         {/* Import Section */}
         <div>
           <h4 className="font-medium mb-3">Import Data</h4>
-          <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+          <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800 mb-4">
             <div className="flex items-start gap-2">
-              <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5" />
+              <AlertCircle className="w-5 h-5 text-yellow-600 dark:text-yellow-400 mt-0.5 flex-shrink-0" />
               <div className="flex-1">
                 <p className="text-sm text-yellow-800 dark:text-yellow-300">
                   <strong>Warning:</strong> Importing data will add new items to your account.
@@ -262,7 +262,7 @@ export function DataExportImport({ userId }: DataExportImportProps) {
               </div>
             </div>
           </div>
-          <div className="mt-4">
+          <div>
             <input
               type="file"
               accept=".json"
@@ -275,6 +275,7 @@ export function DataExportImport({ userId }: DataExportImportProps) {
               variant="outline"
               onClick={() => document.getElementById('import-file')?.click()}
               disabled={importing}
+              className="w-full sm:w-auto"
             >
               <Upload className="w-4 h-4 mr-2" />
               {importing ? 'Importing...' : 'Import JSON'}

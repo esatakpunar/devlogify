@@ -45,7 +45,9 @@
     "somethingWentWrong": "Algo salió mal",
     "errorDetails": "Detalles del Error (Solo Desarrollo)",
     "draftSaved": "Borrador guardado",
-    "anUnexpectedErrorOccurred": "Ocurrió un error inesperado. Por favor, intenta actualizar la página."
+    "anUnexpectedErrorOccurred": "Ocurrió un error inesperado. Por favor, intenta actualizar la página.",
+    "collapse": "Contraer",
+    "expand": "Expandir"
   },
   "nav": {
     "dashboard": "Panel",

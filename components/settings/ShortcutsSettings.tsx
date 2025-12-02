@@ -98,15 +98,15 @@ export function ShortcutsSettings() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-gray-200 dark:border-gray-800">
         <div>
           <h3 className="text-lg font-semibold">Keyboard Shortcuts</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             Customize keyboard shortcuts to match your workflow
           </p>
         </div>
-        <Button variant="outline" size="sm" onClick={handleResetAll}>
+        <Button variant="outline" size="sm" onClick={handleResetAll} className="w-full sm:w-auto">
           <RotateCcw className="w-4 h-4 mr-2" />
           Reset All
         </Button>
@@ -117,8 +117,8 @@ export function ShortcutsSettings() {
         if (categoryShortcuts.length === 0) return null
 
         return (
-          <div key={category} className="space-y-3">
-            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+          <div key={category} className="space-y-2 pb-4 border-b border-gray-200 dark:border-gray-800 last:border-0">
+            <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3">
               {categoryLabels[category] || category}
             </h4>
             <div className="space-y-2">
@@ -130,12 +130,12 @@ export function ShortcutsSettings() {
                 return (
                   <div
                     key={shortcut.id}
-                    className="flex items-center gap-4 p-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900"
+                    className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 rounded-lg border border-gray-200 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50"
                   >
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <Label className="text-sm font-medium">{shortcut.description}</Label>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-shrink-0">
                       {isEditing ? (
                         <>
                           <div className="flex items-center gap-2">
@@ -144,7 +144,7 @@ export function ShortcutsSettings() {
                               value={editingKeys[0] || ''}
                               placeholder="Modifier"
                               onKeyDown={(e) => handleKeyCapture(e, 0)}
-                              className="w-24"
+                              className="w-20 sm:w-24"
                               readOnly
                             />
                             <span className="text-gray-400">+</span>
@@ -153,7 +153,7 @@ export function ShortcutsSettings() {
                               value={editingKeys[1] || ''}
                               placeholder="Key"
                               onKeyDown={(e) => handleKeyCapture(e, 1)}
-                              className="w-24"
+                              className="w-20 sm:w-24"
                               readOnly
                             />
                           </div>
@@ -174,7 +174,7 @@ export function ShortcutsSettings() {
                         </>
                       ) : (
                         <>
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1 flex-wrap">
                             {keys.map((key, keyIndex) => (
                               <span key={keyIndex}>
                                 <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 dark:text-gray-200 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded">

@@ -60,15 +60,15 @@ export function PremiumSettings({ userId }: PremiumSettingsProps) {
 
   if (isPremium) {
     return (
-      <div className="space-y-6">
-        <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-800 p-6">
+      <div className="space-y-4">
+        <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-800 p-5">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center flex-shrink-0">
               <Crown className="w-6 h-6 text-white" />
             </div>
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-xl font-semibold">{t('premium.premiumActive')}</h3>
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <h3 className="text-lg font-semibold">{t('premium.premiumActive')}</h3>
                 <Badge className="bg-purple-600 text-white">{t('premium.active')}</Badge>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -77,19 +77,19 @@ export function PremiumSettings({ userId }: PremiumSettingsProps) {
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-3 sm:grid-cols-2">
             {aiFeatures.map((feature, index) => (
               <div
                 key={index}
-                className="flex items-start gap-3 p-4 rounded-lg bg-white/60 dark:bg-gray-900/60 border border-purple-100 dark:border-purple-800/50"
+                className="flex items-start gap-3 p-3 rounded-lg bg-white/60 dark:bg-gray-900/60 border border-purple-100 dark:border-purple-800/50"
               >
                 <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
                   <feature.icon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <h4 className="font-medium text-sm">{feature.title}</h4>
-                    <Check className="w-4 h-4 text-green-600" />
+                    <Check className="w-4 h-4 text-green-600 flex-shrink-0" />
                   </div>
                   <p className="text-xs text-gray-600 dark:text-gray-400">
                     {feature.description}
@@ -105,15 +105,15 @@ export function PremiumSettings({ userId }: PremiumSettingsProps) {
 
   return (
     <>
-      <div className="space-y-6">
-        <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-800 p-6">
+      <div className="space-y-4">
+        <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-lg border border-purple-200 dark:border-purple-800 p-5">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center flex-shrink-0">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <h3 className="text-xl font-semibold">{t('premium.premiumFeatures')}</h3>
+            <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-2 mb-1">
+                <h3 className="text-lg font-semibold">{t('premium.premiumFeatures')}</h3>
                 <Badge className="bg-gray-600 text-white">{t('premium.upgradeRequired')}</Badge>
               </div>
               <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -122,16 +122,16 @@ export function PremiumSettings({ userId }: PremiumSettingsProps) {
             </div>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2 mb-6">
+          <div className="grid gap-3 sm:grid-cols-2 mb-5">
             {aiFeatures.map((feature, index) => (
               <div
                 key={index}
-                className="flex items-start gap-3 p-4 rounded-lg bg-white/60 dark:bg-gray-900/60 border border-purple-100 dark:border-purple-800/50 opacity-75"
+                className="flex items-start gap-3 p-3 rounded-lg bg-white/60 dark:bg-gray-900/60 border border-purple-100 dark:border-purple-800/50 opacity-75"
               >
                 <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
                   <feature.icon className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                 </div>
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <h4 className="font-medium text-sm mb-1">{feature.title}</h4>
                   <p className="text-xs text-gray-600 dark:text-gray-400">
                     {feature.description}
@@ -143,30 +143,30 @@ export function PremiumSettings({ userId }: PremiumSettingsProps) {
 
           <div className="bg-white/80 dark:bg-gray-900/80 rounded-lg p-4 border border-purple-200 dark:border-purple-800 mb-4">
             <h4 className="font-semibold text-sm mb-2">{t('premium.whatYouGetWithPremium')}</h4>
-            <ul className="space-y-1 text-sm text-gray-700 dark:text-gray-300">
+            <ul className="space-y-1.5 text-sm text-gray-700 dark:text-gray-300">
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
-                {t('premium.allAIPoweredFeaturesUnlocked')}
+                <Check className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                <span>{t('premium.allAIPoweredFeaturesUnlocked')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
-                {t('premium.unlimitedAITaskSuggestions')}
+                <Check className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                <span>{t('premium.unlimitedAITaskSuggestions')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
-                {t('premium.dailyStandupSummaries')}
+                <Check className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                <span>{t('premium.dailyStandupSummaries')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
-                {t('premium.smartTaskGroupingAndOrganization')}
+                <Check className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                <span>{t('premium.smartTaskGroupingAndOrganization')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
-                {t('premium.shareAndExport')}
+                <Check className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                <span>{t('premium.shareAndExport')}</span>
               </li>
               <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-purple-600" />
-                {t('premium.prioritySupport')}
+                <Check className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                <span>{t('premium.prioritySupport')}</span>
               </li>
             </ul>
           </div>

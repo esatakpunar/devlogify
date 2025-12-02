@@ -207,17 +207,17 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Language */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-0.5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 py-3 border-b border-gray-200 dark:border-gray-800 last:border-0">
+        <div className="space-y-0.5 flex-1">
           <Label>{t('settings.language')}</Label>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             {t('settings.languageDescription')}
           </p>
         </div>
         <Select value={locale} onValueChange={handleLanguageChange} disabled={loading}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -234,15 +234,15 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
       </div>
 
       {/* Theme */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-0.5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 py-3 border-b border-gray-200 dark:border-gray-800 last:border-0">
+        <div className="space-y-0.5 flex-1">
           <Label>{t('settings.theme')}</Label>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             {t('settings.themeDescription')}
           </p>
         </div>
         <Select value={theme} onValueChange={handleThemeChange} disabled={loading}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -269,10 +269,10 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
       </div>
 
       {/* Notifications */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-0.5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 py-3 border-b border-gray-200 dark:border-gray-800 last:border-0">
+        <div className="space-y-0.5 flex-1">
           <Label>{t('settings.notifications')}</Label>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             {t('settings.notificationsDescription')}
           </p>
         </div>
@@ -284,15 +284,15 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
       </div>
 
       {/* Week Starts On */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-0.5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 py-3 border-b border-gray-200 dark:border-gray-800 last:border-0">
+        <div className="space-y-0.5 flex-1">
           <Label>{t('settings.weekStartsOn')}</Label>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             {t('settings.weekStartsOnDescription')}
           </p>
         </div>
         <Select value={weekStartsOn} onValueChange={handleWeekStartChange} disabled={loading}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -303,15 +303,15 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
       </div>
 
       {/* Timezone */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-0.5">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 py-3">
+        <div className="space-y-0.5 flex-1">
           <Label>{t('settings.timezone')}</Label>
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             {t('settings.timezoneDescription')}
           </p>
         </div>
         <Select value={timezone} onValueChange={handleTimezoneChange} disabled={loading}>
-          <SelectTrigger className="w-[180px]">
+          <SelectTrigger className="w-full sm:w-[180px]">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

@@ -110,51 +110,55 @@ export function ProfileSettings({ user }: ProfileSettingsProps) {
   }
 
   return (
-    <form onSubmit={handleUpdateProfile} className="space-y-6">
+    <form onSubmit={handleUpdateProfile} className="space-y-4">
       {/* Avatar */}
-      <div className="flex items-center gap-4">
-        <Avatar className="w-20 h-20">
-          <AvatarFallback className="bg-blue-600 text-white text-2xl">
+      <div className="flex items-center gap-4 pb-4 border-b border-gray-200 dark:border-gray-800">
+        <Avatar className="w-16 h-16">
+          <AvatarFallback className="bg-blue-600 text-white text-xl">
             {getInitials(user.email || '')}
           </AvatarFallback>
         </Avatar>
         <div>
           <h3 className="font-medium">{fullName || t('profile.user')}</h3>
-          <p className="text-sm text-gray-600">{user.email}</p>
+          <p className="text-sm text-gray-600 dark:text-gray-400">{user.email}</p>
         </div>
       </div>
 
-      {/* Full Name */}
-      <div className="space-y-2">
-        <Label htmlFor="full-name">{t('profile.fullName')}</Label>
-        <Input
-          id="full-name"
-          placeholder={t('profile.enterYourName')}
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          disabled={loading}
-        />
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Full Name */}
+        <div className="space-y-2">
+          <Label htmlFor="full-name">{t('profile.fullName')}</Label>
+          <Input
+            id="full-name"
+            placeholder={t('profile.enterYourName')}
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            disabled={loading}
+          />
+        </div>
 
-      {/* Email (Read-only) */}
-      <div className="space-y-2">
-        <Label htmlFor="email">{t('profile.email')}</Label>
-        <Input
-          id="email"
-          type="email"
-          value={user.email || ''}
-          disabled
-          className="bg-gray-50"
-        />
-        <p className="text-xs text-gray-500">
-          {t('profile.emailCannotBeChanged')}
-        </p>
+        {/* Email (Read-only) */}
+        <div className="space-y-2">
+          <Label htmlFor="email">{t('profile.email')}</Label>
+          <Input
+            id="email"
+            type="email"
+            value={user.email || ''}
+            disabled
+            className="bg-gray-50 dark:bg-gray-800"
+          />
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            {t('profile.emailCannotBeChanged')}
+          </p>
+        </div>
       </div>
 
       {/* Save Button */}
-      <Button type="submit" disabled={loading}>
-        {loading ? t('projects.saving') : t('projects.saveChanges')}
-      </Button>
+      <div className="flex justify-end pt-2">
+        <Button type="submit" disabled={loading}>
+          {loading ? t('projects.saving') : t('projects.saveChanges')}
+        </Button>
+      </div>
     </form>
   )
 }

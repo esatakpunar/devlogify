@@ -45,7 +45,9 @@
     "somethingWentWrong": "Something went wrong",
     "errorDetails": "Error Details (Development Only)",
     "draftSaved": "Draft saved",
-    "anUnexpectedErrorOccurred": "An unexpected error occurred. Please try refreshing the page."
+    "anUnexpectedErrorOccurred": "An unexpected error occurred. Please try refreshing the page.",
+    "collapse": "Collapse",
+    "expand": "Expand"
   },
   "nav": {
     "dashboard": "Dashboard",

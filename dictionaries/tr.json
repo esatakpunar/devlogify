@@ -45,7 +45,9 @@
     "somethingWentWrong": "Bir şeyler yanlış gitti",
     "errorDetails": "Hata Detayları (Sadece Geliştirme)",
     "draftSaved": "Taslak kaydedildi",
-    "anUnexpectedErrorOccurred": "Beklenmeyen bir hata oluştu. Lütfen sayfayı yenilemeyi deneyin."
+    "anUnexpectedErrorOccurred": "Beklenmeyen bir hata oluştu. Lütfen sayfayı yenilemeyi deneyin.",
+    "collapse": "Daralt",
+    "expand": "Genişlet"
   },
   "nav": {
     "dashboard": "Kontrol Paneli",
