@@ -46,7 +46,7 @@ export async function createShareLink(
     throw new Error(`Failed to create share link: ${error.message}`)
   }
 
-  return data
+  return data as SharedLink
 }
 
 /**
@@ -68,11 +68,12 @@ export async function getShareLinkByToken(token: string, supabaseClient?: Supaba
   }
 
   // Check if expired
-  if (data.expires_at && new Date(data.expires_at) < new Date()) {
+  const shareLink = data as SharedLink
+  if (shareLink.expires_at && new Date(shareLink.expires_at) < new Date()) {
     return null
   }
 
-  return data
+  return shareLink
 }
 
 /**
@@ -100,7 +101,7 @@ export async function getUserShareLinks(
     throw new Error(`Failed to get share links: ${error.message}`)
   }
 
-  return data || []
+  return (data || []) as SharedLink[]
 }
 
 /**
@@ -110,24 +111,32 @@ export async function incrementShareLinkViews(token: string, supabaseClient?: Su
   // Use public client for anonymous access
   const supabase = supabaseClient || createPublicClient()
   
-  const { error } = await supabase.rpc('increment_share_link_views', {
-    link_token: token,
-  })
+  // Try RPC first, fallback to manual update if it doesn't exist
+  try {
+    const { error } = await (supabase.rpc as any)('increment_share_link_views', {
+      link_token: token,
+    })
 
-  if (error) {
-    // If RPC doesn't exist, manually update
-    const { data } = await supabase
-      .from('shared_links')
-      .select('view_count')
-      .eq('token', token)
-      .single()
-
-    if (data) {
-      await supabase
-        .from('shared_links')
-        .update({ view_count: (data.view_count || 0) + 1 })
-        .eq('token', token)
+    if (!error) {
+      return
     }
+  } catch (err) {
+    // RPC doesn't exist, continue to manual update
+  }
+
+  // Manual update if RPC doesn't exist or failed
+  const { data } = await supabase
+    .from('shared_links')
+    .select('view_count')
+    .eq('token', token)
+    .single()
+
+  if (data) {
+    const shareLink = data as { view_count: number | null }
+    const updateQuery = (supabase
+      .from('shared_links') as any)
+      .update({ view_count: (shareLink.view_count || 0) + 1 })
+    await updateQuery.eq('token', token)
   }
 }
 
