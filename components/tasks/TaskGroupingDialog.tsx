@@ -179,70 +179,73 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px] max-h-[80vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Layers className="w-5 h-5" />
-            {t('kanban.taskGrouping')}
-          </DialogTitle>
-          <DialogDescription>
-            {t('kanban.taskGroupingDescription')}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-none sm:max-w-[700px] max-h-none sm:max-h-[80vh] h-full sm:h-auto overflow-hidden p-0 flex flex-col rounded-none sm:rounded-lg w-full sm:w-auto fixed top-0 left-0 right-0 bottom-0 sm:top-[50%] sm:left-[50%] sm:right-auto sm:bottom-auto translate-x-0 translate-y-0 sm:translate-x-[-50%] sm:translate-y-[-50%]">
+        <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 flex-shrink-0">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Layers className="w-5 h-5" />
+              {t('kanban.taskGrouping')}
+            </DialogTitle>
+            <DialogDescription>
+              {t('kanban.taskGroupingDescription')}
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        {loading && (
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-          </div>
-        )}
-
-        {error && (
-          <div className="text-center py-8">
-            <p className="text-sm text-red-600 mb-4">{error}</p>
-            <Button variant="outline" size="sm" onClick={loadGroups}>
-              {t('common.tryAgain')}
-            </Button>
-          </div>
-        )}
-
-        {!loading && !error && groups.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            <p className="text-sm">{t('kanban.noGroupsFound')}</p>
-            <p className="text-xs mt-1">{t('kanban.createMoreTasksToEnableGrouping')}</p>
-          </div>
-        )}
-
-        {!loading && !error && groups.length > 0 && (
-          <div className="flex flex-col flex-1 min-h-0">
-            {/* Selection controls */}
-            <div className="flex items-center justify-between pb-2 border-b flex-shrink-0">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">
-                  {t('kanban.groupsSelected', { selected: selectedGroups.size, total: groups.length })}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={selectAllGroups}
-                  disabled={selectedGroups.size === groups.length}
-                >
-                  {t('kanban.selectAll')}
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={deselectAllGroups}
-                  disabled={selectedGroups.size === 0}
-                >
-                  {t('kanban.deselectAll')}
-                </Button>
-              </div>
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-4 sm:pb-6 min-h-0">
+          {loading && (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
             </div>
+          )}
 
-            {/* Groups */}
-            <div className="space-y-4 mt-4 overflow-y-auto flex-1 min-h-0">
+          {error && (
+            <div className="text-center py-8">
+              <p className="text-sm text-red-600 mb-4">{error}</p>
+              <Button variant="outline" size="sm" onClick={loadGroups}>
+                {t('common.tryAgain')}
+              </Button>
+            </div>
+          )}
+
+          {!loading && !error && groups.length === 0 && (
+            <div className="text-center py-8 text-gray-500">
+              <p className="text-sm">{t('kanban.noGroupsFound')}</p>
+              <p className="text-xs mt-1">{t('kanban.createMoreTasksToEnableGrouping')}</p>
+            </div>
+          )}
+
+          {!loading && !error && groups.length > 0 && (
+            <div className="flex flex-col flex-1 min-h-0">
+              {/* Selection controls */}
+              <div className="flex items-center justify-between pb-2 border-b flex-shrink-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    {t('kanban.groupsSelected', { selected: selectedGroups.size, total: groups.length })}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={selectAllGroups}
+                    disabled={selectedGroups.size === groups.length}
+                  >
+                    {t('kanban.selectAll')}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={deselectAllGroups}
+                    disabled={selectedGroups.size === 0}
+                  >
+                    {t('kanban.deselectAll')}
+                  </Button>
+                </div>
+              </div>
+
+              {/* Groups */}
+              <div className="space-y-4 mt-4 overflow-y-auto flex-1 min-h-0">
               {groups.map((group) => {
                 const isSelected = selectedGroups.has(group.id)
                 return (
@@ -292,11 +295,12 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
                   </Card>
                 )
               })}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        <div className="flex justify-between items-center gap-2 pt-4 border-t flex-shrink-0">
+        <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-800 flex justify-between items-center gap-2 flex-shrink-0 bg-background sticky bottom-0 z-10">
           <div className="flex gap-2">
             {!loading && !error && groups.length > 0 && selectedGroups.size > 0 && (
               <Button 

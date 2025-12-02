@@ -20,11 +20,11 @@ export function TimelinePageContent({
   const t = useTranslation()
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold">{t('timeline.title')}</h1>
-        <p className="text-gray-600 mt-1">
+        <h1 className="text-2xl sm:text-3xl font-bold dark:text-white">{t('timeline.title')}</h1>
+        <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">
           {t('timeline.description')}
         </p>
       </div>

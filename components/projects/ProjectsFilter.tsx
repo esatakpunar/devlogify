@@ -22,13 +22,14 @@ export function ProjectsFilter() {
   }
 
   return (
-    <div className="flex items-center gap-2 bg-white p-1 rounded-lg border border-gray-200 w-fit">
+    <div className="flex items-center gap-1 sm:gap-2 bg-white dark:bg-gray-900 p-1 rounded-lg border border-gray-200 dark:border-gray-800 w-full sm:w-fit overflow-x-auto">
       {filters.map((filter) => (
         <Button
           key={filter.value}
           variant={currentStatus === filter.value ? 'default' : 'ghost'}
           size="sm"
           onClick={() => handleFilterChange(filter.value)}
+          className="text-xs sm:text-sm whitespace-nowrap flex-shrink-0"
         >
           {filter.label}
         </Button>

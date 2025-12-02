@@ -31,6 +31,7 @@ export default async function AnalyticsPage() {
       projectDistribution={projectDistribution}
       mostProductiveDay={mostProductiveDay}
       avgTaskDuration={avgTaskDuration}
+      userId={user.id}
     />
   )
 }

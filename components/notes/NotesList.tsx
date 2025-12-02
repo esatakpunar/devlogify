@@ -67,9 +67,9 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Actions */}
-      <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
         <div className="flex-1 relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input
@@ -79,20 +79,21 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
             className="pl-9"
           />
         </div>
-        <Button onClick={() => setIsCreateDialogOpen(true)}>
-          <Plus className="w-4 h-4 mr-2" />
-          {t('notes.newNote')}
+        <Button onClick={() => setIsCreateDialogOpen(true)} className="w-full sm:w-auto">
+          <Plus className="w-4 h-4 sm:mr-2" />
+          <span className="hidden sm:inline">{t('notes.newNote')}</span>
+          <span className="sm:hidden">{t('notes.newNote')}</span>
         </Button>
       </div>
 
       {/* Notes Grid */}
       {filteredNotes.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-12 bg-white rounded-lg border border-gray-200">
-          <StickyNote className="w-12 h-12 text-gray-400 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+        <div className="flex flex-col items-center justify-center py-8 sm:py-12 px-4 bg-white rounded-lg border border-gray-200">
+          <StickyNote className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400 mb-3 sm:mb-4" />
+          <h3 className="text-base sm:text-lg font-medium text-gray-900 mb-2 text-center">
             {searchQuery ? t('notesList.noNotesFound') : t('notes.noNotes')}
           </h3>
-          <p className="text-gray-600 mb-4">
+          <p className="text-sm sm:text-base text-gray-600 mb-4 text-center">
             {searchQuery ? t('notesList.tryDifferentSearch') : t('notesList.startCapturingIdeas')}
           </p>
           {!searchQuery && (
@@ -107,10 +108,10 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
           {/* Pinned Notes */}
           {pinnedNotes.length > 0 && (
             <div className="space-y-3">
-              <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">
+              <h2 className="text-xs sm:text-sm font-semibold text-gray-700 uppercase tracking-wider">
                 {t('notesList.pinned')}
               </h2>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {pinnedNotes.map((note) => (
                   <NoteCard
                     key={note.id}
@@ -133,11 +134,11 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
           {regularNotes.length > 0 && (
             <div className="space-y-3">
               {pinnedNotes.length > 0 && (
-                <h2 className="text-sm font-semibold text-gray-700 uppercase tracking-wider">
+                <h2 className="text-xs sm:text-sm font-semibold text-gray-700 uppercase tracking-wider">
                   {t('notesList.allNotes')}
                 </h2>
               )}
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 {regularNotes.map((note) => (
                   <NoteCard
                     key={note.id}

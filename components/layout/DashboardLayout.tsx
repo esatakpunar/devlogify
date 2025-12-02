@@ -6,8 +6,11 @@ import { useRouter, usePathname } from 'next/navigation'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Navbar } from '@/components/layout/Navbar'
 import { MobileSidebar } from '@/components/layout/MobileSidebar'
+import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
 import { CommandPalette } from '@/components/layout/CommandPalette'
 import { ShortcutsHelp } from '@/components/ui/ShortcutsHelp'
+import { OfflineIndicator } from '@/components/ui/OfflineIndicator'
+import { GlobalSearch } from '@/components/search/GlobalSearch'
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts'
 import { LanguageProvider } from '@/components/providers/LanguageProvider'
 import { LanguageHtml } from '@/components/providers/LanguageHtml'
@@ -22,28 +25,30 @@ export function DashboardLayout({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [commandPaletteOpen, setCommandPaletteOpen] = useState(false)
   const [shortcutsHelpOpen, setShortcutsHelpOpen] = useState(false)
+  const [globalSearchOpen, setGlobalSearchOpen] = useState(false)
   const router = useRouter()
   const pathname = usePathname()
   const supabase = createClient()
 
-  // Don't use dashboard layout for auth pages and landing page
+  // Don't use dashboard layout for auth pages, landing page, and share pages
   const isAuthPage = pathname?.startsWith('/login') || 
                      pathname?.startsWith('/signup') || 
                      pathname?.startsWith('/forgot-password') || 
                      pathname?.startsWith('/reset-password')
   const isLandingPage = pathname === '/'
+  const isSharePage = pathname?.startsWith('/share/')
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user && !isAuthPage && !isLandingPage) {
+      if (!user && !isAuthPage && !isLandingPage && !isSharePage) {
         router.push('/login')
       } else {
         setUser(user)
       }
     }
     getUser()
-  }, [router, supabase.auth, isAuthPage, isLandingPage])
+  }, [router, supabase.auth, isAuthPage, isLandingPage, isSharePage])
 
   // Keyboard shortcuts
   useKeyboardShortcuts({
@@ -63,11 +68,15 @@ export function DashboardLayout({
     onOpenCommandPalette: () => {
       setCommandPaletteOpen(true)
     },
+    onSearch: () => {
+      // Open global search
+      setGlobalSearchOpen(true)
+    },
     userId: user?.id,
   })
 
-  // Auth sayfaları ve landing page için LanguageProvider ile birlikte render et
-  if (isAuthPage || isLandingPage) {
+  // Auth sayfaları, landing page ve share sayfaları için LanguageProvider ile birlikte render et
+  if (isAuthPage || isLandingPage || isSharePage) {
     return (
       <LanguageProvider userId={undefined}>
         <LanguageHtml />
@@ -99,11 +108,18 @@ export function DashboardLayout({
         {/* Main Content */}
         <div className="flex flex-1 flex-col overflow-hidden">
           <Navbar user={user} onMenuClick={() => setMobileMenuOpen(true)} />
-          <main className="flex-1 overflow-y-auto p-4 md:p-6">
+          <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-6">
             {children}
           </main>
         </div>
       </div>
+      
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
+      
+      {/* Offline Indicator */}
+      <OfflineIndicator />
+      
       <Toaster position="bottom-right" />
       
       {/* Command Palette */}
@@ -120,6 +136,15 @@ export function DashboardLayout({
         open={shortcutsHelpOpen}
         onOpenChange={setShortcutsHelpOpen}
       />
+
+      {/* Global Search */}
+      {user && (
+        <GlobalSearch
+          open={globalSearchOpen}
+          onOpenChange={setGlobalSearchOpen}
+          userId={user.id}
+        />
+      )}
     </LanguageProvider>
   )
 }

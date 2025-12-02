@@ -25,10 +25,13 @@ interface KanbanColumnProps {
   title: string
   status: 'todo' | 'in_progress' | 'done'
   tasks: Task[]
-  count: number
+  count?: number
+  projectId?: string
   userId: string
-  onTaskUpdated: (task: Task) => void
-  onTaskDeleted: (taskId: string) => void
+  onTaskUpdated?: (task: Task) => void
+  onTaskDeleted?: (taskId: string) => void
+  onTaskClick?: (task: Task) => void
+  readOnly?: boolean
 }
 
 const statusIcons = {
@@ -38,17 +41,31 @@ const statusIcons = {
 }
 
 const statusColors = {
-  todo: 'text-gray-500 bg-gray-50',
-  in_progress: 'text-blue-500 bg-blue-50',
-  done: 'text-green-500 bg-green-50'
+  todo: 'text-gray-500 bg-gray-50 dark:text-gray-400 dark:bg-gray-800/50',
+  in_progress: 'text-blue-500 bg-blue-50 dark:text-blue-400 dark:bg-blue-900/20',
+  done: 'text-green-500 bg-green-50 dark:text-green-400 dark:bg-green-900/20'
 }
 
-export function KanbanColumn({ title, status, tasks, count, userId, onTaskUpdated, onTaskDeleted }: KanbanColumnProps) {
+export function KanbanColumn({ 
+  title, 
+  status, 
+  tasks, 
+  count, 
+  projectId,
+  userId, 
+  onTaskUpdated, 
+  onTaskDeleted,
+  onTaskClick,
+  readOnly = false
+}: KanbanColumnProps) {
   const Icon = statusIcons[status]
   const { isOver, setNodeRef } = useDroppable({
     id: status,
+    disabled: readOnly,
   })
   const t = useTranslation()
+  
+  const taskCount = count !== undefined ? count : tasks.length
 
   // Calculate average progress for this column
   const averageProgress = tasks.length > 0 
@@ -100,15 +117,15 @@ export function KanbanColumn({ title, status, tasks, count, userId, onTaskUpdate
   const strokeDashoffset = circumference * (1 - animatedProgress / 100)
 
   return (
-    <div className="flex flex-col h-full max-h-[calc(100vh-25rem)]">
+    <div className="flex flex-col h-full max-h-[calc(100vh-26rem)]">
       <div className="flex items-center justify-between mb-4 px-2 flex-shrink-0">
         <div className="flex items-center gap-2">
           <div className={`p-1.5 rounded-lg ${statusColors[status]}`}>
             <Icon className="w-4 h-4" />
           </div>
-          <h3 className="font-semibold">{title}</h3>
-          <span className="text-sm text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
-            {count}
+          <h3 className="font-semibold dark:text-gray-200">{title}</h3>
+          <span className="text-sm text-gray-500 bg-gray-100 dark:text-gray-300 dark:bg-gray-700 px-2 py-0.5 rounded-full">
+            {taskCount}
           </span>
         </div>
         {/* Progress indicator */}
@@ -185,16 +202,16 @@ export function KanbanColumn({ title, status, tasks, count, userId, onTaskUpdate
       <div 
         ref={setNodeRef}
         className={cn(
-          "flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400 transition-colors",
-          isOver && "bg-blue-50 border-2 border-dashed border-blue-300 rounded-lg"
+          "flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500 transition-colors",
+          isOver && "bg-blue-50 dark:bg-blue-900/20 border-2 border-dashed border-blue-300 dark:border-blue-700 rounded-lg"
         )}
       >
         {tasks.length === 0 ? (
           <div className={cn(
-            "border-2 border-dashed border-gray-200 rounded-lg p-8 text-center transition-colors",
-            isOver && "border-blue-300 bg-blue-50"
+            "border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center transition-colors",
+            isOver && "border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20"
           )}>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {isOver ? t('kanban.dropTaskHere') || "Drop task here" : t('tasks.noTasks')}
             </p>
           </div>
@@ -206,6 +223,8 @@ export function KanbanColumn({ title, status, tasks, count, userId, onTaskUpdate
               userId={userId}
               onTaskUpdated={onTaskUpdated}
               onTaskDeleted={onTaskDeleted}
+              onClick={onTaskClick ? () => onTaskClick(task) : undefined}
+              readOnly={readOnly}
             />
           ))
         )}

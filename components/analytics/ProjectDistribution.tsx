@@ -16,8 +16,8 @@ export function ProjectDistribution({ data }: ProjectDistributionProps) {
   
   if (data.length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6 flex items-center justify-center h-[368px]">
-        <p className="text-gray-500">{t('analytics.noProjectDataYet')}</p>
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6 flex items-center justify-center h-[250px] sm:h-[368px]">
+        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">{t('analytics.noProjectDataYet')}</p>
       </div>
     )
   }
@@ -29,9 +29,9 @@ export function ProjectDistribution({ data }: ProjectDistributionProps) {
   }))
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold mb-4">{t('analytics.timeByProject')}</h3>
-      <ResponsiveContainer width="100%" height={300}>
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 dark:text-white">{t('analytics.timeByProject')}</h3>
+      <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
         <PieChart>
           <Pie
             data={chartData}
