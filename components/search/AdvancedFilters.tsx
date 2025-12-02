@@ -41,7 +41,8 @@ export function AdvancedFilters<T extends TaskFilter | ProjectFilter | NoteFilte
   const savedFilters = getSavedFilters().filter(f => f.type === type)
 
   const handleQuickFilter = (quickFilter: () => TaskFilter | ProjectFilter | NoteFilter) => {
-    onFilterChange(quickFilter() as T)
+    const result = quickFilter()
+    onFilterChange(result as unknown as T)
     setOpen(false)
   }
 
@@ -106,28 +107,28 @@ export function AdvancedFilters<T extends TaskFilter | ProjectFilter | NoteFilte
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleQuickFilter(quickFilters.tasks.todayCompleted as () => TaskFilter | ProjectFilter | NoteFilter)}
+                    onClick={() => handleQuickFilter(quickFilters.tasks.todayCompleted)}
                   >
                     Today Completed
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleQuickFilter(quickFilters.tasks.thisWeek as () => TaskFilter | ProjectFilter | NoteFilter)}
+                    onClick={() => handleQuickFilter(quickFilters.tasks.thisWeek)}
                   >
                     This Week
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleQuickFilter(quickFilters.tasks.highPriority as () => TaskFilter | ProjectFilter | NoteFilter)}
+                    onClick={() => handleQuickFilter(quickFilters.tasks.highPriority)}
                   >
                     High Priority
                   </Button>
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleQuickFilter(quickFilters.tasks.inProgress as () => TaskFilter | ProjectFilter | NoteFilter)}
+                    onClick={() => handleQuickFilter(quickFilters.tasks.inProgress)}
                   >
                     In Progress
                   </Button>
