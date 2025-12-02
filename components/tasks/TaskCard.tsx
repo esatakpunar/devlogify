@@ -330,7 +330,7 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
             }
           }
         }}
-        {...(readOnly || isMobile ? {} : { ...attributes, ...listeners })}
+        {...(readOnly || isMobile || !attributes || !listeners ? {} : { ...attributes, ...listeners })}
       >
         {/* Header */}
         <div className="flex items-start justify-between mb-2">

@@ -35,7 +35,7 @@ export function useKeyboardShortcuts(config: {
   const { isRunning, stopTimer, startTimer } = useTimerStore()
   const { getShortcutKeys } = useShortcutsStore()
   const sequenceRef = useRef<string[]>([])
-  const sequenceTimeoutRef = useRef<NodeJS.Timeout>()
+  const sequenceTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined)
 
   useEffect(() => {
     const shortcuts: ShortcutConfig[] = []
@@ -78,11 +78,21 @@ export function useKeyboardShortcuts(config: {
             if (activeElement?.tagName !== 'INPUT' && activeElement?.tagName !== 'TEXTAREA') {
               // Context-aware: check current page
               if (pathname?.includes('/projects')) {
-                config.onCreateTask?.() || config.onCreateProject?.()
+                if (config.onCreateTask) {
+                  config.onCreateTask()
+                } else if (config.onCreateProject) {
+                  config.onCreateProject()
+                }
               } else if (pathname?.includes('/notes')) {
                 config.onCreateNote?.()
               } else {
-                config.onCreateTask?.() || config.onCreateNote?.() || config.onCreateProject?.()
+                if (config.onCreateTask) {
+                  config.onCreateTask()
+                } else if (config.onCreateNote) {
+                  config.onCreateNote()
+                } else if (config.onCreateProject) {
+                  config.onCreateProject()
+                }
               }
             }
           },
