@@ -103,36 +103,36 @@ export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
   return (
     <AnimatedCard delay={index * 0.05}>
       <Link href={`/projects/${project.id}`}>
-        <div className="group bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-lg transition-all p-6 cursor-pointer">
+        <div className="group bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:shadow-lg transition-all p-4 sm:p-6 cursor-pointer">
           {/* Color bar */}
           <div 
-            className="w-full h-1 rounded-full mb-4" 
+            className="w-full h-1 rounded-full mb-3 sm:mb-4" 
             style={{ backgroundColor: project.color }}
           />
 
           {/* Header */}
-          <div className="flex items-start justify-between mb-3">
+          <div className="flex items-start justify-between mb-2 sm:mb-3 gap-2">
             <div className="flex items-center gap-2 flex-1 min-w-0">
               {isPinned && (
-                <Pin className="w-4 h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                <Pin className="w-3 h-3 sm:w-4 sm:h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
               )}
-              <h3 className="font-semibold text-lg line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors dark:text-white">
+              <h3 className="font-semibold text-base sm:text-lg line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors dark:text-white">
                 {project.title}
               </h3>
             </div>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 flex-shrink-0">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handlePinToggle}
                 disabled={pinLoading}
-                className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-all hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer"
+                className="h-7 w-7 sm:h-8 sm:w-8 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer"
                 title={isPinned ? t('projects.unpinProject') : t('projects.pinProject')}
               >
                 {isPinned ? (
-                  <PinOff className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <PinOff className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600 dark:text-blue-400" />
                 ) : (
-                  <Pin className="h-4 w-4 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" />
+                  <Pin className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" />
                 )}
               </Button>
               <DropdownMenu>
@@ -140,10 +140,10 @@ export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
                   <Button 
                     variant="ghost" 
                     size="icon" 
-                    className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="h-7 w-7 sm:h-8 sm:w-8 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                     disabled={loading}
                   >
-                    <MoreVertical className="h-4 w-4" />
+                    <MoreVertical className="h-3 w-3 sm:h-4 sm:w-4" />
                   </Button>
                 </DropdownMenuTrigger>
               <DropdownMenuContent align="end" onClick={(e) => e.stopPropagation()}>
@@ -175,22 +175,22 @@ export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
           </div>
 
           {/* Description */}
-          <div className="min-h-[2.5rem] mb-4">
-            <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+          <div className="min-h-[2rem] sm:min-h-[2.5rem] mb-3 sm:mb-4">
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
               {project.description || '\u00A0'}
             </p>
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
-            <div className="flex items-center gap-4">
+          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 gap-2">
+            <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
               <div className="flex items-center gap-1">
-                <ListTodo className="w-4 h-4" />
-                <span>{taskCount} {taskCount === 1 ? t('projects.task') : t('projects.tasks')}</span>
+                <ListTodo className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="whitespace-nowrap">{taskCount} {taskCount === 1 ? t('projects.task') : t('projects.tasks')}</span>
               </div>
               <div className="flex items-center gap-1">
-                <Calendar className="w-4 h-4" />
-                <span>{formatDistanceToNow(new Date(project.created_at), { addSuffix: true })}</span>
+                <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                <span className="whitespace-nowrap">{formatDistanceToNow(new Date(project.created_at), { addSuffix: true })}</span>
               </div>
             </div>
           </div>

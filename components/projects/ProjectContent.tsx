@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ProjectProgressStats } from './ProjectProgressStats'
 import { KanbanBoard } from '@/components/tasks/KanbanBoard'
+import { MobileKanban } from '@/components/tasks/MobileKanban'
 
 type Task = {
   id: string
@@ -54,17 +55,35 @@ export function ProjectContent({ projectId, initialTasks, userId, project }: Pro
   return (
     <div className="space-y-4">
       <ProjectProgressStats tasks={tasks} />
-      <KanbanBoard 
-        projectId={projectId} 
-        initialTasks={tasks} 
-        userId={userId}
-        project={project}
-        onTaskCreated={handleTaskCreated}
-        onTasksCreated={handleTasksCreated}
-        onTaskUpdated={handleTaskUpdated}
-        onTaskDeleted={handleTaskDeleted}
-        onTasksChange={setTasks}
-      />
+      
+      {/* Desktop Kanban */}
+      <div className="hidden md:block">
+        <KanbanBoard 
+          projectId={projectId} 
+          initialTasks={tasks} 
+          userId={userId}
+          project={project}
+          onTaskCreated={handleTaskCreated}
+          onTasksCreated={handleTasksCreated}
+          onTaskUpdated={handleTaskUpdated}
+          onTaskDeleted={handleTaskDeleted}
+          onTasksChange={setTasks}
+        />
+      </div>
+
+      {/* Mobile Kanban */}
+      <div className="md:hidden">
+        <MobileKanban
+          projectId={projectId}
+          tasks={tasks}
+          userId={userId}
+          project={project}
+          onTaskCreated={handleTaskCreated}
+          onTasksCreated={handleTasksCreated}
+          onTaskUpdated={handleTaskUpdated}
+          onTaskDeleted={handleTaskDeleted}
+        />
+      </div>
     </div>
   )
 }

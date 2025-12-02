@@ -15,7 +15,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
+import { MarkdownEditor } from '@/components/notes/MarkdownEditor'
+import { cn } from '@/lib/utils'
 import {
   Select,
   SelectContent,
@@ -140,17 +141,21 @@ export function CreateTaskDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle>{t('tasks.createNewTask')}</DialogTitle>
-          <DialogDescription>
-            {t('tasks.addNewTaskToProject')}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-none sm:max-w-[1000px] max-h-none sm:max-h-[95vh] h-full sm:h-auto overflow-hidden p-0 flex flex-col rounded-none sm:rounded-lg w-full sm:w-auto fixed top-0 left-0 right-0 bottom-0 sm:top-[50%] sm:left-[50%] sm:right-auto sm:bottom-auto translate-x-0 translate-y-0 sm:translate-x-[-50%] sm:translate-y-[-50%]">
+        <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0">
+          <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 flex-shrink-0">
+            <DialogHeader>
+              <DialogTitle>{t('tasks.createNewTask')}</DialogTitle>
+              <DialogDescription className="text-xs sm:text-sm">
+                {t('tasks.addNewTaskToProject')}
+              </DialogDescription>
+            </DialogHeader>
+          </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 min-w-0">
+          <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-4 sm:pb-6 min-h-0">
+            <div className="space-y-3 sm:space-y-4 min-w-0">
           {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
+            <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-2.5 sm:p-3 rounded-md text-xs sm:text-sm">
               {error}
             </div>
           )}
@@ -158,17 +163,19 @@ export function CreateTaskDialog({
           {/* Template Selection */}
           {templates.length > 0 && (
             <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label>{t('tasks.quickStartFromTemplate')}</Label>
+              <div className="flex items-center justify-between gap-2">
+                <Label className="text-xs sm:text-sm">{t('tasks.quickStartFromTemplate')}</Label>
                 {!showTemplates && (
                   <Button
                     type="button"
                     variant="ghost"
                     size="sm"
                     onClick={() => setShowTemplates(true)}
+                    className="text-xs sm:text-sm h-7 sm:h-8"
                   >
-                    <FileText className="w-4 h-4 mr-1" />
-                    {t('tasks.browseTemplates')}
+                    <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-1" />
+                    <span className="hidden sm:inline">{t('tasks.browseTemplates')}</span>
+                    <span className="sm:hidden">{t('tasks.browseTemplates')}</span>
                   </Button>
                 )}
               </div>
@@ -176,14 +183,15 @@ export function CreateTaskDialog({
               {showTemplates && (
                 <div className="space-y-2 max-h-48 overflow-y-auto border rounded-lg p-2">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium">{t('tasks.selectATemplate')}</span>
+                    <span className="text-xs sm:text-sm font-medium">{t('tasks.selectATemplate')}</span>
                     <Button
                       type="button"
                       variant="ghost"
                       size="sm"
                       onClick={() => setShowTemplates(false)}
+                      className="h-6 w-6 sm:h-7 sm:w-7 p-0"
                     >
-                      <X className="w-4 h-4" />
+                      <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                     </Button>
                   </div>
                   <div className="grid gap-2">
@@ -192,23 +200,23 @@ export function CreateTaskDialog({
                         key={template.id}
                         type="button"
                         onClick={() => handleTemplateSelect(template)}
-                        className="text-left p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                        className="text-left p-2.5 sm:p-3 border rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
                       >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="font-medium text-sm">{template.title}</div>
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-xs sm:text-sm truncate">{template.title}</div>
                             {template.description && (
-                              <div className="text-xs text-gray-500 mt-1 line-clamp-2">
+                              <div className="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2">
                                 {template.description}
                               </div>
                             )}
                           </div>
-                          <Badge variant="outline" className="ml-2 text-xs">
+                          <Badge variant="outline" className="ml-2 text-xs flex-shrink-0">
                             {template.priority}
                           </Badge>
                         </div>
                         {template.estimated_duration && (
-                          <div className="text-xs text-gray-400 mt-1">
+                          <div className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                             ~{template.estimated_duration} min
                           </div>
                         )}
@@ -219,9 +227,9 @@ export function CreateTaskDialog({
               )}
 
               {selectedTemplate && (
-                <div className="flex items-center gap-2 p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                  <FileText className="w-4 h-4 text-blue-600" />
-                  <span className="text-sm flex-1">
+                <div className="flex items-center gap-2 p-2 sm:p-2.5 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <FileText className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-600 dark:text-blue-400 flex-shrink-0" />
+                  <span className="text-xs sm:text-sm flex-1 min-w-0 truncate">
                     {t('tasks.usingTemplate')} <strong>{selectedTemplate.title}</strong>
                   </span>
                   <Button
@@ -229,8 +237,9 @@ export function CreateTaskDialog({
                     variant="ghost"
                     size="sm"
                     onClick={clearTemplate}
+                    className="h-6 w-6 sm:h-7 sm:w-7 p-0 flex-shrink-0"
                   >
-                    <X className="w-4 h-4" />
+                    <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </Button>
                 </div>
               )}
@@ -238,7 +247,7 @@ export function CreateTaskDialog({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="task-title">
+            <Label htmlFor="task-title" className="text-xs sm:text-sm">
               {t('tasks.taskTitle')} <span className="text-red-500">*</span>
             </Label>
             <Input
@@ -248,30 +257,31 @@ export function CreateTaskDialog({
               onChange={(e) => setTitle(e.target.value)}
               required
               disabled={loading}
+              className="text-sm sm:text-base"
             />
           </div>
 
           <div className="space-y-2 min-w-0">
-            <Label htmlFor="task-description">{t('projects.description')}</Label>
-            <Textarea
-              id="task-description"
-              placeholder={t('tasks.addMoreDetails')}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              disabled={loading}
-              className="resize-none break-words overflow-wrap-anywhere w-full max-w-full h-40 overflow-y-auto"
-            />
+            <Label htmlFor="task-description" className="text-xs sm:text-sm">{t('projects.description')}</Label>
+            <div className={cn("border border-gray-200 dark:border-gray-800 rounded-lg", loading && "opacity-60")}>
+              <MarkdownEditor
+                value={description}
+                onChange={setDescription}
+                placeholder={t('tasks.addMoreDetails')}
+                className="h-[300px] sm:h-[400px] lg:h-[500px]"
+              />
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <div className="space-y-2">
-              <Label htmlFor="task-priority">{t('tasks.priority')}</Label>
+              <Label htmlFor="task-priority" className="text-xs sm:text-sm">{t('tasks.priority')}</Label>
               <Select 
                 value={priority} 
                 onValueChange={(value: 'low' | 'medium' | 'high') => setPriority(value)}
                 disabled={loading}
               >
-                <SelectTrigger id="task-priority">
+                <SelectTrigger id="task-priority" className="text-sm sm:text-base">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -283,7 +293,7 @@ export function CreateTaskDialog({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="task-duration">{t('tasks.estimatedTime')}</Label>
+              <Label htmlFor="task-duration" className="text-xs sm:text-sm">{t('tasks.estimatedTime')}</Label>
               <Input
                 id="task-duration"
                 type="number"
@@ -291,34 +301,41 @@ export function CreateTaskDialog({
                 value={estimatedDuration}
                 onChange={(e) => setEstimatedDuration(e.target.value)}
                 disabled={loading}
+                className="text-sm sm:text-base"
               />
             </div>
           </div>
 
           <div className="space-y-2 min-w-0">
-            <Label htmlFor="task-tags">{t('tasks.tags')}</Label>
+            <Label htmlFor="task-tags" className="text-xs sm:text-sm">{t('tasks.tags')}</Label>
             <Input
               id="task-tags"
               placeholder={t('tasks.tagsPlaceholder')}
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               disabled={loading}
+              className="text-sm sm:text-base"
             />
-            <p className="text-xs text-gray-500">{t('tasks.separateTagsWithCommas')}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400">{t('tasks.separateTagsWithCommas')}</p>
+          </div>
+            </div>
           </div>
 
-          <div className="flex gap-3 pt-4">
-            <Button type="submit" disabled={loading} className="flex-1">
-              {loading ? t('tasks.creatingTask') : t('tasks.createTask')}
-            </Button>
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => onOpenChange(false)}
-              disabled={loading}
-            >
-              {t('common.cancel')}
-            </Button>
+          <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-800 flex-shrink-0 bg-background sticky bottom-0 z-10">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+              <Button type="submit" disabled={loading} className="flex-1 text-xs sm:text-sm h-10 sm:h-9">
+                {loading ? t('tasks.creatingTask') : t('tasks.createTask')}
+              </Button>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => onOpenChange(false)}
+                disabled={loading}
+                className="flex-1 sm:flex-initial text-xs sm:text-sm h-10 sm:h-9"
+              >
+                {t('common.cancel')}
+              </Button>
+            </div>
           </div>
         </form>
       </DialogContent>

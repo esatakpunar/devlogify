@@ -79,9 +79,14 @@ export function AICreateTasksDialog({
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'input' | 'preview'>('input')
 
-  // Load initial note or suggestion if provided
+  // Load initial note or suggestion if provided and auto-select project
   useEffect(() => {
     if (open) {
+      // Auto-select project if only one project is available
+      if (projects.length === 1 && !selectedProjectId) {
+        setSelectedProjectId(projects[0].id)
+      }
+
       if (initialNote) {
         setNotesInput(initialNote.content)
         if (initialNote.title) {
@@ -258,245 +263,267 @@ export function AICreateTasksDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[800px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="w-5 h-5 text-purple-600" />
-            {t('tasks.aiCreateTasks.title')}
-          </DialogTitle>
-          <DialogDescription>
-            {t('tasks.aiCreateTasks.description')}
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-none sm:max-w-[800px] max-h-none sm:max-h-[90vh] h-full sm:h-auto overflow-hidden p-0 flex flex-col rounded-none sm:rounded-lg w-full sm:w-auto fixed top-0 left-0 right-0 bottom-0 sm:top-[50%] sm:left-[50%] sm:right-auto sm:bottom-auto translate-x-0 translate-y-0 sm:translate-x-[-50%] sm:translate-y-[-50%]">
+        <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 flex-shrink-0">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+              {t('tasks.aiCreateTasks.title')}
+            </DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">
+              {t('tasks.aiCreateTasks.description')}
+            </DialogDescription>
+          </DialogHeader>
+        </div>
 
-        <div className="space-y-4">
-          {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
-              {error}
-            </div>
-          )}
-
-          {/* Project Selection */}
-          <div className="space-y-2">
-            <Label htmlFor="project-select">
-              {t('tasks.aiCreateTasks.project')} <span className="text-red-500">*</span>
-            </Label>
-            <Select
-              value={selectedProjectId}
-              onValueChange={setSelectedProjectId}
-              disabled={isGenerating || isCreating}
-            >
-              <SelectTrigger id="project-select">
-                <SelectValue placeholder={t('tasks.aiCreateTasks.selectProject')} />
-              </SelectTrigger>
-              <SelectContent>
-                {projects.map((project) => (
-                  <SelectItem key={project.id} value={project.id}>
-                    <div className="flex items-center gap-2">
-                      <div
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: project.color }}
-                      />
-                      {project.title}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'input' | 'preview')}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="input">{t('tasks.aiCreateTasks.inputNotes')}</TabsTrigger>
-              <TabsTrigger value="preview" disabled={tasks.length === 0}>
-                {t('tasks.aiCreateTasks.previewTasks')} {tasks.length > 0 && `(${tasks.length})`}
-              </TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="input" className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="notes-input">
-                  {t('tasks.aiCreateTasks.notesOrText')} <span className="text-red-500">*</span>
-                </Label>
-                <Textarea
-                  id="notes-input"
-                  placeholder={t('tasks.aiCreateTasks.notesPlaceholder')}
-                  value={notesInput}
-                  onChange={(e) => setNotesInput(e.target.value)}
-                  rows={10}
-                  disabled={isGenerating || isCreating}
-                  className="font-mono text-sm"
-                />
-                <p className="text-xs text-gray-500">
-                  {t('tasks.aiCreateTasks.aiWillAnalyze')}
-                </p>
+        <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-4 sm:pb-6 min-h-0">
+          <div className="space-y-3 sm:space-y-4">
+            {error && (
+              <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-2.5 sm:p-3 rounded-md text-xs sm:text-sm">
+                {error}
               </div>
+            )}
 
-              <Button
-                onClick={handleGenerateTasks}
-                disabled={!notesInput.trim() || !selectedProjectId || isGenerating || isCreating}
-                className="w-full"
-              >
-                {isGenerating ? (
+            {/* Project Selection - Only show if multiple projects available */}
+            {projects.length > 1 && (
+              <div className="space-y-2">
+                <Label htmlFor="project-select" className="text-xs sm:text-sm">
+                  {t('tasks.aiCreateTasks.project')} <span className="text-red-500">*</span>
+                </Label>
+                <Select
+                  value={selectedProjectId}
+                  onValueChange={setSelectedProjectId}
+                  disabled={isGenerating || isCreating}
+                >
+                  <SelectTrigger id="project-select" className="text-sm sm:text-base">
+                    <SelectValue placeholder={t('tasks.aiCreateTasks.selectProject')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {projects.map((project) => (
+                      <SelectItem key={project.id} value={project.id}>
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-3 h-3 rounded-full flex-shrink-0"
+                            style={{ backgroundColor: project.color }}
+                          />
+                          <span className="truncate">{project.title}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+
+            <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'input' | 'preview')}>
+              <TabsList className="grid w-full grid-cols-2 h-9 sm:h-10">
+                <TabsTrigger value="input" className="text-xs sm:text-sm px-2 sm:px-4">
+                  <span className="hidden sm:inline">{t('tasks.aiCreateTasks.inputNotes')}</span>
+                  <span className="sm:hidden">Input</span>
+                </TabsTrigger>
+                <TabsTrigger value="preview" disabled={tasks.length === 0} className="text-xs sm:text-sm px-2 sm:px-4">
+                  <span className="hidden sm:inline">{t('tasks.aiCreateTasks.previewTasks')}</span>
+                  <span className="sm:hidden">Preview</span>
+                  {tasks.length > 0 && <Badge variant="secondary" className="ml-1.5 text-[10px] px-1 h-4">{tasks.length}</Badge>}
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="input" className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
+                <div className="space-y-2">
+                  <Label htmlFor="notes-input" className="text-xs sm:text-sm">
+                    {t('tasks.aiCreateTasks.notesOrText')} <span className="text-red-500">*</span>
+                  </Label>
+                  <Textarea
+                    id="notes-input"
+                    placeholder={t('tasks.aiCreateTasks.notesPlaceholder')}
+                    value={notesInput}
+                    onChange={(e) => setNotesInput(e.target.value)}
+                    rows={6}
+                    disabled={isGenerating || isCreating}
+                    className="font-mono text-xs sm:text-sm resize-none"
+                  />
+                  <p className="text-[10px] sm:text-xs text-gray-500 dark:text-gray-400">
+                    {t('tasks.aiCreateTasks.aiWillAnalyze')}
+                  </p>
+                </div>
+
+                <Button
+                  onClick={handleGenerateTasks}
+                  disabled={!notesInput.trim() || !selectedProjectId || isGenerating || isCreating}
+                  className="w-full text-xs sm:text-sm h-9 sm:h-10"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2 animate-spin" />
+                      <span className="hidden sm:inline">{t('tasks.aiCreateTasks.generatingTasks')}</span>
+                      <span className="sm:hidden">Generating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2" />
+                      <span className="hidden sm:inline">{t('tasks.aiCreateTasks.generateTasks')}</span>
+                      <span className="sm:hidden">Generate</span>
+                    </>
+                  )}
+                </Button>
+              </TabsContent>
+
+              <TabsContent value="preview" className="space-y-3 sm:space-y-4 mt-3 sm:mt-4">
+                {tasks.length === 0 ? (
+                  <div className="text-center py-6 sm:py-8 text-gray-500 dark:text-gray-400 text-xs sm:text-sm">
+                    {t('tasks.aiCreateTasks.noTasksGenerated')}
+                  </div>
+                ) : (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    {t('tasks.aiCreateTasks.generatingTasks')}
+                    <div className="flex items-center justify-between gap-2 flex-shrink-0">
+                      <p className="text-[10px] sm:text-xs text-gray-600 dark:text-gray-400">
+                        {t('tasks.aiCreateTasks.reviewAndEdit')}
+                      </p>
+                      <Button
+                        onClick={handleAddTask}
+                        variant="outline"
+                        size="sm"
+                        disabled={isCreating}
+                        className="text-xs sm:text-sm h-7 sm:h-8 px-2 sm:px-3"
+                      >
+                        <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5 sm:mr-1" />
+                        <span className="hidden sm:inline">{t('tasks.aiCreateTasks.addTask')}</span>
+                      </Button>
+                    </div>
+
+                    <div className="space-y-2 sm:space-y-3 max-h-[calc(100vh-280px)] sm:max-h-[400px] overflow-y-auto pr-1">
+                      {tasks.map((task, index) => (
+                        <Card key={task.id} className="p-2.5 sm:p-4 border-gray-200 dark:border-gray-800">
+                          <div className="space-y-2 sm:space-y-3">
+                            <div className="flex items-start justify-between gap-2">
+                              <span className="text-[10px] sm:text-xs font-semibold text-gray-500 dark:text-gray-400">
+                                {t('tasks.aiCreateTasks.taskNumber', { number: index + 1 })}
+                              </span>
+                              <Button
+                                onClick={() => handleDeleteTask(task.id)}
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6 sm:h-7 sm:w-7 flex-shrink-0"
+                                disabled={isCreating}
+                              >
+                                <Trash2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-red-500" />
+                              </Button>
+                            </div>
+
+                            <div className="space-y-2">
+                              <div>
+                                <Label className="text-[10px] sm:text-xs">{t('tasks.title')} *</Label>
+                                <Input
+                                  value={task.title}
+                                  onChange={(e) => handleTaskChange(task.id, 'title', e.target.value)}
+                                  placeholder={t('tasks.aiCreateTasks.taskTitle')}
+                                  disabled={isCreating}
+                                  className="mt-1 text-xs sm:text-sm h-8 sm:h-9"
+                                />
+                              </div>
+
+                              <div>
+                                <Label className="text-[10px] sm:text-xs">{t('tasks.description')} <span className="text-red-500">*</span></Label>
+                                <Textarea
+                                  value={task.description || ''}
+                                  onChange={(e) => handleTaskChange(task.id, 'description', e.target.value)}
+                                  placeholder={t('tasks.aiCreateTasks.provideContext')}
+                                  rows={2}
+                                  disabled={isCreating}
+                                  className="mt-1 text-xs sm:text-sm resize-none"
+                                  required
+                                />
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-2">
+                                <div>
+                                  <Label className="text-[10px] sm:text-xs">{t('tasks.priority')}</Label>
+                                  <Select
+                                    value={task.priority}
+                                    onValueChange={(value: 'low' | 'medium' | 'high') =>
+                                      handleTaskChange(task.id, 'priority', value)
+                                    }
+                                    disabled={isCreating}
+                                  >
+                                    <SelectTrigger className="mt-1 text-xs sm:text-sm h-8 sm:h-9">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="low">{t('common.low')}</SelectItem>
+                                      <SelectItem value="medium">{t('common.medium')}</SelectItem>
+                                      <SelectItem value="high">{t('common.high')}</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+
+                                <div>
+                                  <Label className="text-[10px] sm:text-xs">{t('tasks.estimatedDuration')}</Label>
+                                  <Input
+                                    type="number"
+                                    value={task.estimated_duration || ''}
+                                    onChange={(e) =>
+                                      handleTaskChange(
+                                        task.id,
+                                        'estimated_duration',
+                                        e.target.value ? parseInt(e.target.value) : undefined
+                                      )
+                                    }
+                                    placeholder="60"
+                                    disabled={isCreating}
+                                    className="mt-1 text-xs sm:text-sm h-8 sm:h-9"
+                                    min="0"
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </TabsContent>
+            </Tabs>
+          </div>
+        </div>
+
+        {/* Sticky Footer for Preview Tab */}
+        {activeTab === 'preview' && tasks.length > 0 && (
+          <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-800 flex-shrink-0 bg-background sticky bottom-0 z-10">
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+              <Button
+                onClick={handleCreateTasks}
+                disabled={tasks.length === 0 || isCreating || tasks.some(task => !task.title.trim() || !task.description?.trim())}
+                className="flex-1 text-xs sm:text-sm h-9 sm:h-10"
+              >
+                {isCreating ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2 animate-spin" />
+                    <span className="hidden sm:inline">{t('tasks.aiCreateTasks.creatingTasks')}</span>
+                    <span className="sm:hidden">Creating...</span>
                   </>
                 ) : (
                   <>
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    {t('tasks.aiCreateTasks.generateTasks')}
+                    <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-2" />
+                    <span className="hidden sm:inline">{t('tasks.aiCreateTasks.createTasks', { count: tasks.length })}</span>
+                    <span className="sm:hidden">Create {tasks.length}</span>
                   </>
                 )}
               </Button>
-            </TabsContent>
-
-            <TabsContent value="preview" className="space-y-4">
-              {tasks.length === 0 ? (
-                <div className="text-center py-8 text-gray-500">
-                  {t('tasks.aiCreateTasks.noTasksGenerated')}
-                </div>
-              ) : (
-                <>
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm text-gray-600">
-                      {t('tasks.aiCreateTasks.reviewAndEdit')}
-                    </p>
-                    <Button
-                      onClick={handleAddTask}
-                      variant="outline"
-                      size="sm"
-                      disabled={isCreating}
-                    >
-                      <Plus className="w-4 h-4 mr-1" />
-                      {t('tasks.aiCreateTasks.addTask')}
-                    </Button>
-                  </div>
-
-                  <div className="space-y-3 max-h-[400px] overflow-y-auto">
-                    {tasks.map((task, index) => (
-                      <Card key={task.id} className="p-4 border-gray-200">
-                        <div className="space-y-3">
-                          <div className="flex items-start justify-between">
-                            <span className="text-xs font-semibold text-gray-500">
-                              {t('tasks.aiCreateTasks.taskNumber', { number: index + 1 })}
-                            </span>
-                            <Button
-                              onClick={() => handleDeleteTask(task.id)}
-                              variant="ghost"
-                              size="icon"
-                              className="h-6 w-6"
-                              disabled={isCreating}
-                            >
-                              <Trash2 className="w-4 h-4 text-red-500" />
-                            </Button>
-                          </div>
-
-                          <div className="space-y-2">
-                            <div>
-                              <Label className="text-xs">{t('tasks.title')} *</Label>
-                              <Input
-                                value={task.title}
-                                onChange={(e) => handleTaskChange(task.id, 'title', e.target.value)}
-                                placeholder={t('tasks.aiCreateTasks.taskTitle')}
-                                disabled={isCreating}
-                                className="mt-1"
-                              />
-                            </div>
-
-                            <div>
-                              <Label className="text-xs">{t('tasks.description')} <span className="text-red-500">*</span></Label>
-                              <Textarea
-                                value={task.description || ''}
-                                onChange={(e) => handleTaskChange(task.id, 'description', e.target.value)}
-                                placeholder={t('tasks.aiCreateTasks.provideContext')}
-                                rows={3}
-                                disabled={isCreating}
-                                className="mt-1"
-                                required
-                              />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3">
-                              <div>
-                                <Label className="text-xs">{t('tasks.priority')}</Label>
-                                <Select
-                                  value={task.priority}
-                                  onValueChange={(value: 'low' | 'medium' | 'high') =>
-                                    handleTaskChange(task.id, 'priority', value)
-                                  }
-                                  disabled={isCreating}
-                                >
-                                  <SelectTrigger className="mt-1">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="low">{t('common.low')}</SelectItem>
-                                    <SelectItem value="medium">{t('common.medium')}</SelectItem>
-                                    <SelectItem value="high">{t('common.high')}</SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </div>
-
-                              <div>
-                                <Label className="text-xs">{t('tasks.estimatedDuration')}</Label>
-                                <Input
-                                  type="number"
-                                  value={task.estimated_duration || ''}
-                                  onChange={(e) =>
-                                    handleTaskChange(
-                                      task.id,
-                                      'estimated_duration',
-                                      e.target.value ? parseInt(e.target.value) : undefined
-                                    )
-                                  }
-                                  placeholder="60"
-                                  disabled={isCreating}
-                                  className="mt-1"
-                                  min="0"
-                                />
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </Card>
-                    ))}
-                  </div>
-
-                  <div className="flex gap-3 pt-4 border-t">
-                    <Button
-                      onClick={handleCreateTasks}
-                      disabled={tasks.length === 0 || isCreating || tasks.some(task => !task.title.trim() || !task.description?.trim())}
-                      className="flex-1"
-                    >
-                      {isCreating ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          {t('tasks.aiCreateTasks.creatingTasks')}
-                        </>
-                      ) : (
-                        <>
-                          <CheckCircle2 className="w-4 h-4 mr-2" />
-                          {t('tasks.aiCreateTasks.createTasks', { count: tasks.length })}
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setTasks([])
-                        setActiveTab('input')
-                      }}
-                      disabled={isCreating}
-                    >
-                      {t('common.cancel')}
-                    </Button>
-                  </div>
-                </>
-              )}
-            </TabsContent>
-          </Tabs>
-        </div>
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setTasks([])
+                  setActiveTab('input')
+                }}
+                disabled={isCreating}
+                className="flex-1 sm:flex-initial text-xs sm:text-sm h-9 sm:h-10"
+              >
+                {t('common.cancel')}
+              </Button>
+            </div>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   )

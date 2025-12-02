@@ -102,53 +102,53 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
 
   if (localTasks.length === 0) {
     return (
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">{t('dashboard.recentTasks')}</h3>
-        <div className="text-center py-8 text-gray-500">
-          <Clock className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-          <p>{t('dashboard.noIncompleteTasks')}</p>
-          <p className="text-sm">{t('dashboard.createSomeTasks')}</p>
+      <Card className="p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 dark:text-white">{t('dashboard.recentTasks')}</h3>
+        <div className="text-center py-6 sm:py-8 text-gray-500 dark:text-gray-400">
+          <Clock className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 text-gray-300 dark:text-gray-600" />
+          <p className="text-sm sm:text-base">{t('dashboard.noIncompleteTasks')}</p>
+          <p className="text-xs sm:text-sm">{t('dashboard.createSomeTasks')}</p>
         </div>
       </Card>
     )
   }
 
   return (
-    <Card className="p-6">
-      <h3 className="text-lg font-semibold mb-4">{t('dashboard.recentTasks')}</h3>
-      <div className="space-y-3">
+    <Card className="p-4 sm:p-6">
+      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 dark:text-white">{t('dashboard.recentTasks')}</h3>
+      <div className="space-y-2 sm:space-y-3">
         {localTasks.map((task) => (
           <div
             key={task.id}
-            className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="flex items-center justify-between p-2.5 sm:p-3 bg-gray-50 dark:bg-gray-800 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors gap-2"
           >
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
+              <div className="flex items-center gap-1.5 sm:gap-2 mb-1 flex-wrap">
                 <Link
                   href={`/projects/${task.project.id}`}
-                  className="text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 truncate"
+                  className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 truncate"
                 >
                   {task.title}
                 </Link>
                 <Badge
                   variant="secondary"
-                  className="text-xs"
+                  className="text-xs flex-shrink-0"
                   style={{ backgroundColor: task.project.color + '20', color: task.project.color }}
                 >
-                  {task.project.title}
+                  <span className="truncate max-w-[80px] sm:max-w-none">{task.project.title}</span>
                 </Badge>
               </div>
-              <div className="flex items-center gap-3 text-xs text-gray-500">
+              <div className="flex items-center gap-2 sm:gap-3 text-xs text-gray-500 dark:text-gray-400 flex-wrap">
                 <span className="flex items-center gap-1">
                   <Clock className="w-3 h-3" />
                   {formatTime(task.actual_duration)}
                 </span>
-                <span>•</span>
+                <span className="hidden sm:inline">•</span>
                 <span>{formatLastUpdated(task.updated_at)}</span>
               </div>
             </div>
             
-            <div className="flex items-center gap-1 ml-3">
+            <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
               {activeTaskId === task.id ? (
                 <Badge variant="default" className="text-xs">
                   {t('common.running')}
@@ -160,20 +160,20 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
                     variant="ghost"
                     onClick={() => handleStartTimer(task)}
                     disabled={isRunning || loadingTasks.has(task.id)}
-                    className="h-8 w-8 p-0 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
+                    className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
                     title={t('timer.start')}
                   >
-                    <Play className="w-4 h-4" />
+                    <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </Button>
                   <Button
                     size="sm"
                     variant="ghost"
                     onClick={() => handleMarkComplete(task.id)}
                     disabled={loadingTasks.has(task.id)}
-                    className="h-8 w-8 p-0 hover:bg-green-100 dark:hover:bg-green-900/30 hover:text-green-600 dark:hover:text-green-400 transition-colors cursor-pointer"
+                    className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-green-100 dark:hover:bg-green-900/30 hover:text-green-600 dark:hover:text-green-400 transition-colors cursor-pointer"
                     title={t('tasks.taskMarkedAsComplete')}
                   >
-                    <Check className="w-4 h-4" />
+                    <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </Button>
                 </>
               )}
@@ -183,9 +183,9 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
       </div>
       
       {localTasks.length >= 5 && (
-        <div className="mt-4 pt-3 border-t border-gray-200 dark:border-gray-700">
+        <div className="mt-3 sm:mt-4 pt-2 sm:pt-3 border-t border-gray-200 dark:border-gray-700">
           <Link href="/projects">
-            <Button variant="ghost" size="sm" className="w-full">
+            <Button variant="ghost" size="sm" className="w-full text-xs sm:text-sm">
               {t('dashboard.viewAllProjects')}
             </Button>
           </Link>

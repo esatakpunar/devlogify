@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { KanbanColumn } from './KanbanColumn'
 import { CreateTaskDialog } from './CreateTaskDialog'
 import { AICreateTasksDialog } from './AICreateTasksDialog'
@@ -68,6 +69,7 @@ export function KanbanBoard({
   onTaskDeleted,
   onTasksChange
 }: KanbanBoardProps) {
+  const router = useRouter()
   const { isPremium } = usePremium(userId)
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
@@ -246,8 +248,8 @@ export function KanbanBoard({
                 projectId={projectId} 
                 userId={userId}
                 onTasksUpdated={() => {
-                  // Refresh tasks by reloading the page data
-                  window.location.reload()
+                  // Refresh tasks by refreshing the page data
+                  router.refresh()
                 }}
               />
             </>

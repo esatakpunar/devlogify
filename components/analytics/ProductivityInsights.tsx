@@ -79,25 +79,25 @@ export function ProductivityInsights({
 
   if (insights.length === 0) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold mb-4">{t('analytics.productivityInsights')}</h3>
-        <p className="text-gray-500">{t('analytics.startWorkingToSeeInsights')}</p>
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 dark:text-white">{t('analytics.productivityInsights')}</h3>
+        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">{t('analytics.startWorkingToSeeInsights')}</p>
       </div>
     )
   }
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold mb-4">{t('analytics.productivityInsights')}</h3>
-      <div className="grid gap-4 md:grid-cols-2">
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 dark:text-white">{t('analytics.productivityInsights')}</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
         {insights.map((insight, index) => (
-          <div key={index} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${insight.color}`}>
-              <insight.icon className="w-5 h-5" />
+          <div key={index} className="flex items-start gap-2 sm:gap-3 p-3 sm:p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
+            <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${insight.color}`}>
+              <insight.icon className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div>
-              <h4 className="font-medium text-sm">{insight.title}</h4>
-              <p className="text-sm text-gray-600 mt-1">{insight.description}</p>
+            <div className="min-w-0 flex-1">
+              <h4 className="font-medium text-xs sm:text-sm dark:text-gray-200">{insight.title}</h4>
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">{insight.description}</p>
             </div>
           </div>
         ))}

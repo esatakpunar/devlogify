@@ -4,6 +4,9 @@ import { ProfileSettings } from './ProfileSettings'
 import { PreferencesSettings } from './PreferencesSettings'
 import { AccountSettings } from './AccountSettings'
 import { PremiumSettings } from './PremiumSettings'
+import { ShortcutsSettings } from './ShortcutsSettings'
+import { DataExportImport } from './DataExportImport'
+import { NotificationSettings } from './NotificationSettings'
 import { Separator } from '@/components/ui/separator'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { User } from '@supabase/supabase-js'
@@ -45,6 +48,27 @@ export function SettingsPageContent({ user }: SettingsPageContentProps) {
       <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
         <h2 className="text-xl font-semibold mb-4">{t('premium.title')}</h2>
         <PremiumSettings userId={user.id} />
+      </div>
+
+      <Separator />
+
+      {/* Shortcuts Section */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
+        <ShortcutsSettings />
+      </div>
+
+      <Separator />
+
+      {/* Data Export/Import Section */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
+        <DataExportImport userId={user.id} />
+      </div>
+
+      <Separator />
+
+      {/* Notifications Section */}
+      <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-6">
+        <NotificationSettings userId={user.id} />
       </div>
 
       <Separator />

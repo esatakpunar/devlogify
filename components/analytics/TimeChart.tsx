@@ -18,9 +18,9 @@ export function TimeChart({ data }: TimeChartProps) {
   }))
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold mb-4">{t('analytics.dailyTimeThisWeek')}</h3>
-      <ResponsiveContainer width="100%" height={300}>
+    <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
+      <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 dark:text-white">{t('analytics.dailyTimeThisWeek')}</h3>
+      <ResponsiveContainer width="100%" height={250} className="sm:h-[300px]">
         <BarChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
           <XAxis dataKey="day" stroke="#666" />

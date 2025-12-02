@@ -104,14 +104,14 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
   return (
     <>
       <div 
-        className="group bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow cursor-pointer"
+        className="group bg-white rounded-lg border border-gray-200 p-3 sm:p-4 hover:shadow-md transition-shadow cursor-pointer"
         onClick={handleCardClick}
       >
         {/* Header */}
-        <div className="flex items-start justify-between mb-3">
+        <div className="flex items-start justify-between mb-2 sm:mb-3 gap-2">
           <div className="flex-1 min-w-0">
             {note.title && (
-              <h3 className="font-semibold text-base line-clamp-1 mb-1">
+              <h3 className="font-semibold text-sm sm:text-base line-clamp-1 mb-1">
                 {note.title}
               </h3>
             )}
@@ -125,11 +125,11 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
                   className="w-2 h-2 rounded-full" 
                   style={{ backgroundColor: note.project.color }}
                 />
-                <span>{note.project.title}</span>
+                <span className="truncate max-w-[120px] sm:max-w-none">{note.project.title}</span>
               </Link>
             )}
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-shrink-0">
             {note.is_pinned && (
               <Pin className="w-4 h-4 text-yellow-600 fill-yellow-600" />
             )}
@@ -138,7 +138,7 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
                 <Button 
                   variant="ghost" 
                   size="icon" 
-                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="h-7 w-7 sm:h-6 sm:w-6 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                   disabled={loading}
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -178,27 +178,27 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
         </div>
 
         {/* Content Preview */}
-        <p className="text-sm text-gray-700 line-clamp-4 mb-3 whitespace-pre-wrap">
+        <p className="text-xs sm:text-sm text-gray-700 line-clamp-3 sm:line-clamp-4 mb-2 sm:mb-3 whitespace-pre-wrap break-words">
           {note.content}
         </p>
 
         {/* Footer */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-2">
           {note.tags && note.tags.length > 0 ? (
-            <div className="flex items-center gap-1 flex-wrap">
-              {note.tags.slice(0, 3).map((tag, index) => (
-                <Badge key={index} variant="secondary" className="text-xs">
+            <div className="flex items-center gap-1 flex-wrap flex-1 min-w-0">
+              {note.tags.slice(0, 2).map((tag, index) => (
+                <Badge key={index} variant="secondary" className="text-xs truncate max-w-[80px] sm:max-w-none">
                   {tag}
                 </Badge>
               ))}
-              {note.tags.length > 3 && (
-                <span className="text-xs text-gray-500">+{note.tags.length - 3}</span>
+              {note.tags.length > 2 && (
+                <span className="text-xs text-gray-500 flex-shrink-0">+{note.tags.length - 2}</span>
               )}
             </div>
           ) : (
-            <div />
+            <div className="flex-1" />
           )}
-          <span className="text-xs text-gray-400">
+          <span className="text-xs text-gray-400 whitespace-nowrap flex-shrink-0">
             {formatDistanceToNow(new Date(note.created_at), { addSuffix: true })}
           </span>
         </div>

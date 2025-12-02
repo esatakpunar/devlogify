@@ -110,13 +110,13 @@ export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
 
   if (loading) {
     return (
-      <Card className="p-6">
+      <Card className="p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Sparkles className="w-5 h-5 text-purple-600" />
-          <h3 className="text-lg font-semibold">{t('dashboard.taskSuggestions.title')}</h3>
+          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+          <h3 className="text-base sm:text-lg font-semibold dark:text-white">{t('dashboard.taskSuggestions.title')}</h3>
         </div>
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+        <div className="flex items-center justify-center py-6 sm:py-8">
+          <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 animate-spin text-gray-400" />
         </div>
       </Card>
     )
@@ -124,14 +124,14 @@ export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
 
   if (error) {
     return (
-      <Card className="p-6">
+      <Card className="p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Sparkles className="w-5 h-5 text-purple-600" />
-          <h3 className="text-lg font-semibold">{t('dashboard.taskSuggestions.title')}</h3>
+          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+          <h3 className="text-base sm:text-lg font-semibold dark:text-white">{t('dashboard.taskSuggestions.title')}</h3>
         </div>
-        <div className="text-center py-8">
-          <p className="text-sm text-gray-500 mb-4">{error}</p>
-          <Button variant="outline" size="sm" onClick={loadSuggestions}>
+        <div className="text-center py-6 sm:py-8">
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-3 sm:mb-4">{error}</p>
+          <Button variant="outline" size="sm" onClick={loadSuggestions} className="text-xs sm:text-sm">
             {t('common.tryAgain')}
           </Button>
         </div>
@@ -141,14 +141,14 @@ export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
 
   if (suggestions.length === 0) {
     return (
-      <Card className="p-6">
+      <Card className="p-4 sm:p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Sparkles className="w-5 h-5 text-purple-600" />
-          <h3 className="text-lg font-semibold">{t('dashboard.taskSuggestions.title')}</h3>
+          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+          <h3 className="text-base sm:text-lg font-semibold dark:text-white">{t('dashboard.taskSuggestions.title')}</h3>
         </div>
-        <div className="text-center py-8 text-gray-500">
-          <Lightbulb className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-          <p className="text-sm">{t('dashboard.taskSuggestions.noSuggestionsAvailable')}</p>
+        <div className="text-center py-6 sm:py-8 text-gray-500 dark:text-gray-400">
+          <Lightbulb className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-2 sm:mb-3 text-gray-300 dark:text-gray-600" />
+          <p className="text-xs sm:text-sm">{t('dashboard.taskSuggestions.noSuggestionsAvailable')}</p>
           <p className="text-xs mt-1">{t('dashboard.taskSuggestions.createTasksToGetSuggestions')}</p>
         </div>
       </Card>
@@ -156,31 +156,32 @@ export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
   }
 
   return (
-    <Card className="p-6">
-      <div className="flex items-center justify-between mb-4">
+    <Card className="p-4 sm:p-6">
+      <div className="flex items-center justify-between mb-3 sm:mb-4">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-5 h-5 text-purple-600" />
-          <h3 className="text-lg font-semibold">{t('dashboard.taskSuggestions.title')}</h3>
+          <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+          <h3 className="text-base sm:text-lg font-semibold dark:text-white">{t('dashboard.taskSuggestions.title')}</h3>
         </div>
-        <Button variant="ghost" size="sm" onClick={loadSuggestions} disabled={loading}>
-          {t('common.refresh')}
+        <Button variant="ghost" size="sm" onClick={loadSuggestions} disabled={loading} className="h-8 w-8 sm:h-9 sm:w-9 p-0">
+          <span className="sr-only">{t('common.refresh')}</span>
+          <Loader2 className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${loading ? 'animate-spin' : ''}`} />
         </Button>
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-2 sm:space-y-3">
         {suggestions.slice(0, 5).map((suggestion, index) => (
           <div
             key={index}
-            className="p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+            className="p-3 sm:p-4 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
           >
-            <div className="flex items-start justify-between mb-2">
-              <div className="flex-1">
-                <h4 className="font-medium text-sm mb-1">{suggestion.title}</h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 mb-2">
+            <div className="flex items-start justify-between mb-2 gap-2">
+              <div className="flex-1 min-w-0">
+                <h4 className="font-medium text-xs sm:text-sm mb-1 dark:text-gray-200">{suggestion.title}</h4>
+                <p className="text-xs text-gray-600 dark:text-gray-400 mb-1.5 sm:mb-2 line-clamp-2">
                   {suggestion.description}
                 </p>
                 {suggestion.reason && (
-                  <p className="text-xs text-gray-500 italic mb-2">
+                  <p className="text-xs text-gray-500 dark:text-gray-400 italic mb-1.5 sm:mb-2 line-clamp-1">
                     💡 {suggestion.reason}
                   </p>
                 )}
@@ -189,17 +190,17 @@ export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
                 variant="ghost"
                 size="sm"
                 onClick={() => handleCreateTask(suggestion)}
-                className="ml-2"
+                className="ml-1 sm:ml-2 h-7 w-7 sm:h-8 sm:w-8 p-0 flex-shrink-0"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </Button>
             </div>
-            <div className="flex items-center gap-2">
-              <Badge className={getPriorityColor(suggestion.priority)}>
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+              <Badge className={`${getPriorityColor(suggestion.priority)} text-xs`}>
                 {t(`common.${suggestion.priority}`)}
               </Badge>
               {suggestion.estimated_duration && (
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
                   ~{suggestion.estimated_duration} {t('common.min')}
                 </span>
               )}
@@ -209,8 +210,8 @@ export function TaskSuggestions({ userId }: TaskSuggestionsProps) {
       </div>
 
       {suggestions.length > 5 && (
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-800">
-          <p className="text-xs text-gray-500 text-center">
+        <div className="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-800">
+          <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
             {t('dashboard.taskSuggestions.showingSuggestions', { count: suggestions.length })}
           </p>
         </div>

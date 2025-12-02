@@ -48,43 +48,49 @@ export function ProjectProgressStats({ tasks }: ProjectProgressStatsProps) {
   const completedTasks = tasks.filter(t => t.status === 'done').length
 
   return (
-    <div className="rounded-lg border bg-card p-4 shadow-sm">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+    <div className="rounded-lg border bg-card p-3 sm:p-3 md:p-4 shadow-sm">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 md:gap-6">
         {/* Overall Progress */}
         <div className="flex-1 min-w-0 w-full sm:w-auto">
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-sm font-medium text-muted-foreground">{t('projects.overallProgress')}</span>
-            <span className="text-lg font-semibold text-foreground">{overallProgress}%</span>
+          <div className="flex items-center justify-between mb-1.5 sm:mb-2">
+            <span className="text-xs sm:text-xs md:text-sm font-medium text-muted-foreground">{t('projects.overallProgress')}</span>
+            <span className="text-sm sm:text-base md:text-lg font-semibold text-foreground">{overallProgress}%</span>
           </div>
           <ProgressBar value={overallProgress} size="sm" />
-          <div className="text-xs text-muted-foreground mt-1.5">
+          <div className="text-[10px] sm:text-[10px] md:text-xs text-muted-foreground mt-1">
             {completedTasks} / {tasks.length} {t('projects.tasks') || 'tasks'}
           </div>
         </div>
 
         {/* Divider */}
-        <div className="hidden sm:block w-px h-12 bg-border" />
+        <div className="hidden sm:block w-px h-8 md:h-10 bg-border flex-shrink-0" />
 
         {/* Status Distribution */}
-        <div className="flex items-center gap-4 sm:gap-6">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-gray-400" />
-            <span className="text-xs text-muted-foreground">{t('common.todo')}</span>
-            <Badge variant="outline" className="text-xs font-medium min-w-[2rem] justify-center">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 md:gap-4">
+          <div className="flex items-center justify-between sm:justify-start gap-2 min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-1.5 md:gap-2 min-w-0 flex-1 sm:flex-initial">
+              <div className="w-2 h-2 rounded-full bg-gray-400 flex-shrink-0" />
+              <span className="text-[10px] sm:text-[10px] md:text-xs text-muted-foreground truncate">{t('common.todo')}</span>
+            </div>
+            <Badge variant="outline" className="text-[10px] sm:text-[10px] md:text-xs font-medium min-w-[1.75rem] sm:min-w-[1.75rem] md:min-w-[2rem] justify-center flex-shrink-0">
               {statusDistribution.todo}
             </Badge>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-blue-500" />
-            <span className="text-xs text-muted-foreground">{t('common.inProgress')}</span>
-            <Badge variant="outline" className="text-xs font-medium min-w-[2rem] justify-center bg-blue-50 text-blue-700 border-blue-200">
+          <div className="flex items-center justify-between sm:justify-start gap-2 min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-1.5 md:gap-2 min-w-0 flex-1 sm:flex-initial">
+              <div className="w-2 h-2 rounded-full bg-blue-500 flex-shrink-0" />
+              <span className="text-[10px] sm:text-[10px] md:text-xs text-muted-foreground truncate">{t('common.inProgress')}</span>
+            </div>
+            <Badge variant="outline" className="text-[10px] sm:text-[10px] md:text-xs font-medium min-w-[1.75rem] sm:min-w-[1.75rem] md:min-w-[2rem] justify-center bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-400 dark:border-blue-800 flex-shrink-0">
               {statusDistribution.in_progress}
             </Badge>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-green-500" />
-            <span className="text-xs text-muted-foreground">{t('common.done')}</span>
-            <Badge variant="outline" className="text-xs font-medium min-w-[2rem] justify-center bg-green-50 text-green-700 border-green-200">
+          <div className="flex items-center justify-between sm:justify-start gap-2 min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-1.5 md:gap-2 min-w-0 flex-1 sm:flex-initial">
+              <div className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
+              <span className="text-[10px] sm:text-[10px] md:text-xs text-muted-foreground truncate">{t('common.done')}</span>
+            </div>
+            <Badge variant="outline" className="text-[10px] sm:text-[10px] md:text-xs font-medium min-w-[1.75rem] sm:min-w-[1.75rem] md:min-w-[2rem] justify-center bg-green-50 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-400 dark:border-green-800 flex-shrink-0">
               {statusDistribution.done}
             </Badge>
           </div>

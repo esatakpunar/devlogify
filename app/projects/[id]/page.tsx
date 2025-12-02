@@ -33,7 +33,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     const tasks = await getTasks(id, supabase)
 
     return (
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <ProjectHeader project={project} userId={user.id} />
         <ProjectContent 
           projectId={id} 

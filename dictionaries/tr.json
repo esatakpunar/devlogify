@@ -144,6 +144,7 @@
     "createNewProject": "Yeni Proje Oluştur",
     "startNewProject": "Çalışmanızı organize etmek ve takip etmek için yeni bir proje başlatın",
     "projectName": "Proje Adı",
+    "projectNamePlaceholder": "Harika Projem",
     "description": "Açıklama",
     "whatIsThisProjectAbout": "Bu proje ne hakkında?",
     "status": "Durum",
@@ -215,6 +216,10 @@
     "separateTagsWithCommas": "Etiketleri virgülle ayırın",
     "creatingTask": "Oluşturuluyor...",
     "createTask": "Görev Oluştur",
+    "noTasksInStatus": "Bu durumda görev yok",
+    "todo": "Yapılacak",
+    "inProgress": "Devam Ediyor",
+    "done": "Tamamlandı",
     "quickStartFromTemplate": "Şablondan Hızlı Başlangıç",
     "browseTemplates": "Şablonlara Göz At",
     "selectATemplate": "Bir şablon seçin",
@@ -234,6 +239,8 @@
     "taskMarkedAsComplete": "Görev tamamlandı olarak işaretlendi!",
     "failedToMarkComplete": "Görev tamamlandı olarak işaretlenemedi",
     "editTask": "Görevi Düzenle",
+    "taskDetails": "Görev Detayları",
+    "viewTaskDetails": "Görev detaylarını görüntüle",
     "updateTaskDetails": "Görev detaylarınızı güncelleyin",
     "taskUpdatedSuccessfully": "Görev başarıyla güncellendi",
     "failedToUpdateTask": "Görev güncellenemedi",
@@ -305,7 +312,11 @@
     "failedToUpdateNote": "Not güncellenemedi",
     "editNote": "Notu Düzenle",
     "updateNote": "Notunuzu güncelleyin",
-    "untitled": "Başlıksız"
+    "untitled": "Başlıksız",
+    "markdownSupported": "Markdown desteklenir. Notları bağlamak için [[Not Başlığı]] kullanın.",
+    "edit": "Düzenle",
+    "preview": "Önizleme",
+    "split": "Bölünmüş"
   },
   "timer": {
     "start": "Başlat",
@@ -317,7 +328,12 @@
     "shortBreak": "Kısa Mola",
     "longBreak": "Uzun Mola",
     "completedPomodoros": "Tamamlanan Pomodoro",
-    "today": "Bugün"
+    "today": "Bugün",
+    "timeBlocking": "Zaman Bloklama",
+    "timeBlockingDescription": "Hafta için zaman bloklarınızı planlayın ve takip edin",
+    "timeBlock": "Zaman Bloğu",
+    "ongoing": "Devam Ediyor",
+    "failedToLoadTimeBlocks": "Zaman blokları yüklenemedi"
   },
   "pomodoro": {
     "title": "Pomodoro Zamanlayıcı",
@@ -531,7 +547,9 @@
     "createdProject": "Proje oluşturuldu",
     "createdNewNote": "Yeni not oluşturuldu",
     "performedAction": "Bir işlem gerçekleştirildi",
-    "unknown": "Bilinmeyen"
+    "unknown": "Bilinmeyen",
+    "groupBy": "Grupla:",
+    "date": "Tarih"
   },
   "auth": {
     "welcomeBack": "Tekrar hoş geldiniz",
@@ -685,5 +703,32 @@
       "security": "Güvenlik",
       "allRightsReserved": "Tüm hakları saklıdır."
     }
+  },
+  "sharing": {
+    "shareProject": "Projeyi Paylaş",
+    "createPublicLink": "Bu projeyi paylaşmak için genel bir link oluştur (salt okunur)",
+    "shareLink": "Paylaşım Linki",
+    "linkCopied": "Link panoya kopyalandı!",
+    "failedToCopyLink": "Link kopyalanamadı",
+    "shareLinkDeactivated": "Paylaşım linki devre dışı bırakıldı",
+    "failedToDeactivateLink": "Paylaşım linki devre dışı bırakılamadı",
+    "failedToCreateLink": "Paylaşım linki oluşturulamadı",
+    "setExpiryDate": "Son Kullanma Tarihi Belirle",
+    "linkWillExpire": "Link belirtilen gün sonra sona erecek",
+    "days": "gün",
+    "deactivateLink": "Linki Devre Dışı Bırak",
+    "creating": "Oluşturuluyor...",
+    "createShareLink": "Paylaşım Linki Oluştur",
+    "readOnly": "Salt Okunur",
+    "readOnlyView": "Bu salt okunur bir görünümdür. Görüntülenme: {count}",
+    "views": "Görüntülenme"
+  },
+  "export": {
+    "download": "İndir",
+    "exporting": "Dışa aktarılıyor...",
+    "downloadAsJSON": "JSON olarak indir",
+    "downloadAsCSV": "CSV olarak indir",
+    "failedToExportJSON": "JSON dışa aktarılamadı",
+    "failedToExportCSV": "CSV dışa aktarılamadı"
   }
 }

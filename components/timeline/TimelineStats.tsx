@@ -14,60 +14,62 @@ export function TimelineStats({ completedTasks, totalMinutes }: TimelineStatsPro
   const minutes = totalMinutes % 60
 
   return (
-    <div className="grid gap-4 md:grid-cols-4">
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600">{t('timeline.today')}</p>
-            <p className="text-2xl font-bold mt-2">{new Date().toLocaleDateString('en-US', { weekday: 'long' })}</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{t('timeline.today')}</p>
+            <p className="text-xl sm:text-2xl font-bold mt-1 sm:mt-2 dark:text-white truncate">
+              {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+            </p>
           </div>
-          <div className="w-12 h-12 bg-purple-50 rounded-lg flex items-center justify-center">
-            <Calendar className="w-6 h-6 text-purple-600" />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-50 dark:bg-purple-900/20 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+            <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600 dark:text-purple-400" />
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600">{t('timeline.completed')}</p>
-            <p className="text-2xl font-bold mt-2">{completedTasks}</p>
-            <p className="text-xs text-gray-500 mt-1">{t('timeline.tasksToday')}</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{t('timeline.completed')}</p>
+            <p className="text-xl sm:text-2xl font-bold mt-1 sm:mt-2 dark:text-white">{completedTasks}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('timeline.tasksToday')}</p>
           </div>
-          <div className="w-12 h-12 bg-green-50 rounded-lg flex items-center justify-center">
-            <CheckCircle2 className="w-6 h-6 text-green-600" />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-50 dark:bg-green-900/20 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+            <CheckCircle2 className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 dark:text-green-400" />
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600">{t('timeline.timeLogged')}</p>
-            <p className="text-2xl font-bold mt-2">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{t('timeline.timeLogged')}</p>
+            <p className="text-xl sm:text-2xl font-bold mt-1 sm:mt-2 dark:text-white">
               {hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`}
             </p>
-            <p className="text-xs text-gray-500 mt-1">{t('timeline.today')}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{t('timeline.today')}</p>
           </div>
-          <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
-            <Clock className="w-6 h-6 text-blue-600" />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+            <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600 dark:text-blue-400" />
           </div>
         </div>
       </div>
 
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
         <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-600">{t('timeline.productivity')}</p>
-            <p className="text-2xl font-bold mt-2">
+          <div className="flex-1 min-w-0">
+            <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{t('timeline.productivity')}</p>
+            <p className="text-xl sm:text-2xl font-bold mt-1 sm:mt-2 dark:text-white">
               {completedTasks > 0 ? '🔥' : '😴'}
             </p>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               {completedTasks > 0 ? t('timeline.onFire') : t('timeline.startWorking')}
             </p>
           </div>
-          <div className="w-12 h-12 bg-orange-50 rounded-lg flex items-center justify-center">
-            <TrendingUp className="w-6 h-6 text-orange-600" />
+          <div className="w-10 h-10 sm:w-12 sm:h-12 bg-orange-50 dark:bg-orange-900/20 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+            <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-orange-600 dark:text-orange-400" />
           </div>
         </div>
       </div>

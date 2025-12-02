@@ -144,6 +144,7 @@
     "createNewProject": "Neues Projekt erstellen",
     "startNewProject": "Starten Sie ein neues Projekt, um Ihre Arbeit zu organisieren und zu verfolgen",
     "projectName": "Projektname",
+    "projectNamePlaceholder": "Mein tolles Projekt",
     "description": "Beschreibung",
     "whatIsThisProjectAbout": "Worum geht es bei diesem Projekt?",
     "status": "Status",
@@ -216,6 +217,10 @@
     "separateTagsWithCommas": "Tags durch Kommas trennen",
     "creatingTask": "Wird erstellt...",
     "createTask": "Aufgabe erstellen",
+    "noTasksInStatus": "Keine Aufgaben in diesem Status",
+    "todo": "Zu erledigen",
+    "inProgress": "In Bearbeitung",
+    "done": "Erledigt",
     "quickStartFromTemplate": "Schnellstart aus Vorlage",
     "browseTemplates": "Vorlagen durchsuchen",
     "selectATemplate": "Wählen Sie eine Vorlage",
@@ -235,6 +240,8 @@
     "taskMarkedAsComplete": "Aufgabe als abgeschlossen markiert!",
     "failedToMarkComplete": "Aufgabe konnte nicht als abgeschlossen markiert werden",
     "editTask": "Aufgabe bearbeiten",
+    "taskDetails": "Aufgabendetails",
+    "viewTaskDetails": "Aufgabendetails anzeigen",
     "updateTaskDetails": "Aktualisieren Sie Ihre Aufgabendetails",
     "taskUpdatedSuccessfully": "Aufgabe erfolgreich aktualisiert",
     "failedToUpdateTask": "Aufgabe konnte nicht aktualisiert werden",
@@ -306,7 +313,11 @@
     "failedToUpdateNote": "Notiz konnte nicht aktualisiert werden",
     "editNote": "Notiz bearbeiten",
     "updateNote": "Aktualisieren Sie Ihre Notiz",
-    "untitled": "Ohne Titel"
+    "untitled": "Ohne Titel",
+    "markdownSupported": "Markdown wird unterstützt. Verwenden Sie [[Notiz-Titel]] zum Verlinken von Notizen.",
+    "edit": "Bearbeiten",
+    "preview": "Vorschau",
+    "split": "Geteilt"
   },
   "timer": {
     "start": "Starten",
@@ -318,7 +329,12 @@
     "shortBreak": "Kurze Pause",
     "longBreak": "Lange Pause",
     "completedPomodoros": "Abgeschlossene Pomodoros",
-    "today": "Heute"
+    "today": "Heute",
+    "timeBlocking": "Zeitblockierung",
+    "timeBlockingDescription": "Planen und verfolgen Sie Ihre Zeitblöcke für die Woche",
+    "timeBlock": "Zeitblock",
+    "ongoing": "Laufend",
+    "failedToLoadTimeBlocks": "Zeitblöcke konnten nicht geladen werden"
   },
   "pomodoro": {
     "title": "Pomodoro-Timer",
@@ -532,7 +548,9 @@
     "createdProject": "Projekt erstellt",
     "createdNewNote": "Neue Notiz erstellt",
     "performedAction": "Eine Aktion durchgeführt",
-    "unknown": "Unbekannt"
+    "unknown": "Unbekannt",
+    "groupBy": "Gruppieren nach:",
+    "date": "Datum"
   },
   "auth": {
     "welcomeBack": "Willkommen zurück",
@@ -686,5 +704,32 @@
       "security": "Sicherheit",
       "allRightsReserved": "Alle Rechte vorbehalten."
     }
+  },
+  "sharing": {
+    "shareProject": "Projekt teilen",
+    "createPublicLink": "Erstellen Sie einen öffentlichen Link, um dieses Projekt zu teilen (schreibgeschützt)",
+    "shareLink": "Teilen-Link",
+    "linkCopied": "Link in die Zwischenablage kopiert!",
+    "failedToCopyLink": "Link konnte nicht kopiert werden",
+    "shareLinkDeactivated": "Teilen-Link deaktiviert",
+    "failedToDeactivateLink": "Teilen-Link konnte nicht deaktiviert werden",
+    "failedToCreateLink": "Teilen-Link konnte nicht erstellt werden",
+    "setExpiryDate": "Ablaufdatum festlegen",
+    "linkWillExpire": "Link läuft nach angegebenen Tagen ab",
+    "days": "Tage",
+    "deactivateLink": "Link deaktivieren",
+    "creating": "Wird erstellt...",
+    "createShareLink": "Teilen-Link erstellen",
+    "readOnly": "Schreibgeschützt",
+    "readOnlyView": "Dies ist eine schreibgeschützte Ansicht. Aufrufe: {count}",
+    "views": "Aufrufe"
+  },
+  "export": {
+    "download": "Herunterladen",
+    "exporting": "Wird exportiert...",
+    "downloadAsJSON": "Als JSON herunterladen",
+    "downloadAsCSV": "Als CSV herunterladen",
+    "failedToExportJSON": "JSON konnte nicht exportiert werden",
+    "failedToExportCSV": "CSV konnte nicht exportiert werden"
   }
 }

@@ -35,7 +35,7 @@ async function ProjectsList({ status, userId }: { status: string; userId: string
   })
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
       {sortedProjects.map((project, index) => (
         <ProjectCard key={project.id} project={project} index={index} userId={userId} />
       ))}
@@ -53,7 +53,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
   if (!user) return null
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Header */}
       <ProjectsHeader userId={user.id} />
 

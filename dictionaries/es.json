@@ -144,6 +144,7 @@
     "createNewProject": "Crear Nuevo Proyecto",
     "startNewProject": "Inicia un nuevo proyecto para organizar y rastrear tu trabajo",
     "projectName": "Nombre del Proyecto",
+    "projectNamePlaceholder": "Mi Proyecto Genial",
     "description": "Descripción",
     "whatIsThisProjectAbout": "¿De qué trata este proyecto?",
     "status": "Estado",
@@ -215,6 +216,10 @@
     "separateTagsWithCommas": "Separa las etiquetas con comas",
     "creatingTask": "Creando...",
     "createTask": "Crear Tarea",
+    "noTasksInStatus": "No hay tareas en este estado",
+    "todo": "Por hacer",
+    "inProgress": "En progreso",
+    "done": "Hecho",
     "quickStartFromTemplate": "Inicio Rápido desde Plantilla",
     "browseTemplates": "Explorar Plantillas",
     "selectATemplate": "Selecciona una plantilla",
@@ -234,6 +239,8 @@
     "taskMarkedAsComplete": "¡Tarea marcada como completa!",
     "failedToMarkComplete": "Error al marcar tarea como completa",
     "editTask": "Editar Tarea",
+    "taskDetails": "Detalles de la Tarea",
+    "viewTaskDetails": "Ver detalles de la tarea",
     "updateTaskDetails": "Actualiza los detalles de tu tarea",
     "taskUpdatedSuccessfully": "Tarea actualizada exitosamente",
     "failedToUpdateTask": "Error al actualizar tarea",
@@ -305,7 +312,11 @@
     "failedToUpdateNote": "Error al actualizar nota",
     "editNote": "Editar Nota",
     "updateNote": "Actualiza tu nota",
-    "untitled": "Sin título"
+    "untitled": "Sin título",
+    "markdownSupported": "Markdown soportado. Usa [[Título de Nota]] para vincular notas.",
+    "edit": "Editar",
+    "preview": "Vista previa",
+    "split": "Dividido"
   },
   "timer": {
     "start": "Iniciar",
@@ -317,7 +328,12 @@
     "shortBreak": "Descanso Corto",
     "longBreak": "Descanso Largo",
     "completedPomodoros": "Pomodoros Completados",
-    "today": "Hoy"
+    "today": "Hoy",
+    "timeBlocking": "Bloqueo de Tiempo",
+    "timeBlockingDescription": "Planifica y rastrea tus bloques de tiempo para la semana",
+    "timeBlock": "Bloque de Tiempo",
+    "ongoing": "En Curso",
+    "failedToLoadTimeBlocks": "Error al cargar bloques de tiempo"
   },
   "pomodoro": {
     "title": "Temporizador Pomodoro",
@@ -531,7 +547,9 @@
     "createdProject": "Proyecto creado",
     "createdNewNote": "Nueva nota creada",
     "performedAction": "Acción realizada",
-    "unknown": "Desconocido"
+    "unknown": "Desconocido",
+    "groupBy": "Agrupar por:",
+    "date": "Fecha"
   },
   "auth": {
     "welcomeBack": "Bienvenido de nuevo",
@@ -685,5 +703,32 @@
       "security": "Seguridad",
       "allRightsReserved": "Todos los derechos reservados."
     }
+  },
+  "sharing": {
+    "shareProject": "Compartir Proyecto",
+    "createPublicLink": "Crear un enlace público para compartir este proyecto (solo lectura)",
+    "shareLink": "Enlace de Compartir",
+    "linkCopied": "¡Enlace copiado al portapapeles!",
+    "failedToCopyLink": "Error al copiar enlace",
+    "shareLinkDeactivated": "Enlace de compartir desactivado",
+    "failedToDeactivateLink": "Error al desactivar enlace de compartir",
+    "failedToCreateLink": "Error al crear enlace de compartir",
+    "setExpiryDate": "Establecer Fecha de Expiración",
+    "linkWillExpire": "El enlace expirará después de los días especificados",
+    "days": "días",
+    "deactivateLink": "Desactivar Enlace",
+    "creating": "Creando...",
+    "createShareLink": "Crear Enlace de Compartir",
+    "readOnly": "Solo Lectura",
+    "readOnlyView": "Esta es una vista de solo lectura. Visualizaciones: {count}",
+    "views": "Visualizaciones"
+  },
+  "export": {
+    "download": "Descargar",
+    "exporting": "Exportando...",
+    "downloadAsJSON": "Descargar como JSON",
+    "downloadAsCSV": "Descargar como CSV",
+    "failedToExportJSON": "Error al exportar JSON",
+    "failedToExportCSV": "Error al exportar CSV"
   }
 }

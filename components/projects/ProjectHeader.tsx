@@ -1,6 +1,6 @@
 'use client'
 
-import { ArrowLeft, Settings, MoreVertical, Edit, Archive, Trash } from 'lucide-react'
+import { ArrowLeft, Settings, MoreVertical, Edit, Archive, Trash, Share2 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
@@ -16,6 +16,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { EditProjectDialog } from './EditProjectDialog'
+import { ShareDialog } from './ShareDialog'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface ProjectHeaderProps {
@@ -32,6 +33,7 @@ interface ProjectHeaderProps {
 export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
   const [loading, setLoading] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const router = useRouter()
   const supabase = createClient()
   const t = useTranslation()
@@ -74,44 +76,105 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
   }
 
   return (
-    <div className="space-y-4">
-      <Link href="/projects">
-        <Button variant="ghost" size="sm">
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          {t('projects.backToProjects')}
-        </Button>
-      </Link>
+    <div className="space-y-3 sm:space-y-4">
+      {/* Mobile: Compact back button, Desktop: Full button */}
+      <div className="flex items-center justify-between gap-2 md:block">
+        <Link href="/projects" className="md:w-auto">
+          <Button variant="ghost" size="sm" className="w-auto md:w-auto">
+            <ArrowLeft className="w-4 h-4 md:mr-2" />
+            <span className="hidden md:inline">{t('projects.backToProjects')}</span>
+          </Button>
+        </Link>
+        {/* Mobile: Show action buttons in header for better UX */}
+        <div className="flex items-center gap-1 md:hidden">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            disabled={loading}
+            onClick={() => setShareDialogOpen(true)}
+            className="h-8 w-8"
+          >
+            <Share2 className="w-4 h-4" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon"
+            disabled={loading}
+            onClick={() => setEditDialogOpen(true)}
+            className="h-8 w-8"
+          >
+            <Edit className="w-4 h-4" />
+          </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" disabled={loading} className="h-8 w-8">
+                <MoreVertical className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setEditDialogOpen(true)}>
+                <Settings className="w-4 h-4 mr-2" />
+                {t('projects.projectSettings')}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleArchive}>
+                <Archive className="w-4 h-4 mr-2" />
+                {t('projects.archiveProject')}
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={handleDelete} className="text-red-600">
+                <Trash className="w-4 h-4 mr-2" />
+                {t('projects.deleteProject')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
 
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-start gap-4 min-w-0 flex-1">
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+        <div className="flex items-start gap-3 sm:gap-4 min-w-0 flex-1">
           <div 
-            className="w-12 h-12 rounded-lg flex-shrink-0" 
+            className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex-shrink-0" 
             style={{ backgroundColor: project.color }}
           />
           <div className="min-w-0 flex-1">
-            <h1 className="text-3xl font-bold break-words">{project.title}</h1>
+            <h1 className="text-2xl sm:text-3xl font-bold break-words dark:text-white">{project.title}</h1>
             {project.description && (
-              <p className="text-gray-600 dark:text-gray-400 mt-2 break-words overflow-wrap-anywhere">
+              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1 sm:mt-2 break-words overflow-wrap-anywhere">
                 {project.description}
               </p>
             )}
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Desktop: Show action buttons */}
+        <div className="hidden md:flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          <Button 
+            variant="outline" 
+            disabled={loading}
+            onClick={() => setShareDialogOpen(true)}
+            size="sm"
+            className="flex-1 sm:flex-initial text-xs sm:text-sm"
+          >
+            <Share2 className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+            <span className="hidden sm:inline">Share</span>
+          </Button>
+          
           <Button 
             variant="outline" 
             disabled={loading}
             onClick={() => setEditDialogOpen(true)}
+            size="sm"
+            className="flex-1 sm:flex-initial text-xs sm:text-sm"
           >
-            <Edit className="w-4 h-4 mr-2" />
-            {t('common.edit')}
+            <Edit className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
+            <span className="hidden sm:inline">{t('common.edit')}</span>
+            <span className="sm:hidden">{t('common.edit')}</span>
           </Button>
 
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" disabled={loading}>
-                <MoreVertical className="h-5 w-5" />
+              <Button variant="ghost" size="icon" disabled={loading} className="h-9 w-9 sm:h-10 sm:w-10">
+                <MoreVertical className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -147,6 +210,14 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
         onProjectUpdated={() => {
           router.refresh()
         }}
+      />
+      
+      <ShareDialog
+        open={shareDialogOpen}
+        onOpenChange={setShareDialogOpen}
+        resourceType="project"
+        resourceId={project.id}
+        userId={userId}
       />
     </div>
   )
