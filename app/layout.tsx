@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { LanguageHtml } from "@/components/providers/LanguageHtml";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,11 +21,13 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className} suppressHydrationWarning>
-        <ThemeProvider>
-          <DashboardLayout>
-            {children}
-          </DashboardLayout>
-        </ThemeProvider>
+        <ErrorBoundary>
+          <ThemeProvider>
+            <DashboardLayout>
+              {children}
+            </DashboardLayout>
+          </ThemeProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

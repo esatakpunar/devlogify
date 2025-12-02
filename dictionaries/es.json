@@ -38,7 +38,14 @@
     "done": "Hecho",
     "total": "total",
     "tryAgain": "Intentar de Nuevo",
-    "refresh": "Actualizar"
+    "refresh": "Actualizar",
+    "retry": "Reintentar",
+    "reloadPage": "Recargar Página",
+    "goHome": "Ir al Inicio",
+    "somethingWentWrong": "Algo salió mal",
+    "errorDetails": "Detalles del Error (Solo Desarrollo)",
+    "draftSaved": "Borrador guardado",
+    "anUnexpectedErrorOccurred": "Ocurrió un error inesperado. Por favor, intenta actualizar la página."
   },
   "nav": {
     "dashboard": "Panel",
@@ -156,6 +163,20 @@
     "failedToCreateProject": "Error al crear proyecto",
     "noStatusProjects": "Aún no hay proyectos {status}",
     "getStartedByCreating": "Comienza creando tu primer proyecto para rastrear tu trabajo",
+    "noStatusProjectsDescription": "No se encontraron proyectos {status}. Crea un nuevo proyecto para comenzar.",
+    "titleValidationMin": "El título debe tener al menos 3 caracteres",
+    "titleValidationMax": "El título debe tener menos de 100 caracteres",
+    "fixErrorsBeforeSubmit": "Por favor, corrige los errores antes de enviar",
+    "exampleProjectsTitle": "Proyectos de ejemplo para comenzar:",
+    "exampleProjectWebApp": "Desarrollo de Aplicación Web",
+    "exampleProjectMarketing": "Campaña de Marketing",
+    "exampleProjectProduct": "Ideas de Producto",
+    "emptyStateTips": {
+      "organizeWork": "Organiza tu trabajo en proyectos para un mejor seguimiento",
+      "trackTime": "Rastrea el tiempo dedicado a cada proyecto",
+      "setGoals": "Establece objetivos y hitos del proyecto",
+      "collaborate": "Colabora compartiendo proyectos con tu equipo"
+    },
     "editProject": "Editar Proyecto",
     "updateProjectDetails": "Actualiza los detalles de tu proyecto",
     "archivedProjectsWontShow": "Los proyectos archivados no se mostrarán en tu lista de proyectos activos",
@@ -730,5 +751,24 @@
     "downloadAsCSV": "Descargar como CSV",
     "failedToExportJSON": "Error al exportar JSON",
     "failedToExportCSV": "Error al exportar CSV"
+  },
+  "commandPalette": {
+    "placeholder": "Escribe un comando o busca...",
+    "noResults": "No se encontraron resultados.",
+    "quickActions": "Acciones Rápidas",
+    "navigation": "Navegación",
+    "createTasksWithAI": "Crear Tareas con IA",
+    "createNewTask": "Crear Nueva Tarea",
+    "createNewNote": "Crear Nueva Nota",
+    "createNewProject": "Crear Nuevo Proyecto",
+    "goToDashboard": "Ir al Panel",
+    "goToProjects": "Ir a Proyectos",
+    "goToNotes": "Ir a Notas",
+    "goToAnalytics": "Ir a Análisis",
+    "goToTimeline": "Ir a Línea de Tiempo",
+    "goToSettings": "Ir a Configuración",
+    "projects": "Proyectos",
+    "recentTasks": "Tareas Recientes",
+    "recentNotes": "Notas Recientes"
   }
 }

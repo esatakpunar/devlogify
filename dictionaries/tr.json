@@ -38,7 +38,14 @@
     "done": "Tamamlandı",
     "total": "toplam",
     "tryAgain": "Tekrar Dene",
-    "refresh": "Yenile"
+    "refresh": "Yenile",
+    "retry": "Tekrar Dene",
+    "reloadPage": "Sayfayı Yenile",
+    "goHome": "Ana Sayfaya Git",
+    "somethingWentWrong": "Bir şeyler yanlış gitti",
+    "errorDetails": "Hata Detayları (Sadece Geliştirme)",
+    "draftSaved": "Taslak kaydedildi",
+    "anUnexpectedErrorOccurred": "Beklenmeyen bir hata oluştu. Lütfen sayfayı yenilemeyi deneyin."
   },
   "nav": {
     "dashboard": "Kontrol Paneli",
@@ -156,6 +163,20 @@
     "failedToCreateProject": "Proje oluşturulamadı",
     "noStatusProjects": "Henüz {status} proje yok",
     "getStartedByCreating": "Çalışmanızı takip etmek için ilk projenizi oluşturarak başlayın",
+    "noStatusProjectsDescription": "{status} proje bulunamadı. Başlamak için yeni bir proje oluşturun.",
+    "titleValidationMin": "Başlık en az 3 karakter olmalıdır",
+    "titleValidationMax": "Başlık 100 karakterden az olmalıdır",
+    "fixErrorsBeforeSubmit": "Göndermeden önce hataları düzeltin",
+    "exampleProjectsTitle": "Başlamanız için örnek projeler:",
+    "exampleProjectWebApp": "Web Uygulaması Geliştirme",
+    "exampleProjectMarketing": "Pazarlama Kampanyası",
+    "exampleProjectProduct": "Ürün Fikirleri",
+    "emptyStateTips": {
+      "organizeWork": "Daha iyi takip için çalışmanızı projelere organize edin",
+      "trackTime": "Her projede harcanan süreyi takip edin",
+      "setGoals": "Proje hedefleri ve kilometre taşları belirleyin",
+      "collaborate": "Projeleri ekibinizle paylaşarak işbirliği yapın"
+    },
     "editProject": "Projeyi Düzenle",
     "updateProjectDetails": "Proje detaylarınızı güncelleyin",
     "archivedProjectsWontShow": "Arşivlenen projeler aktif projeler listenizde görünmez",
@@ -730,5 +751,24 @@
     "downloadAsCSV": "CSV olarak indir",
     "failedToExportJSON": "JSON dışa aktarılamadı",
     "failedToExportCSV": "CSV dışa aktarılamadı"
+  },
+  "commandPalette": {
+    "placeholder": "Bir komut yazın veya arayın...",
+    "noResults": "Sonuç bulunamadı.",
+    "quickActions": "Hızlı İşlemler",
+    "navigation": "Navigasyon",
+    "createTasksWithAI": "AI ile Görev Oluştur",
+    "createNewTask": "Yeni Görev Oluştur",
+    "createNewNote": "Yeni Not Oluştur",
+    "createNewProject": "Yeni Proje Oluştur",
+    "goToDashboard": "Kontrol Paneline Git",
+    "goToProjects": "Projelere Git",
+    "goToNotes": "Notlara Git",
+    "goToAnalytics": "Analitik'e Git",
+    "goToTimeline": "Zaman Çizelgesine Git",
+    "goToSettings": "Ayarlara Git",
+    "projects": "Projeler",
+    "recentTasks": "Son Görevler",
+    "recentNotes": "Son Notlar"
   }
 }

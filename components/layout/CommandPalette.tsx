@@ -18,6 +18,9 @@ import { AICreateTasksDialog } from '@/components/tasks/AICreateTasksDialog'
 import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 import { FolderKanban, FileText, CheckSquare, Sparkles, Plus, Search } from 'lucide-react'
 import { usePremium } from '@/lib/hooks/usePremium'
+import { staleWhileRevalidate, cacheKey, CACHE_TTL } from '@/lib/utils/cache'
+import { KeyboardHint } from '@/components/ui/KeyboardHint'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface CommandPaletteProps {
   open: boolean
@@ -28,6 +31,7 @@ interface CommandPaletteProps {
 export function CommandPalette({ open, onOpenChange, userId }: CommandPaletteProps) {
   const { isPremium } = usePremium(userId)
   const router = useRouter()
+  const t = useTranslation()
   const [projects, setProjects] = useState<any[]>([])
   const [tasks, setTasks] = useState<any[]>([])
   const [notes, setNotes] = useState<any[]>([])
@@ -44,10 +48,23 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
   const loadData = async () => {
     setLoading(true)
     try {
+      // Use stale-while-revalidate pattern for better UX
       const [projectsData, tasksData, notesData] = await Promise.all([
-        getProjects(userId, 'active'),
-        getRecentIncompleteTasks(userId, 10),
-        getNotes(userId),
+        staleWhileRevalidate(
+          cacheKey('command-palette', 'projects', userId),
+          () => getProjects(userId, 'active'),
+          CACHE_TTL.PROJECTS
+        ),
+        staleWhileRevalidate(
+          cacheKey('command-palette', 'tasks', userId),
+          () => getRecentIncompleteTasks(userId, 10),
+          CACHE_TTL.TASKS
+        ),
+        staleWhileRevalidate(
+          cacheKey('command-palette', 'notes', userId),
+          () => getNotes(userId),
+          CACHE_TTL.NOTES
+        ),
       ])
       setProjects(projectsData || [])
       setTasks(tasksData || [])
@@ -118,63 +135,68 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
   return (
     <>
     <CommandDialog open={open} onOpenChange={onOpenChange}>
-      <CommandInput placeholder="Type a command or search..." />
+      <div className="relative">
+        <CommandInput placeholder={t('commandPalette.placeholder')} />
+        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
+          <KeyboardHint shortcutId="command-palette" size="sm" />
+        </div>
+      </div>
       <CommandList>
         {loading && (
           <div className="p-4 text-center text-sm text-gray-500">
-            Loading...
+            {t('common.loading')}
           </div>
         )}
         
-        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandEmpty>{t('commandPalette.noResults')}</CommandEmpty>
 
         {/* Quick Actions */}
-        <CommandGroup heading="Quick Actions">
+        <CommandGroup heading={t('commandPalette.quickActions')}>
           <CommandItem value="create:ai-task" onSelect={handleSelect}>
             <Sparkles className="mr-2 h-4 w-4" />
-            <span>Create Tasks with AI</span>
+            <span>{t('commandPalette.createTasksWithAI')}</span>
           </CommandItem>
           <CommandItem value="create:task" onSelect={handleSelect}>
             <Plus className="mr-2 h-4 w-4" />
-            <span>Create New Task</span>
+            <span>{t('commandPalette.createNewTask')}</span>
           </CommandItem>
           <CommandItem value="create:note" onSelect={handleSelect}>
             <FileText className="mr-2 h-4 w-4" />
-            <span>Create New Note</span>
+            <span>{t('commandPalette.createNewNote')}</span>
           </CommandItem>
           <CommandItem value="create:project" onSelect={handleSelect}>
             <FolderKanban className="mr-2 h-4 w-4" />
-            <span>Create New Project</span>
+            <span>{t('commandPalette.createNewProject')}</span>
           </CommandItem>
         </CommandGroup>
 
         <CommandSeparator />
 
         {/* Navigation */}
-        <CommandGroup heading="Navigation">
+        <CommandGroup heading={t('commandPalette.navigation')}>
           <CommandItem value="nav:/dashboard" onSelect={handleSelect}>
             <Search className="mr-2 h-4 w-4" />
-            <span>Go to Dashboard</span>
+            <span>{t('commandPalette.goToDashboard')}</span>
           </CommandItem>
           <CommandItem value="nav:/projects" onSelect={handleSelect}>
             <FolderKanban className="mr-2 h-4 w-4" />
-            <span>Go to Projects</span>
+            <span>{t('commandPalette.goToProjects')}</span>
           </CommandItem>
           <CommandItem value="nav:/notes" onSelect={handleSelect}>
             <FileText className="mr-2 h-4 w-4" />
-            <span>Go to Notes</span>
+            <span>{t('commandPalette.goToNotes')}</span>
           </CommandItem>
           <CommandItem value="nav:/analytics" onSelect={handleSelect}>
             <Search className="mr-2 h-4 w-4" />
-            <span>Go to Analytics</span>
+            <span>{t('commandPalette.goToAnalytics')}</span>
           </CommandItem>
           <CommandItem value="nav:/timeline" onSelect={handleSelect}>
             <Search className="mr-2 h-4 w-4" />
-            <span>Go to Timeline</span>
+            <span>{t('commandPalette.goToTimeline')}</span>
           </CommandItem>
           <CommandItem value="nav:/settings" onSelect={handleSelect}>
             <Search className="mr-2 h-4 w-4" />
-            <span>Go to Settings</span>
+            <span>{t('commandPalette.goToSettings')}</span>
           </CommandItem>
         </CommandGroup>
 
@@ -182,7 +204,7 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
         {projects.length > 0 && (
           <>
             <CommandSeparator />
-            <CommandGroup heading="Projects">
+            <CommandGroup heading={t('commandPalette.projects')}>
               {projects.slice(0, 5).map((project) => (
                 <CommandItem
                   key={project.id}
@@ -204,7 +226,7 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
         {tasks.length > 0 && (
           <>
             <CommandSeparator />
-            <CommandGroup heading="Recent Tasks">
+            <CommandGroup heading={t('commandPalette.recentTasks')}>
               {tasks.slice(0, 5).map((task) => (
                 <CommandItem
                   key={task.id}
@@ -228,7 +250,7 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
         {notes.length > 0 && (
           <>
             <CommandSeparator />
-            <CommandGroup heading="Recent Notes">
+            <CommandGroup heading={t('commandPalette.recentNotes')}>
               {notes.slice(0, 5).map((note) => (
                 <CommandItem
                   key={note.id}

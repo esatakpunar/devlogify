@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useGlobalSearch } from '@/lib/hooks/useGlobalSearch'
+import { useDebounce } from '@/lib/hooks/useDebounce'
 import {
   Dialog,
   DialogContent,
@@ -27,6 +28,7 @@ export function GlobalSearch({ open, onOpenChange, userId }: GlobalSearchProps) 
   const router = useRouter()
   const { query, results, loading, search, clear } = useGlobalSearch(userId)
   const [searchQuery, setSearchQuery] = useState('')
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
 
   useEffect(() => {
     if (open) {
@@ -42,17 +44,13 @@ export function GlobalSearch({ open, onOpenChange, userId }: GlobalSearchProps) 
       return
     }
     
-    const timeoutId = setTimeout(() => {
-      if (searchQuery.trim()) {
-        search(searchQuery)
-        saveSearchHistory(searchQuery, 'task') // Could be more specific
-      } else {
-        clear()
-      }
-    }, 300) // Debounce
-
-    return () => clearTimeout(timeoutId)
-  }, [searchQuery, open, search, clear])
+    if (debouncedSearchQuery.trim()) {
+      search(debouncedSearchQuery)
+      saveSearchHistory(debouncedSearchQuery, 'task') // Could be more specific
+    } else {
+      clear()
+    }
+  }, [debouncedSearchQuery, open, search, clear])
 
   const handleSelect = (result: any) => {
     router.push(result.url)

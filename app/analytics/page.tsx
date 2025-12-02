@@ -18,11 +18,20 @@ export default async function AnalyticsPage() {
 
   if (!user) return null
 
-  const weeklyStats = await getWeeklyStats(user.id)
-  const dailyTime = await getDailyTimeForWeek(user.id)
-  const projectDistribution = await getProjectTimeDistribution(user.id)
-  const mostProductiveDay = await getMostProductiveDay(user.id)
-  const avgTaskDuration = await getAverageTaskDuration(user.id)
+  // Fetch all analytics data in parallel
+  const [
+    weeklyStats,
+    dailyTime,
+    projectDistribution,
+    mostProductiveDay,
+    avgTaskDuration
+  ] = await Promise.all([
+    getWeeklyStats(user.id),
+    getDailyTimeForWeek(user.id),
+    getProjectTimeDistribution(user.id),
+    getMostProductiveDay(user.id),
+    getAverageTaskDuration(user.id)
+  ])
 
   return (
     <AnalyticsPageContent

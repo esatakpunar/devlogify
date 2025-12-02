@@ -10,15 +10,22 @@ export default async function DashboardPage() {
 
   if (!user) return null
 
-  // Fetch actual stats
-  const projectCount = await getProjectCount(user.id, 'active', supabase)
-  const todayStats = await getTodayStats(user.id)
-  const weeklyStats = await getWeeklyStats(user.id)
-
-  // Fetch dashboard data
-  const recentTasks = await getRecentIncompleteTasks(user.id, 5, supabase)
-  const todayCompletedTasks = await getTodayCompletedTasks(user.id, supabase)
-  const pinnedProjects = await getPinnedProjects(user.id, supabase)
+  // Fetch all dashboard data in parallel to reduce total load time
+  const [
+    projectCount,
+    todayStats,
+    weeklyStats,
+    recentTasks,
+    todayCompletedTasks,
+    pinnedProjects
+  ] = await Promise.all([
+    getProjectCount(user.id, 'active', supabase),
+    getTodayStats(user.id),
+    getWeeklyStats(user.id),
+    getRecentIncompleteTasks(user.id, 5, supabase),
+    getTodayCompletedTasks(user.id, supabase),
+    getPinnedProjects(user.id, supabase)
+  ])
 
   return (
     <DashboardContent

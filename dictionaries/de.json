@@ -38,7 +38,14 @@
     "done": "Erledigt",
     "total": "gesamt",
     "tryAgain": "Erneut versuchen",
-    "refresh": "Aktualisieren"
+    "refresh": "Aktualisieren",
+    "retry": "Wiederholen",
+    "reloadPage": "Seite neu laden",
+    "goHome": "Zur Startseite",
+    "somethingWentWrong": "Etwas ist schief gelaufen",
+    "errorDetails": "Fehlerdetails (Nur Entwicklung)",
+    "draftSaved": "Entwurf gespeichert",
+    "anUnexpectedErrorOccurred": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie, die Seite zu aktualisieren."
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -156,6 +163,20 @@
     "failedToCreateProject": "Projekt konnte nicht erstellt werden",
     "noStatusProjects": "Noch keine {status} Projekte",
     "getStartedByCreating": "Beginnen Sie, indem Sie Ihr erstes Projekt erstellen, um Ihre Arbeit zu verfolgen",
+    "noStatusProjectsDescription": "Keine {status} Projekte gefunden. Erstellen Sie ein neues Projekt, um zu beginnen.",
+    "titleValidationMin": "Der Titel muss mindestens 3 Zeichen lang sein",
+    "titleValidationMax": "Der Titel muss weniger als 100 Zeichen lang sein",
+    "fixErrorsBeforeSubmit": "Bitte beheben Sie die Fehler vor dem Absenden",
+    "exampleProjectsTitle": "Beispielprojekte zum Einstieg:",
+    "exampleProjectWebApp": "Web-App-Entwicklung",
+    "exampleProjectMarketing": "Marketing-Kampagne",
+    "exampleProjectProduct": "Produktideen",
+    "emptyStateTips": {
+      "organizeWork": "Organisieren Sie Ihre Arbeit in Projekten für besseres Tracking",
+      "trackTime": "Verfolgen Sie die Zeit, die für jedes Projekt aufgewendet wird",
+      "setGoals": "Legen Sie Projektziele und Meilensteine fest",
+      "collaborate": "Arbeiten Sie zusammen, indem Sie Projekte mit Ihrem Team teilen"
+    },
     "editProject": "Projekt bearbeiten",
     "updateProjectDetails": "Aktualisieren Sie Ihre Projektdetails",
     "archivedProjectsWontShow": "Archivierte Projekte werden nicht in Ihrer aktiven Projektliste angezeigt",
@@ -731,5 +752,24 @@
     "downloadAsCSV": "Als CSV herunterladen",
     "failedToExportJSON": "JSON konnte nicht exportiert werden",
     "failedToExportCSV": "CSV konnte nicht exportiert werden"
+  },
+  "commandPalette": {
+    "placeholder": "Befehl eingeben oder suchen...",
+    "noResults": "Keine Ergebnisse gefunden.",
+    "quickActions": "Schnellaktionen",
+    "navigation": "Navigation",
+    "createTasksWithAI": "Aufgaben mit KI erstellen",
+    "createNewTask": "Neue Aufgabe erstellen",
+    "createNewNote": "Neue Notiz erstellen",
+    "createNewProject": "Neues Projekt erstellen",
+    "goToDashboard": "Zum Dashboard gehen",
+    "goToProjects": "Zu Projekten gehen",
+    "goToNotes": "Zu Notizen gehen",
+    "goToAnalytics": "Zu Analysen gehen",
+    "goToTimeline": "Zur Zeitachse gehen",
+    "goToSettings": "Zu Einstellungen gehen",
+    "projects": "Projekte",
+    "recentTasks": "Letzte Aufgaben",
+    "recentNotes": "Letzte Notizen"
   }
 }
