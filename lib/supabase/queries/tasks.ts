@@ -156,9 +156,32 @@ export async function updateTaskProgress(id: string, progress: number) {
 export async function updateTasksOrder(taskUpdates: { id: string; order_index: number }[]) {
   const supabase = createBrowserClient()
   
-  // For now, we'll disable batch updates to avoid multiple requests
-  // This function is kept for future optimization
-  return []
+  if (taskUpdates.length === 0) {
+    return []
+  }
+
+  // Update all tasks in parallel
+  const updatePromises = taskUpdates.map(({ id, order_index }) =>
+    supabase
+      .from('tasks')
+      .update({ order_index })
+      .eq('id', id)
+      .select()
+      .single()
+  )
+
+  const results = await Promise.all(updatePromises)
+  
+  // Check for errors
+  for (let i = 0; i < results.length; i++) {
+    const result = results[i]
+    if (result.error) {
+      console.error(`Error updating task ${taskUpdates[i].id} order:`, result.error)
+      throw result.error
+    }
+  }
+
+  return results.map(r => r.data).filter(Boolean) as Task[]
 }
 
 /**

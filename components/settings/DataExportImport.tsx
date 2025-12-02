@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label'
 import { Download, Upload, FileText, History, AlertCircle } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { usePremium } from '@/lib/hooks/usePremium'
+import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 import {
   exportAllData,
   exportAnalyticsToCSV,
@@ -35,6 +37,8 @@ interface DataExportImportProps {
 export function DataExportImport({ userId }: DataExportImportProps) {
   const router = useRouter()
   const t = useTranslation()
+  const { isPremium } = usePremium(userId)
+  const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
   const [exportOptions, setExportOptions] = useState({
     includeProjects: true,
     includeTasks: true,
@@ -46,6 +50,11 @@ export function DataExportImport({ userId }: DataExportImportProps) {
   const [exportHistory, setExportHistory] = useState(getExportHistory())
 
   const handleExport = async () => {
+    if (!isPremium) {
+      setUpgradeDialogOpen(true)
+      return
+    }
+
     setExporting(true)
     try {
       const [projects, notes] = await Promise.all([
@@ -80,6 +89,11 @@ export function DataExportImport({ userId }: DataExportImportProps) {
   }
 
   const handleExportCSV = async () => {
+    if (!isPremium) {
+      setUpgradeDialogOpen(true)
+      return
+    }
+
     setExporting(true)
     try {
       const projects = await getProjects(userId)
@@ -297,6 +311,11 @@ export function DataExportImport({ userId }: DataExportImportProps) {
           </div>
         )}
       </div>
+      <UpgradeDialog
+        open={upgradeDialogOpen}
+        onOpenChange={setUpgradeDialogOpen}
+        feature="Share & Export"
+      />
     </div>
   )
 }

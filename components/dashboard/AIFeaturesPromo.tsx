@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Sparkles, Brain, Calendar, Zap, Layers, ArrowRight } from 'lucide-react'
+import { Sparkles, Brain, Calendar, Zap, Layers, ArrowRight, Share2 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -43,6 +43,11 @@ export function AIFeaturesPromo({ userId }: AIFeaturesPromoProps) {
       icon: Layers,
       title: t('dashboard.aiFeatures.smartGrouping'),
       description: t('dashboard.aiFeatures.smartGroupingDescription'),
+    },
+    {
+      icon: Share2,
+      title: t('premium.shareAndExport'),
+      description: t('premium.shareAndExportDescription'),
     },
   ]
 

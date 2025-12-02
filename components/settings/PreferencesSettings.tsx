@@ -12,7 +12,8 @@ import {
 } from '@/components/ui/select'
 import { Moon, Sun, Monitor, Globe, Languages } from 'lucide-react'
 import { toast } from 'sonner'
-import { getProfile, updateProfile, createProfile, Profile } from '@/lib/supabase/queries/profiles'
+import { updateProfile, createProfile, Profile } from '@/lib/supabase/queries/profiles'
+import { useUserProfileStore } from '@/lib/store/userProfileStore'
 import { useLanguage } from '@/components/providers/LanguageProvider'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { localeNames, localeFlags, type Locale } from '@/lib/i18n/config'
@@ -24,6 +25,7 @@ interface PreferencesSettingsProps {
 export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
   const { locale, setLocale } = useLanguage()
   const t = useTranslation()
+  const { profile: storeProfile, fetchProfile } = useUserProfileStore()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [theme, setTheme] = useState<'light' | 'dark' | 'system'>('system')
   const [notifications, setNotifications] = useState(true)
@@ -34,28 +36,44 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
 
   useEffect(() => {
     const loadProfile = async () => {
+      // First try to get from store
+      if (storeProfile && storeProfile.id === userId) {
+        setProfile(storeProfile)
+        setTheme(storeProfile.theme)
+        setNotifications(storeProfile.notifications_enabled)
+        setWeekStartsOn(storeProfile.week_starts_on)
+        setTimezone(storeProfile.timezone)
+        applyTheme(storeProfile.theme)
+        setInitialLoading(false)
+        return
+      }
+
+      // If not in store, fetch it (shouldn't happen if DashboardLayout loaded properly)
       try {
-        const userProfile = await getProfile(userId)
-        if (userProfile) {
-          setProfile(userProfile)
-          setTheme(userProfile.theme)
-          setNotifications(userProfile.notifications_enabled)
-          setWeekStartsOn(userProfile.week_starts_on)
-          setTimezone(userProfile.timezone)
-          
-          // Apply theme immediately
-          applyTheme(userProfile.theme)
-        } else {
-          // Fallback to localStorage for existing users
-          const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' || 'system'
-          const savedNotifications = localStorage.getItem('notifications') !== 'false'
-          const savedWeekStart = localStorage.getItem('weekStartsOn') as 'monday' | 'sunday' || 'monday'
-          
-          setTheme(savedTheme)
-          setNotifications(savedNotifications)
-          setWeekStartsOn(savedWeekStart)
-          applyTheme(savedTheme)
-        }
+        await fetchProfile(userId)
+        // Wait a bit for store to update, then check again
+        setTimeout(() => {
+          const updatedProfile = useUserProfileStore.getState().profile
+          if (updatedProfile && updatedProfile.id === userId) {
+            setProfile(updatedProfile)
+            setTheme(updatedProfile.theme)
+            setNotifications(updatedProfile.notifications_enabled)
+            setWeekStartsOn(updatedProfile.week_starts_on)
+            setTimezone(updatedProfile.timezone)
+            applyTheme(updatedProfile.theme)
+          } else {
+            // Fallback to localStorage for existing users
+            const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | 'system' || 'system'
+            const savedNotifications = localStorage.getItem('notifications') !== 'false'
+            const savedWeekStart = localStorage.getItem('weekStartsOn') as 'monday' | 'sunday' || 'monday'
+            
+            setTheme(savedTheme)
+            setNotifications(savedNotifications)
+            setWeekStartsOn(savedWeekStart)
+            applyTheme(savedTheme)
+          }
+          setInitialLoading(false)
+        }, 100)
       } catch (error) {
         console.error('Failed to load profile:', error)
         // Fallback to localStorage
@@ -67,13 +85,12 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
         setNotifications(savedNotifications)
         setWeekStartsOn(savedWeekStart)
         applyTheme(savedTheme)
-      } finally {
         setInitialLoading(false)
       }
     }
 
     loadProfile()
-  }, [userId])
+  }, [userId, storeProfile, fetchProfile])
 
   const applyTheme = (newTheme: 'light' | 'dark' | 'system') => {
     const root = window.document.documentElement
@@ -90,13 +107,15 @@ export function PreferencesSettings({ userId }: PreferencesSettingsProps) {
   const updateProfileSetting = async (updates: Partial<Profile>) => {
     setLoading(true)
     try {
+      let updatedProfile: Profile
       if (profile) {
-        const updatedProfile = await updateProfile(userId, updates)
-        setProfile(updatedProfile)
+        updatedProfile = await updateProfile(userId, updates)
       } else {
-        const newProfile = await createProfile(userId, '', '', updates)
-        setProfile(newProfile)
+        updatedProfile = await createProfile(userId, '', '', updates)
       }
+      setProfile(updatedProfile)
+      // Update store
+      useUserProfileStore.getState().setProfile(updatedProfile)
     } catch (error) {
       console.error('Failed to update profile:', error)
       throw error

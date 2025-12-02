@@ -6,6 +6,7 @@ import { useDroppable } from '@dnd-kit/core'
 import { cn } from '@/lib/utils'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 
 type Task = {
   id: string
@@ -202,31 +203,50 @@ export function KanbanColumn({
       <div 
         ref={setNodeRef}
         className={cn(
-          "flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500 transition-colors",
-          isOver && "bg-blue-50 dark:bg-blue-900/20 border-2 border-dashed border-blue-300 dark:border-blue-700 rounded-lg"
+          "flex-1 overflow-y-auto pr-2 space-y-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 dark:scrollbar-thumb-gray-600 dark:scrollbar-track-gray-800 hover:scrollbar-thumb-gray-400 dark:hover:scrollbar-thumb-gray-500 transition-all duration-200",
+          isOver && "bg-blue-50 dark:bg-blue-900/30 border-2 border-dashed border-blue-400 dark:border-blue-600 rounded-lg shadow-inner"
         )}
       >
         {tasks.length === 0 ? (
-          <div className={cn(
-            "border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center transition-colors",
-            isOver && "border-blue-300 dark:border-blue-700 bg-blue-50 dark:bg-blue-900/20"
-          )}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className={cn(
+              "border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-lg p-8 text-center transition-all duration-200",
+              isOver && "border-blue-400 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/30 scale-105"
+            )}
+          >
             <p className="text-sm text-gray-500 dark:text-gray-400">
               {isOver ? t('kanban.dropTaskHere') || "Drop task here" : t('tasks.noTasks')}
             </p>
-          </div>
+          </motion.div>
         ) : (
-          tasks.map((task) => (
-            <TaskCard 
-              key={task.id} 
-              task={task}
-              userId={userId}
-              onTaskUpdated={onTaskUpdated}
-              onTaskDeleted={onTaskDeleted}
-              onClick={onTaskClick ? () => onTaskClick(task) : undefined}
-              readOnly={readOnly}
-            />
-          ))
+          <AnimatePresence mode="popLayout">
+            {tasks.map((task, index) => (
+              <motion.div
+                key={task.id}
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.8, y: -20 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 350,
+                  damping: 25,
+                }}
+                className="relative"
+              >
+                <TaskCard 
+                  task={task}
+                  userId={userId}
+                  onTaskUpdated={onTaskUpdated}
+                  onTaskDeleted={onTaskDeleted}
+                  onClick={onTaskClick ? () => onTaskClick(task) : undefined}
+                  readOnly={readOnly}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         )}
       </div>
     </div>

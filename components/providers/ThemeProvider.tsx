@@ -2,9 +2,11 @@
 
 import { useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { getProfile } from '@/lib/supabase/queries/profiles'
+import { useUserProfileStore } from '@/lib/store/userProfileStore'
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const { profile } = useUserProfileStore()
+
   useEffect(() => {
     const initializeTheme = async () => {
       try {
@@ -12,23 +14,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
         const savedTheme = localStorage.getItem('theme') || 'system'
         applyTheme(savedTheme as 'light' | 'dark' | 'system')
 
-        // Then, try to get theme from database and sync
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        
-        if (user) {
-          try {
-            const profile = await getProfile(user.id)
-            if (profile && profile.theme) {
-              // Database'deki theme'i kullan ve localStorage'ı senkronize et
-              const dbTheme = profile.theme
-              localStorage.setItem('theme', dbTheme)
-              applyTheme(dbTheme)
-            }
-          } catch (error) {
-            // Profile yoksa veya hata varsa localStorage'dan devam et
-            console.warn('Could not load theme from database, using localStorage:', error)
-          }
+        // Then, try to get theme from store profile and sync
+        if (profile && profile.theme) {
+          // Database'deki theme'i kullan ve localStorage'ı senkronize et
+          const dbTheme = profile.theme
+          localStorage.setItem('theme', dbTheme)
+          applyTheme(dbTheme)
         }
       } catch (error) {
         // Fallback to localStorage
@@ -73,7 +64,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       window.removeEventListener('themechange', handleThemeChange as EventListener)
       mediaQuery.removeEventListener('change', handleSystemThemeChange)
     }
-  }, [])
+  }, [profile])
 
   const applyTheme = (theme: 'light' | 'dark' | 'system') => {
     const root = window.document.documentElement

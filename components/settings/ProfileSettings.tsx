@@ -7,7 +7,8 @@ import { Label } from '@/components/ui/label'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { toast } from 'sonner'
 import { User } from '@supabase/supabase-js'
-import { getProfile, updateProfile, createProfile, Profile } from '@/lib/supabase/queries/profiles'
+import { updateProfile, createProfile, Profile } from '@/lib/supabase/queries/profiles'
+import { useUserProfileStore } from '@/lib/store/userProfileStore'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface ProfileSettingsProps {
@@ -15,6 +16,7 @@ interface ProfileSettingsProps {
 }
 
 export function ProfileSettings({ user }: ProfileSettingsProps) {
+  const { profile: storeProfile, fetchProfile } = useUserProfileStore()
   const [profile, setProfile] = useState<Profile | null>(null)
   const [fullName, setFullName] = useState('')
   const [loading, setLoading] = useState(false)
@@ -23,26 +25,39 @@ export function ProfileSettings({ user }: ProfileSettingsProps) {
 
   useEffect(() => {
     const loadProfile = async () => {
+      // First try to get from store
+      if (storeProfile && storeProfile.id === user.id) {
+        setProfile(storeProfile)
+        setFullName(storeProfile.full_name || '')
+        setInitialLoading(false)
+        return
+      }
+
+      // If not in store, fetch it (shouldn't happen if DashboardLayout loaded properly)
       try {
-        const userProfile = await getProfile(user.id)
-        if (userProfile) {
-          setProfile(userProfile)
-          setFullName(userProfile.full_name || '')
-        } else {
-          // Fallback to user metadata if profile doesn't exist yet
-          setFullName(user.user_metadata?.full_name || '')
-        }
+        await fetchProfile(user.id)
+        // Wait a bit for store to update, then check again
+        setTimeout(() => {
+          const updatedProfile = useUserProfileStore.getState().profile
+          if (updatedProfile && updatedProfile.id === user.id) {
+            setProfile(updatedProfile)
+            setFullName(updatedProfile.full_name || '')
+          } else {
+            // Fallback to user metadata if profile doesn't exist yet
+            setFullName(user.user_metadata?.full_name || '')
+          }
+          setInitialLoading(false)
+        }, 100)
       } catch (error) {
         console.error('Failed to load profile:', error)
         // Fallback to user metadata
         setFullName(user.user_metadata?.full_name || '')
-      } finally {
         setInitialLoading(false)
       }
     }
 
     loadProfile()
-  }, [user.id, user.user_metadata?.full_name])
+  }, [user.id, user.user_metadata?.full_name, storeProfile, fetchProfile])
 
   const getInitials = (email: string) => {
     return email.charAt(0).toUpperCase()
@@ -53,16 +68,19 @@ export function ProfileSettings({ user }: ProfileSettingsProps) {
     setLoading(true)
 
     try {
+      let updatedProfile: Profile
       if (profile) {
         // Update existing profile
-        const updatedProfile = await updateProfile(user.id, {
+        updatedProfile = await updateProfile(user.id, {
           full_name: fullName
         })
-        setProfile(updatedProfile)
       } else {
-        const newProfile = await createProfile(user.id, user.email || '', fullName)
-        setProfile(newProfile)
+        updatedProfile = await createProfile(user.id, user.email || '', fullName)
       }
+      
+      setProfile(updatedProfile)
+      // Update store
+      useUserProfileStore.getState().setProfile(updatedProfile)
 
       toast.success(t('profile.profileUpdatedSuccessfully'))
     } catch (error: any) {

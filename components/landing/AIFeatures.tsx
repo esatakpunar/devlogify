@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Brain, Calendar, Sparkles, Layers, Zap, Mail } from 'lucide-react'
+import { Brain, Calendar, Sparkles, Layers, Zap, Mail, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { useTranslation } from '@/lib/i18n/useTranslation'
@@ -34,6 +34,11 @@ export function AIFeatures() {
       icon: Zap,
       title: t('premium.aiTagSuggestions'),
       description: t('premium.aiTagSuggestionsDescription'),
+    },
+    {
+      icon: Share2,
+      title: t('premium.shareAndExport'),
+      description: t('premium.shareAndExportDescription'),
     },
   ]
   

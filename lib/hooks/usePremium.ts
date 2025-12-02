@@ -1,37 +1,21 @@
-import { useState, useEffect } from 'react'
-import { getProfile } from '@/lib/supabase/queries/profiles'
-import { User } from '@supabase/supabase-js'
+import { useUserProfileStore } from '@/lib/store/userProfileStore'
 
 /**
  * Hook to check if user has premium subscription (client-side)
+ * Reads from global userProfileStore - profile should be fetched once on login in DashboardLayout
+ * This hook does NOT trigger fetches - it only reads from store
  * @param userId - User ID to check
  * @returns { isPremium: boolean, loading: boolean }
  */
 export function usePremium(userId: string | undefined) {
-  const [isPremium, setIsPremium] = useState(false)
-  const [loading, setLoading] = useState(true)
+  const { isPremium, isLoading, profile } = useUserProfileStore()
 
-  useEffect(() => {
-    if (!userId) {
-      setLoading(false)
-      return
-    }
+  // Only return premium status if profile exists and matches userId
+  const isValid = userId && profile && profile.id === userId
 
-    const checkPremium = async () => {
-      try {
-        const profile = await getProfile(userId)
-        setIsPremium(profile?.is_premium ?? false)
-      } catch (error) {
-        console.error('Error checking premium status:', error)
-        setIsPremium(false)
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    checkPremium()
-  }, [userId])
-
-  return { isPremium, loading }
+  return { 
+    isPremium: isValid ? isPremium : false, 
+    loading: userId ? isLoading : false 
+  }
 }
 

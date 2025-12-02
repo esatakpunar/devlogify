@@ -2,7 +2,8 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { getProfile, updateProfile } from '@/lib/supabase/queries/profiles'
+import { updateProfile } from '@/lib/supabase/queries/profiles'
+import { useUserProfileStore } from '@/lib/store/userProfileStore'
 import type { Locale } from '@/lib/i18n/config'
 import { getBrowserLocale, defaultLocale, isValidLocale } from '@/lib/i18n/config'
 
@@ -17,6 +18,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 export function LanguageProvider({ children, userId }: { children: React.ReactNode; userId?: string }) {
   const [locale, setLocaleState] = useState<Locale>(defaultLocale)
   const [loading, setLoading] = useState(true)
+  const { profile } = useUserProfileStore()
 
   // Initialize locale from profile or browser
   useEffect(() => {
@@ -29,32 +31,27 @@ export function LanguageProvider({ children, userId }: { children: React.ReactNo
           setLoading(false)
         }
 
-        // Then, try to get from database if user is logged in
-        if (userId) {
-          try {
-            const profile = await getProfile(userId)
-            if (profile?.language && isValidLocale(profile.language)) {
-              const dbLocale = profile.language
-              setLocaleState(dbLocale)
-              localStorage.setItem('locale', dbLocale)
-            } else {
-              // No language in profile, use browser language
-              const browserLocale = getBrowserLocale()
-              setLocaleState(browserLocale)
-              localStorage.setItem('locale', browserLocale)
-              
-              // Save browser locale to profile
-              if (profile) {
-                await updateProfile(userId, { language: browserLocale })
-              }
-            }
-          } catch (error) {
-            console.warn('Could not load language from database:', error)
-            // Fallback to browser locale
+        // Then, try to get from store profile if user is logged in
+        if (userId && profile && profile.id === userId) {
+          if (profile.language && isValidLocale(profile.language)) {
+            const dbLocale = profile.language
+            setLocaleState(dbLocale)
+            localStorage.setItem('locale', dbLocale)
+          } else {
+            // No language in profile, use browser language
             const browserLocale = getBrowserLocale()
             setLocaleState(browserLocale)
             localStorage.setItem('locale', browserLocale)
+            
+            // Save browser locale to profile
+            await updateProfile(userId, { language: browserLocale })
           }
+        } else if (userId) {
+          // User is logged in but profile not loaded yet, wait a bit
+          // This will be handled when profile loads in DashboardLayout
+          const browserLocale = getBrowserLocale()
+          setLocaleState(browserLocale)
+          localStorage.setItem('locale', browserLocale)
         } else {
           // Not logged in, use browser locale
           const browserLocale = getBrowserLocale()
@@ -72,7 +69,7 @@ export function LanguageProvider({ children, userId }: { children: React.ReactNo
     }
 
     initializeLocale()
-  }, [userId])
+  }, [userId, profile])
 
   // Update locale (both state and database)
   const setLocale = useCallback(async (newLocale: Locale) => {

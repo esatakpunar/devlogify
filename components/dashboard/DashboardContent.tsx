@@ -1,10 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { FolderKanban, Clock, CheckCircle2, TrendingUp } from 'lucide-react'
+import { FolderKanban, Clock, CheckCircle2, TrendingUp, Zap, Calendar, Target } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { AnimatedCard } from '@/components/ui/AnimatedCard'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { RecentTasks } from '@/components/dashboard/RecentTasks'
 import { TodayCompleted } from '@/components/dashboard/TodayCompleted'
 import { PinnedProjects } from '@/components/dashboard/PinnedProjects'
@@ -16,6 +17,7 @@ import { MobileTimer } from '@/components/timer/MobileTimer'
 import { AIFeaturesPromo } from '@/components/dashboard/AIFeaturesPromo'
 import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { cn } from '@/lib/utils'
 import type { ProjectWithTasks } from '@/lib/supabase/queries/projects'
 import type { TaskWithProject } from '@/lib/supabase/queries/tasks'
 
@@ -113,18 +115,22 @@ export function DashboardContent({
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Enhanced */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         {stats.map((stat, index) => (
           <AnimatedCard key={stat.title} delay={index * 0.1}>
-            <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 sm:p-6 hover:shadow-lg transition-shadow">
+            <div className="bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800 p-4 sm:p-6 hover:shadow-lg hover:scale-[1.02] transition-all duration-200 cursor-pointer">
               <div className="flex items-center justify-between">
                 <div className="flex-1 min-w-0">
                   <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{stat.title}</p>
                   <p className="text-xl sm:text-2xl font-bold mt-1 sm:mt-2 dark:text-white truncate">{stat.value}</p>
                 </div>
-                <div className={`w-10 h-10 sm:w-12 sm:h-12 ${stat.bgColor} rounded-lg flex items-center justify-center flex-shrink-0 ml-2`}>
-                  <stat.icon className={`w-5 h-5 sm:w-6 sm:h-6 ${stat.iconColor}`} />
+                <div className={cn(
+                  "w-10 h-10 sm:w-12 sm:h-12 rounded-lg flex items-center justify-center flex-shrink-0 ml-2",
+                  stat.bgColor,
+                  "transition-transform duration-200 group-hover:scale-110"
+                )}>
+                  <stat.icon className={cn("w-5 h-5 sm:w-6 sm:h-6", stat.iconColor)} />
                 </div>
               </div>
             </div>
@@ -132,29 +138,67 @@ export function DashboardContent({
         ))}
       </div>
 
+      {/* Quick Access Section */}
+      <Card className="border-2">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Zap className="w-5 h-5 text-yellow-500" />
+            {t('dashboard.quickAccess') || 'Quick Access'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Desktop Timer */}
+            <div className="hidden md:block">
+              <PomodoroTimer />
+            </div>
+            
+            {/* Mobile Timer */}
+            <div className="md:hidden">
+              <MobileTimer />
+            </div>
+            
+            <QuickTimerCard userId={user.id} />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Today Section */}
+      <Card>
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Calendar className="w-5 h-5 text-blue-500" />
+            {t('dashboard.today') || 'Today'}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <RecentTasks tasks={recentTasks || []} userId={user.id} />
+            <TodayCompleted tasks={todayCompletedTasks || []} />
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Main Dashboard Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        {/* Left Column */}
-        <div className="space-y-4 sm:space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        {/* Left Column - Primary Actions */}
+        <div className="lg:col-span-2 space-y-4 sm:space-y-6">
           <DailyStandup userId={user.id} />
-          <RecentTasks tasks={recentTasks || []} userId={user.id} />
-          <TodayCompleted tasks={todayCompletedTasks || []} />
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2 text-lg">
+                <Target className="w-5 h-5 text-green-500" />
+                {t('dashboard.projects') || 'Projects'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <PinnedProjects projects={pinnedProjects || []} userId={user.id} />
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Right Column */}
+        {/* Right Column - Secondary Info */}
         <div className="space-y-4 sm:space-y-6">
-          {/* Desktop Timer */}
-          <div className="hidden md:block">
-            <PomodoroTimer />
-          </div>
-          
-          {/* Mobile Timer */}
-          <div className="md:hidden">
-            <MobileTimer />
-          </div>
-          
-          <QuickTimerCard userId={user.id} />
-          <PinnedProjects projects={pinnedProjects || []} userId={user.id} />
           <AIFeaturesPromo userId={user.id} />
           <TaskSuggestions userId={user.id} />
         </div>

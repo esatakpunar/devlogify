@@ -14,6 +14,7 @@ import { GlobalSearch } from '@/components/search/GlobalSearch'
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts'
 import { LanguageProvider } from '@/components/providers/LanguageProvider'
 import { LanguageHtml } from '@/components/providers/LanguageHtml'
+import { useUserProfileStore } from '@/lib/store/userProfileStore'
 import { Toaster } from 'sonner'
 
 export function DashboardLayout({
@@ -29,6 +30,7 @@ export function DashboardLayout({
   const router = useRouter()
   const pathname = usePathname()
   const supabase = createClient()
+  const { fetchProfile, clearProfile } = useUserProfileStore()
 
   // Don't use dashboard layout for auth pages, landing page, and share pages
   const isAuthPage = pathname?.startsWith('/login') || 
@@ -42,12 +44,35 @@ export function DashboardLayout({
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user && !isAuthPage && !isLandingPage && !isSharePage) {
+        clearProfile()
         router.push('/login')
       } else {
         setUser(user)
+        // Fetch profile once when user is logged in
+        if (user?.id) {
+          fetchProfile(user.id)
+        }
       }
     }
     getUser()
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        clearProfile()
+        setUser(null)
+      } else if (event === 'SIGNED_IN' && session?.user) {
+        setUser(session.user)
+        if (session.user.id) {
+          fetchProfile(session.user.id)
+        }
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router, supabase.auth, isAuthPage, isLandingPage, isSharePage])
 
   // Keyboard shortcuts

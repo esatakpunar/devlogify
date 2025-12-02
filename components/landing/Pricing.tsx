@@ -44,6 +44,7 @@ export function Pricing() {
         t('premium.aiTaskGeneration'),
         t('premium.smartTaskGrouping'),
         t('premium.aiTagSuggestions'),
+        t('premium.shareAndExport'),
       ],
       cta: t('landing.pricing.startFreeTrial'),
       popular: true,

@@ -19,6 +19,7 @@ import {
   useSensor,
   useSensors,
   DragOverEvent,
+  closestCenter,
 } from '@dnd-kit/core'
 import { updateTaskStatus, updateTasksOrder } from '@/lib/supabase/queries/tasks'
 import { logActivity } from '@/lib/supabase/queries/activities'
@@ -86,14 +87,15 @@ export function KanbanBoard({
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 12,
+        delay: 100,
       },
     })
   )
 
-  const todoTasks = tasks.filter(t => t.status === 'todo')
-  const inProgressTasks = tasks.filter(t => t.status === 'in_progress')
-  const doneTasks = tasks.filter(t => t.status === 'done')
+  const todoTasks = tasks.filter(t => t.status === 'todo').sort((a, b) => a.order_index - b.order_index)
+  const inProgressTasks = tasks.filter(t => t.status === 'in_progress').sort((a, b) => a.order_index - b.order_index)
+  const doneTasks = tasks.filter(t => t.status === 'done').sort((a, b) => a.order_index - b.order_index)
 
   const updateTasks = (newTasks: Task[]) => {
     setTasks(newTasks)
@@ -160,6 +162,8 @@ export function KanbanBoard({
         })
         updateTasks(updatedTasks)
       }
+      // Same-column reordering is disabled to avoid multiple database requests
+      // Only cross-column movement is supported
     }
   }
 
@@ -219,6 +223,44 @@ export function KanbanBoard({
         toast.error(t('tasks.failedToUpdateTask'))
       }
     } else {
+      // Dropping over another task - only handle cross-column movement
+      const overTask = tasks.find(t => t.id === overId)
+      if (!overTask) return
+
+      if (activeTask.status !== overTask.status) {
+        // Cross-column movement
+        const newStatus = overTask.status as 'todo' | 'in_progress' | 'done'
+        try {
+          const updatedTask = { 
+            ...activeTask, 
+            status: newStatus,
+            ...(newStatus === 'done' ? { progress: 100 } : {})
+          }
+          const updatedTasks = tasks.map(t => t.id === activeId ? updatedTask : t)
+          updateTasks(updatedTasks)
+
+          await updateTaskStatus(activeId, newStatus)
+          
+          await logActivity(
+            userId,
+            activeTask.project_id,
+            activeTask.id,
+            newStatus === 'done' ? 'task_completed' : 'task_status_changed',
+            { 
+              old_status: activeTask.status,
+              new_status: newStatus,
+              task_title: activeTask.title
+            }
+          )
+
+          toast.success(t('tasks.taskMarkedAsComplete'))
+        } catch (error) {
+          console.error('Failed to update task status:', error)
+          const revertedTasks = tasks.map(t => t.id === activeId ? activeTask : t)
+          updateTasks(revertedTasks)
+          toast.error(t('tasks.failedToUpdateTask'))
+        }
+      }
       // Same-column reordering is disabled to avoid multiple database requests
       // Only cross-column movement is supported
     }
@@ -227,6 +269,7 @@ export function KanbanBoard({
   return (
     <DndContext
       sensors={sensors}
+      collisionDetection={closestCenter}
       onDragStart={handleDragStart}
       onDragOver={handleDragOver}
       onDragEnd={handleDragEnd}
@@ -340,8 +383,25 @@ export function KanbanBoard({
 
       <DragOverlay>
         {activeTask ? (
-          <div className="border-2 border-dashed rounded-lg p-4 bg-white shadow-lg opacity-90">
-            <h4 className="font-semibold text-sm">{activeTask.title}</h4>
+          <div className="border rounded-lg p-3 bg-white dark:bg-gray-800 shadow-lg opacity-95 cursor-grabbing">
+            <div className="flex items-start justify-between mb-2">
+              <h4 className="font-semibold text-sm dark:text-gray-200">{activeTask.title}</h4>
+            </div>
+            {activeTask.description && (
+              <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mb-2">
+                {activeTask.description}
+              </p>
+            )}
+            <div className="flex items-center gap-2 text-[10px] text-gray-500 dark:text-gray-400">
+              {activeTask.actual_duration > 0 && (
+                <span>{activeTask.actual_duration}m</span>
+              )}
+              {activeTask.priority && (
+                <span className="px-1.5 py-0.5 rounded bg-gray-100 dark:bg-gray-700">
+                  {t(`common.${activeTask.priority}`)}
+                </span>
+              )}
+            </div>
           </div>
         ) : null}
       </DragOverlay>

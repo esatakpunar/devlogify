@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { Sparkles, Check, Zap, Brain, Calendar, Layers } from 'lucide-react'
+import { Sparkles, Check, Zap, Brain, Calendar, Layers, Share2, Download } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface UpgradeDialogProps {
@@ -45,6 +45,11 @@ export function UpgradeDialog({ open, onOpenChange, feature }: UpgradeDialogProp
       icon: Zap,
       title: t('premium.aiTagSuggestions'),
       description: t('premium.aiTagSuggestionsDescription'),
+    },
+    {
+      icon: Share2,
+      title: t('premium.shareAndExport'),
+      description: t('premium.shareAndExportDescription'),
     },
   ]
   return (
@@ -118,6 +123,7 @@ export function UpgradeDialog({ open, onOpenChange, feature }: UpgradeDialogProp
                   <li>• {t('premium.unlimitedAITaskSuggestions')}</li>
                   <li>• {t('premium.dailyStandupSummaries')}</li>
                   <li>• {t('premium.smartTaskGroupingAndOrganization')}</li>
+                  <li>• {t('premium.shareAndExport')}</li>
                   <li>• {t('premium.prioritySupport')}</li>
                 </ul>
               </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Sparkles, Brain, Calendar, Zap, Layers, Check, Crown } from 'lucide-react'
+import { Sparkles, Brain, Calendar, Zap, Layers, Check, Crown, Share2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { usePremium } from '@/lib/hooks/usePremium'
@@ -42,6 +42,11 @@ export function PremiumSettings({ userId }: PremiumSettingsProps) {
       icon: Zap,
       title: t('premium.aiTagSuggestions'),
       description: t('premium.aiTagSuggestionsDescription'),
+    },
+    {
+      icon: Share2,
+      title: t('premium.shareAndExport'),
+      description: t('premium.shareAndExportDescription'),
     },
   ]
 
@@ -154,6 +159,10 @@ export function PremiumSettings({ userId }: PremiumSettingsProps) {
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-purple-600" />
                 {t('premium.smartTaskGroupingAndOrganization')}
+              </li>
+              <li className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-purple-600" />
+                {t('premium.shareAndExport')}
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-purple-600" />

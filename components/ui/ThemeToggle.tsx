@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { Sun, Moon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { createClient } from '@/lib/supabase/client'
-import { getProfile, updateProfile, createProfile } from '@/lib/supabase/queries/profiles'
+import { updateProfile } from '@/lib/supabase/queries/profiles'
+import { useUserProfileStore } from '@/lib/store/userProfileStore'
 
 interface ThemeToggleProps {
   userId?: string
@@ -15,6 +16,7 @@ interface ThemeToggleProps {
 export function ThemeToggle({ userId, variant = 'ghost', size = 'icon' }: ThemeToggleProps) {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
   const [loading, setLoading] = useState(false)
+  const { profile } = useUserProfileStore()
 
   useEffect(() => {
     // Get current theme from localStorage
@@ -45,27 +47,18 @@ export function ThemeToggle({ userId, variant = 'ghost', size = 'icon' }: ThemeT
     // Dispatch custom event to notify ThemeProvider
     window.dispatchEvent(new CustomEvent('themechange', { detail: { theme: newTheme } }))
 
-    // Update in database if userId is provided
-    if (userId) {
+    // Update in database if userId is provided and profile exists
+    if (userId && profile && profile.id === userId) {
       setLoading(true)
       try {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        
-        if (user) {
-          try {
-            const profile = await getProfile(user.id)
-            if (profile) {
-              await updateProfile(user.id, { theme: newTheme })
-            } else {
-              await createProfile(user.id, user.email || '', '', { theme: newTheme })
-            }
-          } catch (error) {
-            console.error('Failed to update theme in database:', error)
-          }
-        }
+        await updateProfile(userId, { theme: newTheme })
+        // Update store profile
+        useUserProfileStore.getState().setProfile({
+          ...profile,
+          theme: newTheme
+        })
       } catch (error) {
-        console.error('Failed to update theme:', error)
+        console.error('Failed to update theme in database:', error)
       } finally {
         setLoading(false)
       }

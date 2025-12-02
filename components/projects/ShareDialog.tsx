@@ -16,6 +16,8 @@ import { Copy, ExternalLink, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { getShareUrl, copyToClipboard } from '@/lib/utils/sharing'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { usePremium } from '@/lib/hooks/usePremium'
+import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 
 interface ShareDialogProps {
   open: boolean
@@ -36,6 +38,8 @@ export function ShareDialog({
   const [loading, setLoading] = useState(false)
   const [hasExpiry, setHasExpiry] = useState(false)
   const [expiryDays, setExpiryDays] = useState(7)
+  const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
+  const { isPremium } = usePremium(userId)
   const t = useTranslation()
 
   useEffect(() => {
@@ -46,6 +50,11 @@ export function ShareDialog({
   }, [open])
 
   const createShareLink = async () => {
+    if (!isPremium) {
+      setUpgradeDialogOpen(true)
+      return
+    }
+
     setLoading(true)
     try {
       // Calculate expiry date if needed
@@ -251,6 +260,11 @@ export function ShareDialog({
           )}
         </div>
       </DialogContent>
+      <UpgradeDialog
+        open={upgradeDialogOpen}
+        onOpenChange={setUpgradeDialogOpen}
+        feature="Share & Export"
+      />
     </Dialog>
   )
 }

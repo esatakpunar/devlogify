@@ -18,6 +18,8 @@ import {
 import { EditProjectDialog } from './EditProjectDialog'
 import { ShareDialog } from './ShareDialog'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { usePremium } from '@/lib/hooks/usePremium'
+import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 
 interface ProjectHeaderProps {
   project: {
@@ -34,9 +36,19 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
   const [loading, setLoading] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
+  const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
+  const { isPremium } = usePremium(userId)
   const router = useRouter()
   const supabase = createClient()
   const t = useTranslation()
+
+  const handleShareClick = () => {
+    if (!isPremium) {
+      setUpgradeDialogOpen(true)
+      return
+    }
+    setShareDialogOpen(true)
+  }
 
   const handleArchive = async () => {
     if (!confirm(t('projects.areYouSureArchiveProject'))) return
@@ -91,7 +103,7 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
             variant="ghost" 
             size="icon"
             disabled={loading}
-            onClick={() => setShareDialogOpen(true)}
+            onClick={handleShareClick}
             className="h-8 w-8"
           >
             <Share2 className="w-4 h-4" />
@@ -151,7 +163,7 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
           <Button 
             variant="outline" 
             disabled={loading}
-            onClick={() => setShareDialogOpen(true)}
+            onClick={handleShareClick}
             size="sm"
             className="flex-1 sm:flex-initial text-xs sm:text-sm"
           >
@@ -218,6 +230,11 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
         resourceType="project"
         resourceId={project.id}
         userId={userId}
+      />
+      <UpgradeDialog
+        open={upgradeDialogOpen}
+        onOpenChange={setUpgradeDialogOpen}
+        feature="Share & Export"
       />
     </div>
   )

@@ -69,8 +69,6 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
   const [localTask, setLocalTask] = useState(task)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isTimeDialogOpen, setIsTimeDialogOpen] = useState(false)
-  const [mouseDownPos, setMouseDownPos] = useState<{ x: number; y: number } | null>(null)
-  const [hasMoved, setHasMoved] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const { taskId, isRunning, elapsed, startTimer, stopTimer, formatTime } = useTimer()
   const t = useTranslation()
@@ -85,7 +83,13 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    isDragging,
+  } = useDraggable({
     id: task.id,
     disabled: readOnly || isMobile,
   })
@@ -243,81 +247,6 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
     transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
   } : undefined
 
-  useEffect(() => {
-    // Reset hasMoved when dragging ends
-    if (!isDragging && hasMoved) {
-      const timer = setTimeout(() => {
-        setHasMoved(false)
-        setMouseDownPos(null)
-      }, 100)
-      return () => clearTimeout(timer)
-    }
-  }, [isDragging, hasMoved])
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    // Store mouse down position to detect drag vs click
-    setMouseDownPos({ x: e.clientX, y: e.clientY })
-    setHasMoved(false)
-    
-    // Apply drag listeners if not read-only and not clicking on interactive elements
-    const target = e.target as HTMLElement
-    if (!readOnly && listeners && !target.closest('button') && !target.closest('[role="menuitem"]')) {
-      // Use a small delay to allow click to register first
-      const timer = setTimeout(() => {
-        if (listeners?.onPointerDown && !hasMoved) {
-          listeners.onPointerDown(e as any)
-        }
-      }, 10)
-      
-      // Clear timer if component unmounts
-      return () => clearTimeout(timer)
-    }
-  }
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    // Track if mouse moved (indicating a drag)
-    if (mouseDownPos) {
-      const deltaX = Math.abs(e.clientX - mouseDownPos.x)
-      const deltaY = Math.abs(e.clientY - mouseDownPos.y)
-      if (deltaX > 5 || deltaY > 5) {
-        setHasMoved(true)
-      }
-    }
-  }
-
-  const handleMouseUp = (e: React.MouseEvent) => {
-    // Don't open modal if this was a drag
-    if (hasMoved || isDragging) {
-      setMouseDownPos(null)
-      setHasMoved(false)
-      return
-    }
-
-    // Don't open modal if clicking on buttons or dropdown
-    const target = e.target as HTMLElement
-    if (
-      target.closest('button') ||
-      target.closest('[role="menuitem"]') ||
-      target.closest('[role="menu"]')
-    ) {
-      setMouseDownPos(null)
-      return
-    }
-
-    // Small delay to ensure drag detection is complete
-    setTimeout(() => {
-      if (!hasMoved && !isDragging) {
-        // If onClick prop is provided, use it, otherwise open edit dialog
-        if (onClick) {
-          onClick()
-        } else {
-          setIsEditDialogOpen(true)
-        }
-      }
-      setMouseDownPos(null)
-      setHasMoved(false)
-    }, 50)
-  }
 
   return (
     <>
@@ -325,15 +254,12 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
         ref={setNodeRef}
         style={style}
         className={cn(
-          "border rounded-lg p-3 hover:shadow-md dark:hover:shadow-lg transition-all duration-200 group",
+          "border rounded-lg p-3 hover:shadow-md dark:hover:shadow-lg transition-all duration-200 group relative",
           statusStyles[localTask.status],
           isTimerActive && 'border-l-4 border-l-blue-500 shadow-blue-100 dark:shadow-blue-900/50 shadow-md',
-          isDragging && 'opacity-50 border-dashed border-2',
-          !readOnly && 'cursor-pointer'
+          isDragging && 'opacity-0 pointer-events-none',
+          !readOnly && !isMobile && 'cursor-grab active:cursor-grabbing'
         )}
-        onMouseDown={!isMobile ? handleMouseDown : undefined}
-        onMouseMove={!isMobile ? handleMouseMove : undefined}
-        onMouseUp={!isMobile ? handleMouseUp : undefined}
         onClick={(e) => {
           e.stopPropagation()
           
@@ -358,8 +284,8 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
             return
           }
           
-          // On desktop, check if it was a drag
-          if (!hasMoved && !isDragging) {
+          // On desktop, only open if not dragging
+          if (!isDragging) {
             if (onClick) {
               onClick()
             } else {
@@ -367,7 +293,23 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
             }
           }
         }}
-        {...(readOnly || isMobile || !attributes || !listeners ? {} : { ...attributes, ...listeners })}
+        {...(!readOnly && !isMobile ? {
+          ...attributes,
+          ...(listeners ? {
+            onPointerDown: (e: React.PointerEvent) => {
+              // Don't start drag if clicking on buttons
+              const target = e.target as HTMLElement
+              if (
+                target.closest('button') ||
+                target.closest('[role="menuitem"]') ||
+                target.closest('[role="menu"]')
+              ) {
+                return
+              }
+              listeners.onPointerDown?.(e)
+            }
+          } : {})
+        } : {})}
       >
         {/* Header */}
         <div className="flex items-start justify-between mb-2">
