@@ -224,7 +224,6 @@ export function MobileKanban({
         onOpenChange={setIsCreateDialogOpen}
         projectId={projectId}
         userId={userId}
-        project={project}
         onTaskCreated={(task) => {
           onTaskCreated?.(task)
           setIsCreateDialogOpen(false)
