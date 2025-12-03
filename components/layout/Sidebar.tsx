@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { 
   LayoutDashboard, 
@@ -34,9 +35,13 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
       {/* Logo */}
       <div className="flex h-16 items-center px-6 border-b border-gray-200">
         <Link href="/dashboard" onClick={onLinkClick} className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">D</span>
-          </div>
+          <Image 
+            src="/favicon.ico" 
+            alt="Devlogify" 
+            width={32} 
+            height={32} 
+            className="w-8 h-8"
+          />
           <span className="text-xl font-bold">Devlogify</span>
         </Link>
       </div>

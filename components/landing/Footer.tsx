@@ -96,7 +96,7 @@ export function Footer() {
 
           <div className="flex items-center space-x-4">
             <Link
-              href="https://github.com"
+              href="https://github.com/esatakpunar"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-colors"
@@ -105,16 +105,16 @@ export function Footer() {
               <span className="sr-only">GitHub</span>
             </Link>
             <Link
-              href="https://twitter.com"
+              href="https://x.com/esatakpunar"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-colors"
             >
               <Twitter className="h-5 w-5" />
-              <span className="sr-only">Twitter</span>
+              <span className="sr-only">X</span>
             </Link>
             <Link
-              href="https://linkedin.com"
+              href="https://www.linkedin.com/in/esatakpunar/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-muted-foreground hover:text-foreground transition-colors"
