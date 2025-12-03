@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import { LanguageHtml } from "@/components/providers/LanguageHtml";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,6 +29,7 @@ export default function RootLayout({
             </DashboardLayout>
           </ThemeProvider>
         </ErrorBoundary>
+        <SpeedInsights />
       </body>
     </html>
   );
