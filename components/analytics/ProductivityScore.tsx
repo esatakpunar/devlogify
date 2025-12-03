@@ -121,10 +121,10 @@ export function ProductivityScore({ userId }: ProductivityScoreProps) {
   }
 
   const getScoreLabel = (score: number) => {
-    if (score >= 80) return 'Excellent'
-    if (score >= 60) return 'Good'
-    if (score >= 40) return 'Fair'
-    return 'Needs Improvement'
+    if (score >= 80) return t('analytics.excellent')
+    if (score >= 60) return t('analytics.good')
+    if (score >= 40) return t('analytics.fair')
+    return t('analytics.needsImprovement')
   }
 
   if (loading) {
@@ -142,7 +142,7 @@ export function ProductivityScore({ userId }: ProductivityScoreProps) {
     <Card className="p-4 sm:p-6">
       <div className="flex items-center gap-2 mb-3 sm:mb-4">
         <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
-        <h3 className="text-base sm:text-lg font-semibold dark:text-white">Productivity Score</h3>
+        <h3 className="text-base sm:text-lg font-semibold dark:text-white">{t('analytics.productivityScore')}</h3>
       </div>
 
       <div className="space-y-3 sm:space-y-4">
@@ -162,7 +162,7 @@ export function ProductivityScore({ userId }: ProductivityScoreProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 dark:text-gray-400" />
-              <span className="text-xs sm:text-sm dark:text-gray-300">Task Completion</span>
+              <span className="text-xs sm:text-sm dark:text-gray-300">{t('analytics.taskCompletion')}</span>
             </div>
             <span className="text-xs sm:text-sm font-medium dark:text-gray-300">{breakdown.taskCompletion}%</span>
           </div>
@@ -171,7 +171,7 @@ export function ProductivityScore({ userId }: ProductivityScoreProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 dark:text-gray-400" />
-              <span className="text-xs sm:text-sm dark:text-gray-300">Time Consistency</span>
+              <span className="text-xs sm:text-sm dark:text-gray-300">{t('analytics.timeConsistency')}</span>
             </div>
             <span className="text-xs sm:text-sm font-medium dark:text-gray-300">{breakdown.timeConsistency}%</span>
           </div>
@@ -180,7 +180,7 @@ export function ProductivityScore({ userId }: ProductivityScoreProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <TrendingUp className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 dark:text-gray-400" />
-              <span className="text-xs sm:text-sm dark:text-gray-300">Weekly Growth</span>
+              <span className="text-xs sm:text-sm dark:text-gray-300">{t('analytics.weeklyGrowth')}</span>
             </div>
             <span className="text-xs sm:text-sm font-medium dark:text-gray-300">{breakdown.weeklyGrowth}%</span>
           </div>
@@ -189,7 +189,7 @@ export function ProductivityScore({ userId }: ProductivityScoreProps) {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-1.5 sm:gap-2">
               <Target className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500 dark:text-gray-400" />
-              <span className="text-xs sm:text-sm dark:text-gray-300">Activity Frequency</span>
+              <span className="text-xs sm:text-sm dark:text-gray-300">{t('analytics.activityFrequency')}</span>
             </div>
             <span className="text-xs sm:text-sm font-medium dark:text-gray-300">{breakdown.activityFrequency}%</span>
           </div>

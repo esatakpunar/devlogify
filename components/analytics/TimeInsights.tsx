@@ -105,13 +105,13 @@ export function TimeInsights({ userId }: TimeInsightsProps) {
 
       const insightsData: Insight[] = [
         {
-          label: 'Most Time Spent',
+          label: t('analytics.mostTimeSpent'),
           value: mostTimeProject.title,
           icon: Target,
           color: 'text-blue-600 dark:text-blue-400',
         },
         {
-          label: 'Most Productive Hour',
+          label: t('analytics.mostProductiveHour'),
           value: mostProductiveHour > 0 
             ? `${mostProductiveHour}:00 - ${mostProductiveHour + 1}:00`
             : 'N/A',
@@ -119,16 +119,16 @@ export function TimeInsights({ userId }: TimeInsightsProps) {
           color: 'text-green-600 dark:text-green-400',
         },
         {
-          label: 'Avg Task Duration',
-          value: avgDuration > 0 ? `${avgDuration} min` : 'N/A',
+          label: t('analytics.averageTaskDuration'),
+          value: avgDuration > 0 ? `${avgDuration} ${t('common.min')}` : 'N/A',
           icon: TrendingUp,
           color: 'text-purple-600 dark:text-purple-400',
         },
         {
-          label: 'Total Time (30 days)',
+          label: t('analytics.totalTime30Days'),
           value: totalHours > 0 
-            ? `${totalHours}h ${remainingMinutes}m`
-            : `${totalMinutes}m`,
+            ? `${totalHours}${t('common.h')} ${remainingMinutes}${t('common.min')}`
+            : `${totalMinutes}${t('common.min')}`,
           icon: Calendar,
           color: 'text-orange-600 dark:text-orange-400',
         },
@@ -161,7 +161,7 @@ export function TimeInsights({ userId }: TimeInsightsProps) {
     <Card className="p-4 sm:p-6">
       <div className="flex items-center gap-2 mb-3 sm:mb-4">
         <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
-        <h3 className="text-base sm:text-lg font-semibold dark:text-white">Time Insights</h3>
+        <h3 className="text-base sm:text-lg font-semibold dark:text-white">{t('analytics.timeInsights')}</h3>
       </div>
 
       <div className="grid grid-cols-2 gap-2 sm:gap-4">

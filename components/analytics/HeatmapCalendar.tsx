@@ -136,13 +136,13 @@ export function HeatmapCalendar({ userId }: HeatmapCalendarProps) {
     <Card className="p-4 sm:p-6">
       <div className="flex items-center gap-2 mb-3 sm:mb-4">
         <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" />
-        <h3 className="text-base sm:text-lg font-semibold dark:text-white">Activity Heatmap</h3>
+        <h3 className="text-base sm:text-lg font-semibold dark:text-white">{t('analytics.activityHeatmap')}</h3>
       </div>
 
       <div className="space-y-3 sm:space-y-4">
         {/* Legend */}
         <div className="flex items-center justify-between text-xs">
-          <span className="text-gray-500 dark:text-gray-400">Less</span>
+          <span className="text-gray-500 dark:text-gray-400">{t('analytics.less')}</span>
           <div className="flex gap-0.5 sm:gap-1">
             <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-gray-100 dark:bg-gray-800"></div>
             <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-green-200 dark:bg-green-900/30"></div>
@@ -150,7 +150,7 @@ export function HeatmapCalendar({ userId }: HeatmapCalendarProps) {
             <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-green-600 dark:bg-green-600"></div>
             <div className="w-2.5 h-2.5 sm:w-3 sm:h-3 rounded bg-green-800 dark:bg-green-500"></div>
           </div>
-          <span className="text-gray-500 dark:text-gray-400">More</span>
+          <span className="text-gray-500 dark:text-gray-400">{t('analytics.more')}</span>
         </div>
 
         {/* Heatmap Grid */}
@@ -165,7 +165,7 @@ export function HeatmapCalendar({ userId }: HeatmapCalendarProps) {
                       'w-2.5 h-2.5 sm:w-3 sm:h-3 rounded cursor-pointer transition-all hover:scale-125',
                       getColor(day.level)
                     )}
-                    title={`${format(day.date, 'MMM dd, yyyy')}: ${day.value.toFixed(1)} activity points`}
+                    title={`${format(day.date, 'MMM dd, yyyy')}: ${day.value.toFixed(1)} ${t('analytics.activityPoints')}`}
                     onClick={() => setSelectedDay(day)}
                   />
                 ))}
@@ -179,13 +179,13 @@ export function HeatmapCalendar({ userId }: HeatmapCalendarProps) {
           <div className="p-2 sm:p-3 bg-gray-50 dark:bg-gray-900 rounded-lg text-xs sm:text-sm">
             <p className="font-medium dark:text-gray-200">{format(selectedDay.date, 'EEEE, MMMM dd, yyyy')}</p>
             <p className="text-gray-600 dark:text-gray-400">
-              {selectedDay.value.toFixed(1)} activity points
+              {selectedDay.value.toFixed(1)} {t('analytics.activityPoints')}
             </p>
           </div>
         )}
 
         <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
-          Last 365 days of activity
+          {t('analytics.last365DaysOfActivity')}
         </p>
       </div>
     </Card>

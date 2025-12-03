@@ -150,29 +150,29 @@ export function HabitTracker({ userId }: HabitTrackerProps) {
     <Card className="p-4 sm:p-6">
       <div className="flex items-center gap-2 mb-3 sm:mb-4">
         <Flame className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500" />
-        <h3 className="text-base sm:text-lg font-semibold dark:text-white">Habit Tracker</h3>
+        <h3 className="text-base sm:text-lg font-semibold dark:text-white">{t('analytics.habitTracker')}</h3>
       </div>
 
       <div className="space-y-3 sm:space-y-4">
         {/* Streaks */}
         <div className="grid grid-cols-2 gap-2 sm:gap-4">
           <div className="p-3 sm:p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">Current Streak</p>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">{t('analytics.currentStreak')}</p>
             <p className="text-xl sm:text-2xl font-bold text-orange-600 dark:text-orange-400">
-              {currentStreak} {currentStreak === 1 ? 'day' : 'days'}
+              {currentStreak} {currentStreak === 1 ? t('analytics.day') : t('analytics.days')}
             </p>
           </div>
           <div className="p-3 sm:p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">Longest Streak</p>
+            <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mb-1">{t('analytics.longestStreak')}</p>
             <p className="text-xl sm:text-2xl font-bold text-blue-600 dark:text-blue-400">
-              {longestStreak} {longestStreak === 1 ? 'day' : 'days'}
+              {longestStreak} {longestStreak === 1 ? t('analytics.day') : t('analytics.days')}
             </p>
           </div>
         </div>
 
         {/* Week Activity */}
         <div>
-          <p className="text-xs sm:text-sm font-medium mb-2 dark:text-gray-300">This Week</p>
+          <p className="text-xs sm:text-sm font-medium mb-2 dark:text-gray-300">{t('dashboard.thisWeek')}</p>
           <div className="flex gap-1 sm:gap-2">
             {weekActivity.map((day, index) => (
               <div

@@ -122,29 +122,29 @@ export function TimeComparison({ userId }: TimeComparisonProps) {
     <Card className="p-4 sm:p-6">
       <div className="flex items-center gap-2 mb-3 sm:mb-4">
         <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" />
-        <h3 className="text-base sm:text-lg font-semibold dark:text-white">Time Estimates vs Actual</h3>
+        <h3 className="text-base sm:text-lg font-semibold dark:text-white">{t('analytics.timeEstimatesVsActual')}</h3>
       </div>
 
       <div className="space-y-3 sm:space-y-4">
         {/* Stats */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
           <div className="p-2 sm:p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Avg Difference</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">{t('analytics.avgDifference')}</p>
             <p className="text-base sm:text-lg font-bold dark:text-gray-200">
               {stats.avgDifference > 0 ? '+' : ''}
-              {stats.avgDifference} min
+              {stats.avgDifference} {t('common.min')}
             </p>
           </div>
           <div className="p-2 sm:p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Over Estimate</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">{t('analytics.overEstimate')}</p>
             <p className="text-base sm:text-lg font-bold dark:text-gray-200">{stats.tasksOverEstimate}</p>
           </div>
           <div className="p-2 sm:p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Under Estimate</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">{t('analytics.underEstimate')}</p>
             <p className="text-base sm:text-lg font-bold dark:text-gray-200">{stats.tasksUnderEstimate}</p>
           </div>
           <div className="p-2 sm:p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">Accuracy</p>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mb-1">{t('analytics.accuracy')}</p>
             <p className="text-base sm:text-lg font-bold dark:text-gray-200">{stats.accuracy}%</p>
           </div>
         </div>
@@ -166,14 +166,14 @@ export function TimeComparison({ userId }: TimeComparisonProps) {
                 <YAxis fontSize={10} className="sm:text-xs" />
                 <Tooltip />
                 <Legend wrapperStyle={{ fontSize: '12px' }} />
-                <Bar dataKey="estimated" fill="#3b82f6" name="Estimated" />
-                <Bar dataKey="actual" fill="#10b981" name="Actual" />
+                <Bar dataKey="estimated" fill="#3b82f6" name={t('analytics.estimated')} />
+                <Bar dataKey="actual" fill="#10b981" name={t('analytics.actual')} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         ) : (
           <div className="text-center py-8 sm:py-12 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-            No comparison data available. Complete tasks with time estimates to see comparisons.
+            {t('analytics.noComparisonDataAvailable')}
           </div>
         )}
       </div>
