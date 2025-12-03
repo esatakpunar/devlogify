@@ -2,7 +2,7 @@ import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton'
 
 export default function SettingsLoading() {
   return (
-    <div className="w-full max-w-7xl mx-auto">
+    <div className="w-full max-w-full mx-auto">
       {/* Header */}
       <div className="mb-6">
         <LoadingSkeleton className="h-9 w-48 mb-2" />
