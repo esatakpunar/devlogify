@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label'
 import { Keyboard, RotateCcw, Save } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { useConfirmModal } from '@/lib/hooks/useConfirmModal'
 
 function formatKey(key: string): string {
   const keyMap: Record<string, string> = {
@@ -26,6 +27,7 @@ function formatKey(key: string): string {
 export function ShortcutsSettings() {
   const t = useTranslation()
   const { shortcuts, customBindings, setShortcut, resetShortcut, resetAll, getShortcutKeys } = useShortcutsStore()
+  const { confirm, confirmWithAction, Modal: ConfirmModal } = useConfirmModal()
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editingKeys, setEditingKeys] = useState<string[]>([])
 
@@ -41,21 +43,21 @@ export function ShortcutsSettings() {
 
   const handleSave = (id: string) => {
     if (editingKeys.length === 0) {
-      toast.error('Please enter at least one key')
+      toast.error(t('settings.pleaseEnterAtLeastOneKey'))
       return
     }
     
     // Validate keys
     const validKeys = editingKeys.filter(k => k.trim() !== '')
     if (validKeys.length === 0) {
-      toast.error('Please enter valid keys')
+      toast.error(t('settings.pleaseEnterValidKeys'))
       return
     }
 
     setShortcut(id, validKeys)
     setEditingId(null)
     setEditingKeys([])
-    toast.success('Shortcut updated')
+    toast.success(t('settings.shortcutUpdated'))
   }
 
   const handleKeyCapture = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
@@ -79,36 +81,44 @@ export function ShortcutsSettings() {
 
   const handleReset = (id: string) => {
     resetShortcut(id)
-    toast.success('Shortcut reset to default')
+    toast.success(t('settings.shortcutResetToDefault'))
   }
 
-  const handleResetAll = () => {
-    if (confirm('Are you sure you want to reset all shortcuts to defaults?')) {
-      resetAll()
-      toast.success('All shortcuts reset to defaults')
-    }
+  const handleResetAll = async () => {
+    const confirmed = await confirm({
+      title: t('settings.resetAllShortcuts'),
+      description: t('settings.resetAllShortcutsDescription'),
+      confirmText: t('settings.resetAll'),
+      cancelText: t('common.cancel'),
+      variant: 'warning',
+    })
+
+    if (!confirmed) return
+
+    resetAll()
+    toast.success(t('settings.allShortcutsResetToDefaults'))
   }
 
   const categories = ['global', 'navigation', 'task', 'editor'] as const
   const categoryLabels: Record<string, string> = {
-    global: 'Global Shortcuts',
-    navigation: 'Navigation',
-    task: 'Task Management',
-    editor: 'Editor',
+    global: t('settings.globalShortcuts'),
+    navigation: t('settings.navigation'),
+    task: t('settings.taskManagement'),
+    editor: t('settings.editor'),
   }
 
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-4 border-b border-gray-200 dark:border-gray-800">
         <div>
-          <h3 className="text-lg font-semibold">Keyboard Shortcuts</h3>
+          <h3 className="text-lg font-semibold">{t('settings.keyboardShortcuts')}</h3>
           <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-            Customize keyboard shortcuts to match your workflow
+            {t('settings.customizeKeyboardShortcuts')}
           </p>
         </div>
         <Button variant="outline" size="sm" onClick={handleResetAll} className="w-full sm:w-auto">
           <RotateCcw className="w-4 h-4 mr-2" />
-          Reset All
+          {t('settings.resetAll')}
         </Button>
       </div>
 
@@ -142,7 +152,7 @@ export function ShortcutsSettings() {
                             <Input
                               type="text"
                               value={editingKeys[0] || ''}
-                              placeholder="Modifier"
+                              placeholder={t('settings.modifier')}
                               onKeyDown={(e) => handleKeyCapture(e, 0)}
                               className="w-20 sm:w-24"
                               readOnly
@@ -151,7 +161,7 @@ export function ShortcutsSettings() {
                             <Input
                               type="text"
                               value={editingKeys[1] || ''}
-                              placeholder="Key"
+                              placeholder={t('settings.key')}
                               onKeyDown={(e) => handleKeyCapture(e, 1)}
                               className="w-20 sm:w-24"
                               readOnly
@@ -169,7 +179,7 @@ export function ShortcutsSettings() {
                             variant="ghost"
                             onClick={handleCancelEdit}
                           >
-                            Cancel
+                            {t('common.cancel')}
                           </Button>
                         </>
                       ) : (
@@ -215,10 +225,10 @@ export function ShortcutsSettings() {
 
       <div className="pt-4 border-t border-gray-200 dark:border-gray-800">
         <p className="text-xs text-gray-500 dark:text-gray-400">
-          <strong>Tip:</strong> Click the keyboard icon to edit a shortcut. Press the keys you want to use.
-          For sequence shortcuts (like navigation), press the keys in order.
+          <strong>{t('settings.tip')}:</strong> {t('settings.shortcutTip')}
         </p>
       </div>
+      {ConfirmModal}
     </div>
   )
 }

@@ -26,6 +26,7 @@ import { AddManualTimeDialog } from './AddManualTimeDialog'
 import { useDraggable } from '@dnd-kit/core'
 import { cn } from '@/lib/utils'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { useConfirmModal } from '@/lib/hooks/useConfirmModal'
 
 type Task = {
   id: string
@@ -72,6 +73,7 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
   const [isMobile, setIsMobile] = useState(false)
   const { taskId, isRunning, elapsed, startTimer, stopTimer, formatTime } = useTimer()
   const t = useTranslation()
+  const { confirm, confirmWithAction, Modal: ConfirmModal } = useConfirmModal()
 
   useEffect(() => {
     // Check if mobile on mount and resize
@@ -91,7 +93,7 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
     isDragging,
   } = useDraggable({
     id: task.id,
-    disabled: readOnly || isMobile,
+    disabled: readOnly || isMobile || isEditDialogOpen || isTimeDialogOpen,
   })
 
   const isTimerActive = isRunning && taskId === task.id
@@ -147,7 +149,15 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
   const handleDelete = async () => {
     if (readOnly || !onTaskDeleted) return
     
-    if (!confirm(t('tasks.areYouSureDeleteTask'))) return
+    const confirmed = await confirm({
+      title: t('tasks.areYouSureDeleteTask'),
+      description: t('tasks.deleteTaskDescription') || undefined,
+      confirmText: t('common.delete'),
+      cancelText: t('common.cancel'),
+      variant: 'destructive',
+    })
+    
+    if (!confirmed) return
     
     // Optimistic update - remove from UI immediately
     const previousTask = { ...localTask }
@@ -488,6 +498,9 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
           onTimeAdded={handleTimeAdded}
         />
       )}
+
+      {/* Confirm Modal */}
+      {ConfirmModal}
     </>
   )
 }

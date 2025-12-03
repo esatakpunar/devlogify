@@ -20,6 +20,7 @@ import { formatDistanceToNow } from 'date-fns'
 import { AnimatedCard } from '@/components/ui/AnimatedCard'
 import { EditProjectDialog } from './EditProjectDialog'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { useConfirmModal } from '@/lib/hooks/useConfirmModal'
 
 interface ProjectCardProps {
   project: {
@@ -43,13 +44,22 @@ export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
   const router = useRouter()
   const supabase = createClient()
   const t = useTranslation()
+  const { confirm, confirmWithAction, Modal: ConfirmModal } = useConfirmModal()
 
   const taskCount = project.tasks?.[0]?.count ?? 0
   const isPinned = project.is_pinned || false
 
   const handleArchive = async (e: React.MouseEvent) => {
     e.preventDefault()
-    if (!confirm(t('projects.areYouSureArchiveProject'))) return
+    const confirmed = await confirm({
+      title: t('projects.areYouSureArchiveProject'),
+      description: t('projects.archiveProjectDescription') || undefined,
+      confirmText: t('projects.archive'),
+      cancelText: t('common.cancel'),
+      variant: 'default',
+    })
+
+    if (!confirmed) return
 
     setLoading(true)
     try {
@@ -64,7 +74,15 @@ export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.preventDefault()
-    if (!confirm(t('projects.areYouSureDeleteProjectWithTasks'))) return
+    const confirmed = await confirm({
+      title: t('projects.areYouSureDeleteProjectWithTasks'),
+      description: t('projects.deleteProjectDescription') || undefined,
+      confirmText: t('common.delete'),
+      cancelText: t('common.cancel'),
+      variant: 'destructive',
+    })
+
+    if (!confirmed) return
 
     setLoading(true)
     try {
@@ -213,6 +231,7 @@ export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
           }}
         />
       )}
+      {ConfirmModal}
     </AnimatedCard>
   )
 }

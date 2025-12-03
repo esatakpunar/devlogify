@@ -20,6 +20,7 @@ import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 import Link from 'next/link'
 import { usePremium } from '@/lib/hooks/usePremium'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { useConfirmModal } from '@/lib/hooks/useConfirmModal'
 
 interface Note {
   id: string
@@ -57,6 +58,7 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
   const [isAIDialogOpen, setIsAIDialogOpen] = useState(false)
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
   const t = useTranslation()
+  const { confirm, confirmWithAction, Modal: ConfirmModal } = useConfirmModal()
 
   const handleTogglePin = async () => {
     setLoading(true)
@@ -73,7 +75,15 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
   }
 
   const handleDelete = async () => {
-    if (!confirm(t('noteCard.areYouSureDeleteNote'))) return
+    const confirmed = await confirm({
+      title: t('noteCard.areYouSureDeleteNote'),
+      description: t('noteCard.deleteNoteDescription') || undefined,
+      confirmText: t('common.delete'),
+      cancelText: t('common.cancel'),
+      variant: 'destructive',
+    })
+
+    if (!confirmed) return
 
     setLoading(true)
     try {
@@ -232,6 +242,7 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
         onOpenChange={setUpgradeDialogOpen}
         feature="AI Task Generation from Notes"
       />
+      {ConfirmModal}
     </>
   )
 }

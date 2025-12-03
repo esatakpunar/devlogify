@@ -18,6 +18,8 @@ import {
 } from '@/components/ui/select'
 import { ArrowLeft, Save } from 'lucide-react'
 import Link from 'next/link'
+import { useConfirmModal } from '@/lib/hooks/useConfirmModal'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 const COLORS = [
   '#6366f1', // Indigo
@@ -50,6 +52,8 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
+  const { confirm, confirmWithAction, Modal: ConfirmModal } = useConfirmModal()
+  const t = useTranslation()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -90,9 +94,15 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
   }
 
   const handleDelete = async () => {
-    if (!confirm('Are you sure you want to delete this project? This action cannot be undone and will delete all associated tasks.')) {
-      return
-    }
+    const confirmed = await confirm({
+      title: t('projects.areYouSureDeleteProjectWithTasks'),
+      description: t('projects.deleteProjectDescription'),
+      confirmText: t('projects.deleteProject'),
+      cancelText: t('common.cancel'),
+      variant: 'destructive',
+    })
+
+    if (!confirmed) return
 
     setLoading(true)
     setError(null)
@@ -122,12 +132,12 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
         <Link href={`/projects/${project.id}`}>
           <Button variant="ghost" size="sm" className="mb-4">
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Project
+            {t('projects.backToProject')}
           </Button>
         </Link>
-        <h1 className="text-3xl font-bold">Edit Project</h1>
+        <h1 className="text-3xl font-bold">{t('projects.editProject')}</h1>
         <p className="text-gray-600 mt-1">
-          Update your project details
+          {t('projects.updateProjectDetails')}
         </p>
       </div>
 
@@ -141,11 +151,11 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
 
         <div className="space-y-2">
           <Label htmlFor="title">
-            Project Name <span className="text-red-500">*</span>
+            {t('projects.projectName')} <span className="text-red-500">*</span>
           </Label>
           <Input
             id="title"
-            placeholder="My Awesome Project"
+            placeholder={t('projects.projectNamePlaceholder')}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
@@ -154,10 +164,10 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="description">Description</Label>
+          <Label htmlFor="description">{t('projects.description')}</Label>
           <Textarea
             id="description"
-            placeholder="What is this project about?"
+            placeholder={t('projects.whatIsThisProjectAbout')}
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={4}
@@ -166,7 +176,7 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="status">Status</Label>
+          <Label htmlFor="status">{t('projects.status')}</Label>
           <Select 
             value={status} 
             onValueChange={(value: 'active' | 'archived' | 'completed') => setStatus(value)}
@@ -176,18 +186,18 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="active">Active</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="archived">Archived</SelectItem>
+              <SelectItem value="active">{t('common.active')}</SelectItem>
+              <SelectItem value="completed">{t('common.completed')}</SelectItem>
+              <SelectItem value="archived">{t('common.archived')}</SelectItem>
             </SelectContent>
           </Select>
           <p className="text-xs text-gray-500">
-            Archived projects won't show in your active projects list
+            {t('projects.archivedProjectsWontShow')}
           </p>
         </div>
 
         <div className="space-y-2">
-          <Label>Project Color</Label>
+          <Label>{t('projects.projectColor')}</Label>
           <div className="flex gap-2 flex-wrap">
             {COLORS.map((c) => (
               <button
@@ -209,11 +219,11 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
         <div className="flex gap-3 pt-4 border-t border-gray-200">
           <Button type="submit" disabled={loading} className="flex-1">
             <Save className="w-4 h-4 mr-2" />
-            {loading ? 'Saving...' : 'Save Changes'}
+            {loading ? t('projects.saving') : t('projects.saveChanges')}
           </Button>
           <Link href={`/projects/${project.id}`} className="flex-1">
             <Button type="button" variant="outline" className="w-full" disabled={loading}>
-              Cancel
+              {t('common.cancel')}
             </Button>
           </Link>
         </div>
@@ -222,17 +232,17 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
       {/* Danger Zone */}
       <div className="bg-white rounded-lg border border-red-200 p-6 space-y-4">
         <div>
-          <h2 className="text-lg font-semibold text-red-600">Danger Zone</h2>
+          <h2 className="text-lg font-semibold text-red-600">{t('projects.dangerZone')}</h2>
           <p className="text-sm text-gray-600 mt-1">
-            Irreversible and destructive actions
+            {t('projects.irreversibleActions')}
           </p>
         </div>
         
         <div className="flex items-center justify-between p-4 bg-red-50 rounded-lg">
           <div>
-            <h3 className="font-medium text-red-900">Delete this project</h3>
+            <h3 className="font-medium text-red-900">{t('projects.deleteThisProject')}</h3>
             <p className="text-sm text-red-700 mt-1">
-              Once you delete a project, there is no going back. All tasks will be deleted.
+              {t('projects.deleteProjectWarning')}
             </p>
           </div>
           <Button 
@@ -241,10 +251,11 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
             onClick={handleDelete}
             disabled={loading}
           >
-            Delete Project
+            {t('projects.deleteProject')}
           </Button>
         </div>
       </div>
+      {ConfirmModal}
     </div>
   )
 }

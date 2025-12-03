@@ -20,6 +20,7 @@ import { ShareDialog } from './ShareDialog'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { usePremium } from '@/lib/hooks/usePremium'
 import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
+import { useConfirmModal } from '@/lib/hooks/useConfirmModal'
 
 interface ProjectHeaderProps {
   project: {
@@ -41,6 +42,7 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
   const router = useRouter()
   const supabase = createClient()
   const t = useTranslation()
+  const { confirm, confirmWithAction, Modal: ConfirmModal } = useConfirmModal()
 
   const handleShareClick = () => {
     if (!isPremium) {
@@ -51,7 +53,15 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
   }
 
   const handleArchive = async () => {
-    if (!confirm(t('projects.areYouSureArchiveProject'))) return
+    const confirmed = await confirm({
+      title: t('projects.areYouSureArchiveProject'),
+      description: t('projects.archiveProjectDescription') || undefined,
+      confirmText: t('projects.archive'),
+      cancelText: t('common.cancel'),
+      variant: 'default',
+    })
+
+    if (!confirmed) return
 
     setLoading(true)
     try {
@@ -65,9 +75,15 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
   }
 
   const handleDelete = async () => {
-    if (!confirm(t('projects.areYouSureDeleteProjectWithTasks'))) {
-      return
-    }
+    const confirmed = await confirm({
+      title: t('projects.areYouSureDeleteProjectWithTasks'),
+      description: t('projects.deleteProjectDescription') || undefined,
+      confirmText: t('common.delete'),
+      cancelText: t('common.cancel'),
+      variant: 'destructive',
+    })
+
+    if (!confirmed) return
 
     setLoading(true)
     try {
@@ -168,7 +184,7 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
             className="flex-1 sm:flex-initial text-xs sm:text-sm"
           >
             <Share2 className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
-            <span className="hidden sm:inline">Share</span>
+            <span className="hidden sm:inline">{t('sharing.share')}</span>
           </Button>
           
           <Button 
@@ -236,6 +252,7 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
         onOpenChange={setUpgradeDialogOpen}
         feature="Share & Export"
       />
+      {ConfirmModal}
     </div>
   )
 }

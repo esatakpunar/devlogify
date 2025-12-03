@@ -10,6 +10,7 @@ import { Target, Plus, Edit2, Trash2 } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
+import { useConfirmModal } from '@/lib/hooks/useConfirmModal'
 
 interface Goal {
   id: string
@@ -37,6 +38,7 @@ export function GoalSetting({ userId }: GoalSettingProps) {
   })
   const [progress, setProgress] = useState<Record<string, number>>({})
   const [loading, setLoading] = useState(true)
+  const { confirm, confirmWithAction, Modal: ConfirmModal } = useConfirmModal()
 
   useEffect(() => {
     loadGoals()
@@ -140,7 +142,7 @@ export function GoalSetting({ userId }: GoalSettingProps) {
 
   const handleAdd = () => {
     if (!formData.target || Number(formData.target) <= 0) {
-      toast.error('Please enter a valid target')
+      toast.error(t('analytics.pleaseEnterValidTarget'))
       return
     }
 
@@ -155,7 +157,7 @@ export function GoalSetting({ userId }: GoalSettingProps) {
     saveGoals([...goals, newGoal])
     setFormData({ type: 'tasks', target: '', period: 'weekly' })
     setShowAddForm(false)
-    toast.success('Goal added')
+    toast.success(t('analytics.goalAdded'))
     loadProgress()
   }
 
@@ -171,7 +173,7 @@ export function GoalSetting({ userId }: GoalSettingProps) {
 
   const handleUpdate = () => {
     if (!editingId || !formData.target || Number(formData.target) <= 0) {
-      toast.error('Please enter a valid target')
+      toast.error(t('analytics.pleaseEnterValidTarget'))
       return
     }
 
@@ -185,17 +187,25 @@ export function GoalSetting({ userId }: GoalSettingProps) {
     setEditingId(null)
     setFormData({ type: 'tasks', target: '', period: 'weekly' })
     setShowAddForm(false)
-    toast.success('Goal updated')
+    toast.success(t('analytics.goalUpdated'))
     loadProgress()
   }
 
-  const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this goal?')) {
-      const updated = goals.filter(g => g.id !== id)
-      saveGoals(updated)
-      toast.success('Goal deleted')
-      loadProgress()
-    }
+  const handleDelete = async (id: string) => {
+    const confirmed = await confirm({
+      title: t('analytics.areYouSureDeleteGoal'),
+      description: t('analytics.deleteGoalDescription'),
+      confirmText: t('common.delete'),
+      cancelText: t('common.cancel'),
+      variant: 'destructive',
+    })
+
+    if (!confirmed) return
+
+    const updated = goals.filter(g => g.id !== id)
+    saveGoals(updated)
+    toast.success(t('analytics.goalDeleted'))
+    loadProgress()
   }
 
   const getProgress = (goal: Goal) => {
@@ -206,18 +216,18 @@ export function GoalSetting({ userId }: GoalSettingProps) {
 
   const getTypeLabel = (type: string) => {
     switch (type) {
-      case 'tasks': return 'Tasks'
-      case 'time': return 'Time (minutes)'
-      case 'projects': return 'Projects'
+      case 'tasks': return t('analytics.goalTypeTasks')
+      case 'time': return t('analytics.goalTypeTime')
+      case 'projects': return t('analytics.goalTypeProjects')
       default: return type
     }
   }
 
   const getPeriodLabel = (period: string) => {
     switch (period) {
-      case 'daily': return 'Daily'
-      case 'weekly': return 'Weekly'
-      case 'monthly': return 'Monthly'
+      case 'daily': return t('analytics.goalPeriodDaily')
+      case 'weekly': return t('analytics.goalPeriodWeekly')
+      case 'monthly': return t('analytics.goalPeriodMonthly')
       default: return period
     }
   }
@@ -238,7 +248,7 @@ export function GoalSetting({ userId }: GoalSettingProps) {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0 mb-3 sm:mb-4">
         <div className="flex items-center gap-2">
           <Target className="w-4 h-4 sm:w-5 sm:h-5 text-purple-500" />
-          <h3 className="text-base sm:text-lg font-semibold dark:text-white">Goals</h3>
+          <h3 className="text-base sm:text-lg font-semibold dark:text-white">{t('analytics.goals')}</h3>
         </div>
         <Button
           size="sm"
@@ -251,45 +261,45 @@ export function GoalSetting({ userId }: GoalSettingProps) {
           className="w-full sm:w-auto text-xs sm:text-sm"
         >
           <Plus className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
-          <span className="hidden sm:inline">Add Goal</span>
-          <span className="sm:hidden">Add</span>
+          <span className="hidden sm:inline">{t('analytics.addGoal')}</span>
+          <span className="sm:hidden">{t('common.add')}</span>
         </Button>
       </div>
 
       {showAddForm && (
         <div className="mb-3 sm:mb-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-900 rounded-lg space-y-2 sm:space-y-3">
           <div>
-            <Label className="text-xs sm:text-sm">Type</Label>
+            <Label className="text-xs sm:text-sm">{t('analytics.goalType')}</Label>
             <select
               value={formData.type}
               onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
               className="w-full mt-1 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800"
             >
-              <option value="tasks">Tasks</option>
-              <option value="time">Time (minutes)</option>
-              <option value="projects">Projects</option>
+              <option value="tasks">{t('analytics.goalTypeTasks')}</option>
+              <option value="time">{t('analytics.goalTypeTime')}</option>
+              <option value="projects">{t('analytics.goalTypeProjects')}</option>
             </select>
           </div>
           <div>
-            <Label className="text-xs sm:text-sm">Target</Label>
+            <Label className="text-xs sm:text-sm">{t('analytics.goalTarget')}</Label>
             <Input
               type="number"
               value={formData.target}
               onChange={(e) => setFormData({ ...formData, target: e.target.value })}
-              placeholder="Enter target"
+              placeholder={t('analytics.enterTarget')}
               className="text-xs sm:text-sm"
             />
           </div>
           <div>
-            <Label className="text-xs sm:text-sm">Period</Label>
+            <Label className="text-xs sm:text-sm">{t('analytics.goalPeriod')}</Label>
             <select
               value={formData.period}
               onChange={(e) => setFormData({ ...formData, period: e.target.value as any })}
               className="w-full mt-1 px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800"
             >
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
+              <option value="daily">{t('analytics.goalPeriodDaily')}</option>
+              <option value="weekly">{t('analytics.goalPeriodWeekly')}</option>
+              <option value="monthly">{t('analytics.goalPeriodMonthly')}</option>
             </select>
           </div>
           <div className="flex flex-col sm:flex-row gap-2">
@@ -298,7 +308,7 @@ export function GoalSetting({ userId }: GoalSettingProps) {
               onClick={editingId ? handleUpdate : handleAdd}
               className="w-full sm:w-auto text-xs sm:text-sm"
             >
-              {editingId ? 'Update' : 'Add'} Goal
+              {editingId ? t('common.update') : t('common.add')} {t('analytics.goal')}
             </Button>
             <Button
               size="sm"
@@ -310,7 +320,7 @@ export function GoalSetting({ userId }: GoalSettingProps) {
               }}
               className="w-full sm:w-auto text-xs sm:text-sm"
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
           </div>
         </div>
@@ -319,7 +329,7 @@ export function GoalSetting({ userId }: GoalSettingProps) {
       <div className="space-y-3 sm:space-y-4">
         {goals.length === 0 ? (
           <p className="text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400 py-6 sm:py-8">
-            No goals set. Add a goal to track your progress!
+            {t('analytics.noGoalsSet')}
           </p>
         ) : (
           goals.map((goal) => {
@@ -332,7 +342,7 @@ export function GoalSetting({ userId }: GoalSettingProps) {
                       {getTypeLabel(goal.type)} - {getPeriodLabel(goal.period)}
                     </p>
                     <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">
-                      {current} / {goal.target} {goal.type === 'time' ? 'minutes' : goal.type}
+                      {current} / {goal.target} {goal.type === 'time' ? t('common.minutes') : goal.type}
                     </p>
                   </div>
                   <div className="flex gap-1 sm:gap-2 flex-shrink-0">
@@ -360,6 +370,7 @@ export function GoalSetting({ userId }: GoalSettingProps) {
           })
         )}
       </div>
+      {ConfirmModal}
     </Card>
   )
 }

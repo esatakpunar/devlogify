@@ -103,14 +103,12 @@ export function KanbanBoard({
   }
 
   const handleTaskCreated = (newTask: Task) => {
-    const updatedTasks = [...tasks, newTask]
-    updateTasks(updatedTasks)
+    // Only notify parent - parent will update state and pass new tasks via initialTasks prop
     onTaskCreated?.(newTask)
   }
 
   const handleTasksCreated = (newTasks: Task[]) => {
-    const updatedTasks = [...tasks, ...newTasks]
-    updateTasks(updatedTasks)
+    // Only notify parent - parent will update state and pass new tasks via initialTasks prop
     onTasksCreated?.(newTasks)
   }
 
@@ -369,7 +367,7 @@ export function KanbanBoard({
         <AICreateTasksDialog
           open={isAICreateDialogOpen}
           onOpenChange={setIsAICreateDialogOpen}
-          projects={project ? [project] : [{ id: projectId, title: 'Current Project', color: '#3b82f6' }]}
+          projects={project ? [project] : [{ id: projectId, title: t('kanban.currentProject'), color: '#3b82f6' }]}
           userId={userId}
           onTasksCreated={handleTasksCreated}
         />
@@ -377,7 +375,7 @@ export function KanbanBoard({
         <UpgradeDialog
           open={upgradeDialogOpen}
           onOpenChange={setUpgradeDialogOpen}
-          feature="AI Task Features"
+          feature={t('kanban.aiTaskFeatures')}
         />
       </div>
 
