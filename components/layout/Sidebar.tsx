@@ -29,34 +29,46 @@ interface SidebarProps {
   onLinkClick?: () => void
 }
 
+// Animation constants for consistent timing
+const SIDEBAR_TRANSITION = {
+  duration: 0.3,
+  ease: [0.32, 0.72, 0, 1] as [number, number, number, number], // Smooth cubic bezier
+}
+
+const TEXT_TRANSITION = {
+  duration: 0.25,
+  ease: [0.32, 0.72, 0, 1] as [number, number, number, number],
+}
+
 export function Sidebar({ onLinkClick }: SidebarProps = {}) {
   const pathname = usePathname()
   const t = useTranslation()
   const { isCollapsed, toggleCollapse } = useSidebarCollapse()
 
   return (
-    <motion.div
-      className="flex h-full flex-col bg-white border-r border-gray-200 overflow-hidden"
+    <motion.aside
+      className="relative flex h-full flex-col bg-white border-r border-gray-200 overflow-hidden will-change-[width]"
       initial={false}
       animate={{
-        width: isCollapsed ? 64 : 256, // 64px for collapsed, 256px (w-64) for expanded
+        width: isCollapsed ? 64 : 256,
       }}
-      transition={{
-        duration: 0.2,
-        ease: [0.4, 0, 0.2, 1], // Custom easing for smooth animation
+      transition={SIDEBAR_TRANSITION}
+      style={{
+        minWidth: isCollapsed ? 64 : 256,
+        maxWidth: isCollapsed ? 64 : 256,
       }}
     >
       {/* Logo */}
       <div className={cn(
-        "flex h-16 items-center border-b border-gray-200 shrink-0",
-        isCollapsed ? "justify-center" : ""
+        "flex h-16 items-center border-b border-gray-200 shrink-0 transition-all",
+        isCollapsed ? "justify-center px-0" : "px-6"
       )}>
         <Link 
           href="/dashboard" 
           onClick={onLinkClick} 
           className={cn(
-            "flex items-center transition-all duration-200",
-            isCollapsed ? "justify-center" : "space-x-2 px-6"
+            "flex items-center transition-all duration-300 ease-[cubic-bezier(0.32,0.72,0,1)]",
+            isCollapsed ? "justify-center w-full" : "space-x-2 w-full"
           )}
         >
           <Image 
@@ -64,17 +76,25 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
             alt="Devlogify" 
             width={32} 
             height={32} 
-            className="w-8 h-8 shrink-0"
+            className="w-8 h-8 shrink-0 transition-transform duration-300"
           />
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             {!isCollapsed && (
               <motion.span
                 key="logo-text"
-                className="text-xl font-bold whitespace-nowrap"
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: 'auto' }}
-                exit={{ opacity: 0, width: 0 }}
-                transition={{ duration: 0.15 }}
+                className="text-xl font-bold whitespace-nowrap overflow-hidden"
+                initial={{ opacity: 0, maxWidth: 0, marginLeft: 0 }}
+                animate={{ 
+                  opacity: 1, 
+                  maxWidth: 200,
+                  marginLeft: 8,
+                }}
+                exit={{ 
+                  opacity: 0, 
+                  maxWidth: 0,
+                  marginLeft: 0,
+                }}
+                transition={TEXT_TRANSITION}
               >
                 Devlogify
               </motion.span>
@@ -84,7 +104,7 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto">
+      <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto overflow-x-hidden">
         {navigation.map((item) => {
           const isActive = pathname === item.href || pathname?.startsWith(item.href + '/')
           
@@ -94,7 +114,7 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
               href={item.href}
               onClick={onLinkClick}
               className={cn(
-                'flex items-center rounded-lg text-sm font-medium transition-colors group relative',
+                'flex items-center rounded-lg text-sm font-medium transition-colors group relative overflow-hidden',
                 isCollapsed ? 'justify-center px-3 py-2' : 'space-x-3 px-3 py-2',
                 isActive
                   ? 'bg-blue-50 text-blue-700'
@@ -102,16 +122,16 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
               )}
               title={isCollapsed ? t(`nav.${item.key}`) : undefined}
             >
-              <item.icon className="w-5 h-5 shrink-0" />
-              <AnimatePresence mode="wait">
+              <item.icon className="w-5 h-5 shrink-0 transition-transform duration-300" />
+              <AnimatePresence mode="wait" initial={false}>
                 {!isCollapsed && (
                   <motion.span
                     key={`nav-${item.key}`}
-                    className="whitespace-nowrap"
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    transition={{ duration: 0.15 }}
+                    className="whitespace-nowrap overflow-hidden"
+                    initial={{ opacity: 0, maxWidth: 0 }}
+                    animate={{ opacity: 1, maxWidth: 200 }}
+                    exit={{ opacity: 0, maxWidth: 0 }}
+                    transition={TEXT_TRANSITION}
                   >
                     {t(`nav.${item.key}`)}
                   </motion.span>
@@ -119,9 +139,14 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
               </AnimatePresence>
               {/* Tooltip for collapsed state */}
               {isCollapsed && (
-                <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
+                <motion.div
+                  className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded shadow-lg pointer-events-none whitespace-nowrap z-50"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  whileHover={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.15 }}
+                >
                   {t(`nav.${item.key}`)}
-                </div>
+                </motion.div>
               )}
             </Link>
           )
@@ -134,21 +159,21 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
           href="/settings"
           onClick={onLinkClick}
           className={cn(
-            'flex items-center rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors group relative',
+            'flex items-center rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors group relative overflow-hidden',
             isCollapsed ? 'justify-center px-3 py-2' : 'space-x-3 px-3 py-2'
           )}
           title={isCollapsed ? t('common.settings') : undefined}
         >
-          <Settings className="w-5 h-5 shrink-0" />
-          <AnimatePresence mode="wait">
+          <Settings className="w-5 h-5 shrink-0 transition-transform duration-300" />
+          <AnimatePresence mode="wait" initial={false}>
             {!isCollapsed && (
               <motion.span
                 key="settings-text"
-                className="whitespace-nowrap"
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: 'auto' }}
-                exit={{ opacity: 0, width: 0 }}
-                transition={{ duration: 0.15 }}
+                className="whitespace-nowrap overflow-hidden"
+                initial={{ opacity: 0, maxWidth: 0 }}
+                animate={{ opacity: 1, maxWidth: 200 }}
+                exit={{ opacity: 0, maxWidth: 0 }}
+                transition={TEXT_TRANSITION}
               >
                 {t('common.settings')}
               </motion.span>
@@ -156,9 +181,14 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
           </AnimatePresence>
           {/* Tooltip for collapsed state */}
           {isCollapsed && (
-            <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50">
+            <motion.div
+              className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded shadow-lg pointer-events-none whitespace-nowrap z-50"
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileHover={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.15 }}
+            >
               {t('common.settings')}
-            </div>
+            </motion.div>
           )}
         </Link>
         
@@ -166,7 +196,7 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
         <button
           onClick={toggleCollapse}
           className={cn(
-            'flex items-center w-full rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors',
+            'flex items-center w-full rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors overflow-hidden',
             isCollapsed ? 'justify-center px-3 py-2' : 'space-x-3 px-3 py-2'
           )}
           aria-label={isCollapsed ? t('common.expand') || 'Expand sidebar' : t('common.collapse') || 'Collapse sidebar'}
@@ -174,20 +204,20 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
         >
           <motion.div
             animate={{ rotate: isCollapsed ? 180 : 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
             className="shrink-0"
           >
             <ChevronLeft className="w-5 h-5" />
           </motion.div>
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="wait" initial={false}>
             {!isCollapsed && (
               <motion.span
                 key="collapse-text"
-                className="whitespace-nowrap"
-                initial={{ opacity: 0, width: 0 }}
-                animate={{ opacity: 1, width: 'auto' }}
-                exit={{ opacity: 0, width: 0 }}
-                transition={{ duration: 0.15 }}
+                className="whitespace-nowrap overflow-hidden"
+                initial={{ opacity: 0, maxWidth: 0 }}
+                animate={{ opacity: 1, maxWidth: 200 }}
+                exit={{ opacity: 0, maxWidth: 0 }}
+                transition={TEXT_TRANSITION}
               >
                 {t('common.collapse') || 'Collapse'}
               </motion.span>
@@ -195,6 +225,6 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
           </AnimatePresence>
         </button>
       </div>
-    </motion.div>
+    </motion.aside>
   )
 }
