@@ -1,6 +1,7 @@
 'use client'
 
-import { Menu, Search, Bell } from 'lucide-react'
+import { useState } from 'react'
+import { Menu, Search, Bell, Check, ChevronDown, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { KeyboardHint } from '@/components/ui/KeyboardHint'
@@ -16,6 +17,9 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { GlobalTimerIndicator } from '@/components/timer/GlobalTimerIndicator'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { useLanguage } from '@/components/providers/LanguageProvider'
+import { locales, localeNames, localeFlags, type Locale } from '@/lib/i18n/config'
+import { toast } from 'sonner'
 
 interface NavbarProps {
   user: {
@@ -27,10 +31,23 @@ interface NavbarProps {
 
 export function Navbar({ user, onMenuClick }: NavbarProps) {
   const t = useTranslation()
+  const { locale, setLocale } = useLanguage()
+  const [isLanguageOpen, setIsLanguageOpen] = useState(false)
   
   const getInitials = (email?: string) => {
     if (!email) return 'U'
     return email.charAt(0).toUpperCase()
+  }
+
+  const handleLanguageChange = async (newLocale: Locale) => {
+    try {
+      await setLocale(newLocale)
+      setIsLanguageOpen(false)
+      toast.success(t('settings.languageUpdated'))
+    } catch (error) {
+      console.error('Failed to change language:', error)
+      toast.error(t('settings.updateFailed'))
+    }
   }
 
   return (
@@ -75,7 +92,13 @@ export function Navbar({ user, onMenuClick }: NavbarProps) {
         </Button>
 
         {/* User menu */}
-        <DropdownMenu>
+        <DropdownMenu
+          onOpenChange={(open) => {
+            if (!open) {
+              setIsLanguageOpen(false)
+            }
+          }}
+        >
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" className="relative h-8 w-8 sm:h-9 sm:w-9 rounded-full flex-shrink-0">
               <Avatar className="h-8 w-8 sm:h-9 sm:w-9">
@@ -92,6 +115,39 @@ export function Navbar({ user, onMenuClick }: NavbarProps) {
                 <p className="text-xs text-gray-500">{user?.email}</p>
               </div>
             </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onSelect={(e) => {
+                e.preventDefault()
+                setIsLanguageOpen(!isLanguageOpen)
+              }}
+              className="cursor-pointer"
+            >
+              <span className="mr-2">{localeFlags[locale]}</span>
+              <span className="flex-1">{t('settings.language')}</span>
+              {isLanguageOpen ? (
+                <ChevronDown className="h-4 w-4" />
+              ) : (
+                <ChevronRight className="h-4 w-4" />
+              )}
+            </DropdownMenuItem>
+            {isLanguageOpen && (
+              <>
+                {locales.map((loc) => (
+                  <DropdownMenuItem
+                    key={loc}
+                    onClick={() => handleLanguageChange(loc)}
+                    className="cursor-pointer pl-8"
+                  >
+                    <span className="mr-2">{localeFlags[loc]}</span>
+                    <span className="flex-1">{localeNames[loc]}</span>
+                    {locale === loc && (
+                      <Check className="h-4 w-4 text-blue-600" />
+                    )}
+                  </DropdownMenuItem>
+                ))}
+              </>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <a href="/settings">{t('common.settings')}</a>
