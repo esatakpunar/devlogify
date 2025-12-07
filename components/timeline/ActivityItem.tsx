@@ -12,6 +12,11 @@ import {
   ArrowRight
 } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { useLanguage } from '@/components/providers/LanguageProvider'
+import { tr } from 'date-fns/locale/tr'
+import { enUS } from 'date-fns/locale/en-US'
+import { de } from 'date-fns/locale/de'
+import { es } from 'date-fns/locale/es'
 
 interface Activity {
   id: string
@@ -51,8 +56,16 @@ const activityColors = {
   note_created: 'bg-yellow-50 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400',
 }
 
+const localeMap = {
+  tr,
+  en: enUS,
+  de,
+  es,
+}
+
 export function ActivityItem({ activity }: ActivityItemProps) {
   const t = useTranslation()
+  const { locale } = useLanguage()
   const Icon = activityIcons[activity.action_type as keyof typeof activityIcons] || Clock
   const colorClass = activityColors[activity.action_type as keyof typeof activityColors] || 'bg-gray-50 text-gray-600'
 
@@ -142,7 +155,7 @@ export function ActivityItem({ activity }: ActivityItemProps) {
         </p>
         <div className="flex items-center gap-2 sm:gap-3 mt-1 flex-wrap">
           <span className="text-xs text-gray-500 dark:text-gray-400">
-            {format(parseISO(activity.created_at), 'h:mm a')}
+            {format(parseISO(activity.created_at), 'HH:mm', { locale: localeMap[locale] })}
           </span>
           {activity.project && (
             <div className="flex items-center gap-1">

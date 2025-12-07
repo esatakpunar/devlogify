@@ -2,14 +2,28 @@
 
 import { CheckCircle2, Clock, TrendingUp, Calendar } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { useLanguage } from '@/components/providers/LanguageProvider'
+import { format } from 'date-fns'
+import { tr } from 'date-fns/locale/tr'
+import { enUS } from 'date-fns/locale/en-US'
+import { de } from 'date-fns/locale/de'
+import { es } from 'date-fns/locale/es'
 
 interface TimelineStatsProps {
   completedTasks: number
   totalMinutes: number
 }
 
+const localeMap = {
+  tr,
+  en: enUS,
+  de,
+  es,
+}
+
 export function TimelineStats({ completedTasks, totalMinutes }: TimelineStatsProps) {
   const t = useTranslation()
+  const { locale } = useLanguage()
   const hours = Math.floor(totalMinutes / 60)
   const minutes = totalMinutes % 60
 
@@ -20,7 +34,7 @@ export function TimelineStats({ completedTasks, totalMinutes }: TimelineStatsPro
           <div className="flex-1 min-w-0">
             <p className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">{t('timeline.today')}</p>
             <p className="text-xl sm:text-2xl font-bold mt-1 sm:mt-2 dark:text-white truncate">
-              {new Date().toLocaleDateString('en-US', { weekday: 'long' })}
+              {format(new Date(), 'EEEE', { locale: localeMap[locale] })}
             </p>
           </div>
           <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-50 dark:bg-purple-900/20 rounded-lg flex items-center justify-center flex-shrink-0 ml-2">

@@ -657,7 +657,18 @@
     "performedAction": "Acción realizada",
     "unknown": "Desconocido",
     "groupBy": "Agrupar por:",
-    "date": "Fecha"
+    "date": "Fecha",
+    "filters": "Filtros",
+    "clear": "Limpiar",
+    "searchActivities": "Buscar actividades...",
+    "activityType": "Tipo de Actividad",
+    "allTypes": "Todos los Tipos",
+    "projects": "Proyectos",
+    "tasks": "Tareas",
+    "notes": "Notas",
+    "timeEntries": "Entradas de Tiempo",
+    "dateRange": "Rango de Fechas",
+    "allTime": "Todo el Tiempo"
   },
   "auth": {
     "welcomeBack": "Bienvenido de nuevo",

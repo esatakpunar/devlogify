@@ -657,7 +657,18 @@
     "performedAction": "Performed an action",
     "unknown": "Unknown",
     "groupBy": "Group by:",
-    "date": "Date"
+    "date": "Date",
+    "filters": "Filters",
+    "clear": "Clear",
+    "searchActivities": "Search activities...",
+    "activityType": "Activity Type",
+    "allTypes": "All Types",
+    "projects": "Projects",
+    "tasks": "Tasks",
+    "notes": "Notes",
+    "timeEntries": "Time Entries",
+    "dateRange": "Date Range",
+    "allTime": "All Time"
   },
   "auth": {
     "welcomeBack": "Welcome back",

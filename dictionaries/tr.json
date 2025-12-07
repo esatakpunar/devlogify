@@ -659,7 +659,18 @@
     "performedAction": "Bir işlem gerçekleştirildi",
     "unknown": "Bilinmeyen",
     "groupBy": "Grupla:",
-    "date": "Tarih"
+    "date": "Tarih",
+    "filters": "Filtreler",
+    "clear": "Temizle",
+    "searchActivities": "Aktiviteleri ara...",
+    "activityType": "Aktivite Türü",
+    "allTypes": "Tüm Türler",
+    "projects": "Projeler",
+    "tasks": "Görevler",
+    "notes": "Notlar",
+    "timeEntries": "Zaman Kayıtları",
+    "dateRange": "Tarih Aralığı",
+    "allTime": "Tüm Zaman"
   },
   "auth": {
     "welcomeBack": "Tekrar hoş geldiniz",

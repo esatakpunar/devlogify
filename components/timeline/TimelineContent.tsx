@@ -3,10 +3,13 @@
 import { useState } from 'react'
 import { ActivityFeed } from './ActivityFeed'
 import { ActivityFilters, type ActivityFilter } from './ActivityFilters'
-import { Button } from '@/components/ui/button'
-import { useTranslation } from '@/lib/i18n/useTranslation'
 import { applyFilters, groupByDate } from '@/lib/utils/activityUtils'
 import { format } from 'date-fns'
+import { useLanguage } from '@/components/providers/LanguageProvider'
+import { tr } from 'date-fns/locale/tr'
+import { enUS } from 'date-fns/locale/en-US'
+import { de } from 'date-fns/locale/de'
+import { es } from 'date-fns/locale/es'
 
 interface Activity {
   id: string
@@ -29,14 +32,20 @@ interface TimelineContentProps {
   userId: string
 }
 
+const localeMap = {
+  tr,
+  en: enUS,
+  de,
+  es,
+}
+
 export function TimelineContent({ initialActivities, userId }: TimelineContentProps) {
-  const t = useTranslation()
+  const { locale } = useLanguage()
   const [filter, setFilter] = useState<ActivityFilter>({
     type: 'all',
     dateRange: 'all',
     search: '',
   })
-  const [groupBy, setGroupBy] = useState<'none' | 'date'>('date')
 
   const filteredActivities = applyFilters(initialActivities, filter)
 
@@ -48,10 +57,8 @@ export function TimelineContent({ initialActivities, userId }: TimelineContentPr
     })
   }
 
-  // Group activities if needed
-  const groupedActivities = groupBy === 'date' 
-    ? groupByDate(filteredActivities)
-    : { 'all': filteredActivities }
+  // Always group activities by date
+  const groupedActivities = groupByDate(filteredActivities)
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -62,36 +69,19 @@ export function TimelineContent({ initialActivities, userId }: TimelineContentPr
         onClear={handleClearFilters}
       />
 
-      {/* Grouping Toggle */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-        <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">{t('timeline.groupBy') || 'Group by:'}</span>
-        <Button
-          variant={groupBy === 'date' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setGroupBy(groupBy === 'date' ? 'none' : 'date')}
-          className="w-full sm:w-auto"
-        >
-          {groupBy === 'date' ? (t('timeline.date') || 'Date') : (t('common.none') || 'None')}
-        </Button>
+      {/* Activity Feed - Always grouped by date */}
+      <div className="space-y-4 sm:space-y-6">
+        {Object.entries(groupedActivities)
+          .sort(([a], [b]) => b.localeCompare(a))
+          .map(([date, activities]) => (
+            <div key={date}>
+              <h3 className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                {format(new Date(date), 'EEEE, MMMM dd, yyyy', { locale: localeMap[locale] })}
+              </h3>
+              <ActivityFeed activities={activities} />
+            </div>
+          ))}
       </div>
-
-      {/* Activity Feed */}
-      {groupBy === 'date' ? (
-        <div className="space-y-4 sm:space-y-6">
-          {Object.entries(groupedActivities)
-            .sort(([a], [b]) => b.localeCompare(a))
-            .map(([date, activities]) => (
-              <div key={date}>
-                <h3 className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
-                  {format(new Date(date), 'EEEE, MMMM dd, yyyy')}
-                </h3>
-                <ActivityFeed activities={activities} />
-              </div>
-            ))}
-        </div>
-      ) : (
-        <ActivityFeed activities={filteredActivities} />
-      )}
     </div>
   )
 }

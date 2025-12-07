@@ -36,7 +36,7 @@ export function ActivityFilters({ filter, onFilterChange, onClear }: ActivityFil
     <div className="space-y-3 sm:space-y-4 p-3 sm:p-4 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-800">
       <div className="flex items-center gap-2">
         <Filter className="w-4 h-4 text-gray-500 dark:text-gray-400" />
-        <h3 className="text-sm sm:text-base font-medium dark:text-gray-200">Filters</h3>
+        <h3 className="text-sm sm:text-base font-medium dark:text-gray-200">{t('timeline.filters')}</h3>
         {hasActiveFilters && (
           <Button
             variant="ghost"
@@ -45,7 +45,7 @@ export function ActivityFilters({ filter, onFilterChange, onClear }: ActivityFil
             className="ml-auto text-xs sm:text-sm"
           >
             <X className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-1" />
-            <span className="hidden sm:inline">Clear</span>
+            <span className="hidden sm:inline">{t('timeline.clear')}</span>
           </Button>
         )}
       </div>
@@ -54,7 +54,7 @@ export function ActivityFilters({ filter, onFilterChange, onClear }: ActivityFil
         {/* Search */}
         <div className="flex-1">
           <Input
-            placeholder="Search activities..."
+            placeholder={t('timeline.searchActivities')}
             value={filter.search}
             onChange={(e) => onFilterChange({ ...filter, search: e.target.value })}
             className="w-full"
@@ -67,14 +67,14 @@ export function ActivityFilters({ filter, onFilterChange, onClear }: ActivityFil
           onValueChange={(value) => onFilterChange({ ...filter, type: value as any })}
         >
           <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Activity Type" />
+            <SelectValue placeholder={t('timeline.activityType')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Types</SelectItem>
-            <SelectItem value="project">Projects</SelectItem>
-            <SelectItem value="task">Tasks</SelectItem>
-            <SelectItem value="note">Notes</SelectItem>
-            <SelectItem value="time_entry">Time Entries</SelectItem>
+            <SelectItem value="all">{t('timeline.allTypes')}</SelectItem>
+            <SelectItem value="project">{t('timeline.projects')}</SelectItem>
+            <SelectItem value="task">{t('timeline.tasks')}</SelectItem>
+            <SelectItem value="note">{t('timeline.notes')}</SelectItem>
+            <SelectItem value="time_entry">{t('timeline.timeEntries')}</SelectItem>
           </SelectContent>
         </Select>
 
@@ -84,13 +84,13 @@ export function ActivityFilters({ filter, onFilterChange, onClear }: ActivityFil
           onValueChange={(value) => onFilterChange({ ...filter, dateRange: value as any })}
         >
           <SelectTrigger className="w-full sm:w-[140px]">
-            <SelectValue placeholder="Date Range" />
+            <SelectValue placeholder={t('timeline.dateRange')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Time</SelectItem>
-            <SelectItem value="today">Today</SelectItem>
-            <SelectItem value="week">This Week</SelectItem>
-            <SelectItem value="month">This Month</SelectItem>
+            <SelectItem value="all">{t('timeline.allTime')}</SelectItem>
+            <SelectItem value="today">{t('timeline.today')}</SelectItem>
+            <SelectItem value="week">{t('timeline.thisWeek')}</SelectItem>
+            <SelectItem value="month">{t('timeline.thisMonth')}</SelectItem>
           </SelectContent>
         </Select>
       </div>
