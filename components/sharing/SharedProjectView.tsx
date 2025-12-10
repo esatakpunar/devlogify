@@ -13,6 +13,7 @@ import {
 import { Lock, Download, FileJson, FileSpreadsheet, Loader2 } from 'lucide-react'
 import { KanbanColumn } from '@/components/tasks/KanbanColumn'
 import { TaskCard } from '@/components/tasks/TaskCard'
+import { EditTaskDialog } from '@/components/tasks/EditTaskDialog'
 import { useSwipeGesture } from '@/lib/hooks/useSwipeGesture'
 import type { SharedLink } from '@/lib/supabase/queries/sharing'
 import { exportToJSON, exportToCSV, downloadFile, prepareExportData } from '@/lib/utils/export'
@@ -51,6 +52,8 @@ interface SharedProjectViewProps {
 export function SharedProjectView({ project, tasks, shareLink }: SharedProjectViewProps) {
   const [downloading, setDownloading] = useState(false)
   const [selectedStatus, setSelectedStatus] = useState<'todo' | 'in_progress' | 'done'>('todo')
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null)
+  const [isTaskDialogOpen, setIsTaskDialogOpen] = useState(false)
   const t = useTranslation()
   const todoTasks = tasks.filter(t => t.status === 'todo')
   const inProgressTasks = tasks.filter(t => t.status === 'in_progress')
@@ -147,6 +150,16 @@ export function SharedProjectView({ project, tasks, shareLink }: SharedProjectVi
     }
   }
 
+  const handleTaskClick = (task: Task) => {
+    setSelectedTask(task)
+    setIsTaskDialogOpen(true)
+  }
+
+  const handleTaskDialogClose = () => {
+    setIsTaskDialogOpen(false)
+    setSelectedTask(null)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-4 sm:py-8 px-3 sm:px-4">
       <div className="max-w-full mx-auto">
@@ -213,7 +226,7 @@ export function SharedProjectView({ project, tasks, shareLink }: SharedProjectVi
             count={todoTasks.length}
             projectId={project.id}
             userId=""
-            onTaskClick={() => {}}
+            onTaskClick={handleTaskClick}
             readOnly
           />
           <KanbanColumn
@@ -223,7 +236,7 @@ export function SharedProjectView({ project, tasks, shareLink }: SharedProjectVi
             count={inProgressTasks.length}
             projectId={project.id}
             userId=""
-            onTaskClick={() => {}}
+            onTaskClick={handleTaskClick}
             readOnly
           />
           <KanbanColumn
@@ -233,7 +246,7 @@ export function SharedProjectView({ project, tasks, shareLink }: SharedProjectVi
             count={doneTasks.length}
             projectId={project.id}
             userId=""
-            onTaskClick={() => {}}
+            onTaskClick={handleTaskClick}
             readOnly
           />
         </div>
@@ -285,6 +298,7 @@ export function SharedProjectView({ project, tasks, shareLink }: SharedProjectVi
                     task={task}
                     userId=""
                     readOnly={true}
+                    onClick={() => handleTaskClick(task)}
                   />
                 ))}
               </>
@@ -297,6 +311,17 @@ export function SharedProjectView({ project, tasks, shareLink }: SharedProjectVi
           <p>{t('sharing.readOnlyView', { count: shareLink.view_count || 0 })}</p>
         </div>
       </div>
+
+      {/* Task Dialog (Read-Only) */}
+      {selectedTask && (
+        <EditTaskDialog
+          open={isTaskDialogOpen}
+          onOpenChange={handleTaskDialogClose}
+          task={selectedTask}
+          onTaskUpdated={() => {}}
+          readOnly={true}
+        />
+      )}
     </div>
   )
 }
