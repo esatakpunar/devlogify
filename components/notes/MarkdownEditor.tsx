@@ -101,10 +101,6 @@ export function MarkdownEditor({
           </div>
         </TabsContent>
       </Tabs>
-
-      <div className="text-xs text-gray-500 dark:text-gray-400 mt-2 flex-shrink-0">
-        <p>{t('notes.markdownSupported')}</p>
-      </div>
     </div>
   )
 }
