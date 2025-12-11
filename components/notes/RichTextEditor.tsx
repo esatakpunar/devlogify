@@ -69,6 +69,8 @@ export function RichTextEditor({
           flex-direction: column;
           height: 100%;
           width: 100%;
+          max-width: 100%;
+          overflow: hidden;
         }
         
         .rich-text-editor .ql-toolbar {
@@ -76,6 +78,9 @@ export function RichTextEditor({
           border-top-left-radius: 0.5rem;
           border-top-right-radius: 0.5rem;
           background: white;
+          flex-shrink: 0;
+          max-width: 100%;
+          overflow-x: auto;
         }
         
         .dark .rich-text-editor .ql-toolbar {
@@ -89,10 +94,13 @@ export function RichTextEditor({
           border-bottom-left-radius: 0.5rem;
           border-bottom-right-radius: 0.5rem;
           background: white;
-          flex: 1;
+          flex: 1 1 0%;
           display: flex;
           flex-direction: column;
-          min-height: ${minHeight};
+          min-height: 0;
+          max-width: 100%;
+          overflow: hidden;
+          position: relative;
         }
         
         .dark .rich-text-editor .ql-container {
@@ -101,10 +109,31 @@ export function RichTextEditor({
         }
         
         .rich-text-editor .ql-editor {
-          flex: 1;
+          flex: 1 1 0%;
+          min-height: ${minHeight};
           font-size: 0.9375rem;
           line-height: 1.6;
           color: rgb(17 24 39);
+          overflow-y: auto;
+          overflow-x: hidden;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+          word-break: break-word;
+          max-width: 100%;
+          width: 100%;
+          box-sizing: border-box;
+          height: 100%;
+        }
+        
+        .rich-text-editor .ql-editor * {
+          max-width: 100%;
+          word-wrap: break-word;
+          overflow-wrap: break-word;
+        }
+        
+        .rich-text-editor .ql-editor pre {
+          white-space: pre-wrap;
+          word-break: break-all;
         }
         
         .dark .rich-text-editor .ql-editor {
