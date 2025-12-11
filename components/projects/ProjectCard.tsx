@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { formatDistanceToNow } from 'date-fns'
 import { AnimatedCard } from '@/components/ui/AnimatedCard'
+import { getPlainTextFromHTML } from '@/components/ui/HTMLContent'
 import { EditProjectDialog } from './EditProjectDialog'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { useConfirmModal } from '@/lib/hooks/useConfirmModal'
@@ -195,7 +196,7 @@ export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
           {/* Description */}
           <div className="min-h-[2rem] sm:min-h-[2.5rem] mb-3 sm:mb-4">
             <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-              {project.description || '\u00A0'}
+              {project.description ? getPlainTextFromHTML(project.description) : '\u00A0'}
             </p>
           </div>
 

@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
+import { RichTextEditor } from '@/components/notes/RichTextEditor'
 import {
   Select,
   SelectContent,
@@ -263,7 +264,7 @@ export function AICreateTasksDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-none sm:max-w-[800px] max-h-none sm:max-h-[90vh] h-full sm:h-auto overflow-hidden p-0 flex flex-col rounded-none sm:rounded-lg w-full sm:w-auto fixed top-0 left-0 right-0 bottom-0 sm:top-[50%] sm:left-[50%] sm:right-auto sm:bottom-auto translate-x-0 translate-y-0 sm:translate-x-[-50%] sm:translate-y-[-50%]">
+      <DialogContent className="max-w-none sm:max-w-[900px] sm:min-w-[800px] max-h-none sm:max-h-[90vh] h-full sm:h-auto overflow-hidden p-0 flex flex-col rounded-none sm:rounded-lg w-full sm:w-auto fixed top-0 left-0 right-0 bottom-0 sm:top-[50%] sm:left-[50%] sm:right-auto sm:bottom-auto translate-x-0 translate-y-0 sm:translate-x-[-50%] sm:translate-y-[-50%]">
         <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 flex-shrink-0">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2 text-base sm:text-lg">
@@ -424,15 +425,15 @@ export function AICreateTasksDialog({
 
                               <div>
                                 <Label className="text-[10px] sm:text-xs">{t('tasks.description')} <span className="text-red-500">*</span></Label>
-                                <Textarea
-                                  value={task.description || ''}
-                                  onChange={(e) => handleTaskChange(task.id, 'description', e.target.value)}
-                                  placeholder={t('tasks.aiCreateTasks.provideContext')}
-                                  rows={2}
-                                  disabled={isCreating}
-                                  className="mt-1 text-xs sm:text-sm resize-none"
-                                  required
-                                />
+                                <div className="mt-1">
+                                  <RichTextEditor
+                                    value={task.description || ''}
+                                    onChange={(value) => handleTaskChange(task.id, 'description', value)}
+                                    placeholder={t('tasks.aiCreateTasks.provideContext')}
+                                    minHeight="150px"
+                                    readOnly={isCreating}
+                                  />
+                                </div>
                               </div>
 
                               <div className="grid grid-cols-2 gap-2">

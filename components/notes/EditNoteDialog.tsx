@@ -12,7 +12,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
 import {
   Select,
   SelectContent,
@@ -22,7 +21,7 @@ import {
 } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/useTranslation'
-import { MarkdownEditor } from './MarkdownEditor'
+import { RichTextEditor } from './RichTextEditor'
 
 interface Note {
   id: string
@@ -65,14 +64,13 @@ export function EditNoteDialog({
   const [content, setContent] = useState(note.content)
   const [projectId, setProjectId] = useState<string>(note.project?.id || '')
   const [tags, setTags] = useState(note.tags?.join(', ') || '')
-  const [useMarkdown, setUseMarkdown] = useState(false)
   const [loading, setLoading] = useState(false)
   const t = useTranslation()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!content.trim()) {
+    if (!content || content.trim().length === 0) {
       toast.error(t('notes.pleaseEnterNoteContent'))
       return
     }
@@ -87,7 +85,7 @@ export function EditNoteDialog({
 
       const updatedNote = await updateNote(note.id, {
         title: title.trim() || null,
-        content: content.trim(),
+        content: content,
         project_id: projectId || null,
         tags: tagsArray.length > 0 ? tagsArray : null,
       })
@@ -105,7 +103,7 @@ export function EditNoteDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-none sm:max-w-[900px] max-h-none sm:max-h-[95vh] h-full sm:h-auto overflow-hidden p-0 flex flex-col rounded-none sm:rounded-lg w-full sm:w-auto fixed top-0 left-0 right-0 bottom-0 sm:top-[50%] sm:left-[50%] sm:right-auto sm:bottom-auto translate-x-0 translate-y-0 sm:translate-x-[-50%] sm:translate-y-[-50%]">
+      <DialogContent className="max-w-none sm:max-w-[900px] sm:min-w-[800px] max-h-none sm:max-h-[95vh] h-full sm:h-auto overflow-hidden p-0 flex flex-col rounded-none sm:rounded-lg w-full sm:w-auto fixed top-0 left-0 right-0 bottom-0 sm:top-[50%] sm:left-[50%] sm:right-auto sm:bottom-auto translate-x-0 translate-y-0 sm:translate-x-[-50%] sm:translate-y-[-50%]">
         {/* Fixed Header */}
         <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
           <DialogTitle className="text-lg sm:text-xl">{t('notes.editNote')}</DialogTitle>
@@ -129,40 +127,18 @@ export function EditNoteDialog({
             </div>
 
             <div className="space-y-2 min-w-0">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <Label htmlFor="edit-note-content" className="text-sm sm:text-base">
-                  {t('notes.content')} <span className="text-red-500">*</span>
-                </Label>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setUseMarkdown(!useMarkdown)}
-                  className="text-xs sm:text-sm"
-                >
-                  {useMarkdown ? 'Plain Text' : 'Markdown'}
-                </Button>
-              </div>
-              {useMarkdown ? (
-                <div className="h-[300px] sm:h-[400px] lg:h-[500px]">
-                  <MarkdownEditor
-                    value={content}
-                    onChange={setContent}
-                    placeholder={t('notes.writeYourNoteHere')}
-                    className="h-full"
-                  />
-                </div>
-              ) : (
-                <Textarea
-                  id="edit-note-content"
-                  placeholder={t('notes.writeYourNoteHere')}
+              <Label htmlFor="edit-note-content" className="text-sm sm:text-base">
+                {t('notes.content')} <span className="text-red-500">*</span>
+              </Label>
+              <div className="h-[300px] sm:h-[400px] lg:h-[500px]">
+                <RichTextEditor
                   value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  disabled={loading}
-                  required
-                  className="resize-none break-words overflow-wrap-anywhere w-full max-w-full h-[300px] sm:h-[400px] lg:h-[500px] overflow-y-auto text-sm sm:text-base"
+                  onChange={setContent}
+                  placeholder={t('notes.writeYourNoteHere')}
+                  className="h-full"
+                  minHeight="100%"
                 />
-              )}
+              </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">

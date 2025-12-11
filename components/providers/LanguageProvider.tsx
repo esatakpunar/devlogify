@@ -112,7 +112,13 @@ export function LanguageProvider({ children, userId }: { children: React.ReactNo
 export function useLanguage() {
   const context = useContext(LanguageContext)
   if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider')
+    // Return default values instead of throwing during SSR or before provider is ready
+    console.warn('useLanguage called outside of LanguageProvider, using defaults')
+    return {
+      locale: defaultLocale,
+      setLocale: async () => {},
+      loading: false
+    }
   }
   return context
 }
