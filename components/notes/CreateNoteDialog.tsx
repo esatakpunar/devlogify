@@ -104,9 +104,9 @@ export function CreateNoteDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] sm:max-w-[1000px] h-[100dvh] sm:h-auto sm:max-h-[90vh] p-0 gap-0 flex flex-col">
+      <DialogContent className="max-w-none sm:max-w-[900px] sm:min-w-[800px] max-h-none sm:max-h-[95vh] h-full sm:h-auto overflow-hidden p-0 flex flex-col rounded-none sm:rounded-lg w-full sm:w-auto fixed top-0 left-0 right-0 bottom-0 sm:top-[50%] sm:left-[50%] sm:right-auto sm:bottom-auto translate-x-0 translate-y-0 sm:translate-x-[-50%] sm:translate-y-[-50%]">
         {/* Fixed Header */}
-        <DialogHeader className="px-3 sm:px-6 pt-3 sm:pt-4 pb-3 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
+        <DialogHeader className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 border-b border-gray-200 dark:border-gray-800 flex-shrink-0">
           <DialogTitle className="text-lg sm:text-xl">{t('notes.createNewNote')}</DialogTitle>
           <DialogDescription className="text-sm">
             {t('notes.captureYourIdeas')}
@@ -115,7 +115,8 @@ export function CreateNoteDialog({
 
         {/* Scrollable Content */}
         <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0 overflow-hidden">
-          <div className="flex-1 overflow-y-auto px-3 sm:px-6 py-4 sm:py-5 space-y-4 sm:space-y-6 min-w-0">
+          <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-4 sm:pb-6 min-h-0">
+              <div className="space-y-3 sm:space-y-4 min-w-0">
             <div className="space-y-2">
               <Label htmlFor="note-title">{t('notes.titleOptional')}</Label>
               <Input
@@ -180,9 +181,10 @@ export function CreateNoteDialog({
               </div>
             </div>
           </div>
+            </div>
 
           {/* Fixed Footer */}
-          <div className="px-3 sm:px-6 pt-4 pb-4 sm:pb-5 border-t border-gray-200 dark:border-gray-800 flex-shrink-0 bg-background sticky bottom-0 z-10">
+          <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-800 flex-shrink-0 bg-background sticky bottom-0 z-10">
             <div className="flex flex-col-reverse sm:flex-row gap-2 sm:gap-3">
               <Button 
                 type="button" 
