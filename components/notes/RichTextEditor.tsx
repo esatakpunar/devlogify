@@ -62,7 +62,7 @@ export function RichTextEditor({
   minHeight = '420px'
 }: RichTextEditorProps) {
   return (
-    <div className={cn('rich-text-editor w-full', className)}>
+    <div className={cn('rich-text-editor w-full overflow-visible', className)}>
       <style jsx global>{`
         .rich-text-editor .quill {
           display: flex;
@@ -70,7 +70,7 @@ export function RichTextEditor({
           height: 100%;
           width: 100%;
           max-width: 100%;
-          overflow: hidden;
+          overflow: visible;
         }
         
         .rich-text-editor .ql-toolbar {
@@ -80,7 +80,9 @@ export function RichTextEditor({
           background: white;
           flex-shrink: 0;
           max-width: 100%;
-          overflow-x: auto;
+          overflow: visible;
+          position: relative;
+          z-index: 10;
         }
         
         .dark .rich-text-editor .ql-toolbar {
@@ -101,6 +103,7 @@ export function RichTextEditor({
           max-width: 100%;
           overflow: hidden;
           position: relative;
+          z-index: 1;
         }
         
         .dark .rich-text-editor .ql-container {
@@ -224,6 +227,14 @@ export function RichTextEditor({
         }
         
         /* Dropdown styles */
+        .rich-text-editor .ql-toolbar .ql-picker {
+          position: relative;
+        }
+        
+        .rich-text-editor .ql-toolbar .ql-picker.ql-expanded {
+          z-index: 100;
+        }
+        
         .rich-text-editor .ql-toolbar .ql-picker-label {
           color: rgb(55 65 81);
         }
@@ -235,6 +246,11 @@ export function RichTextEditor({
         .rich-text-editor .ql-toolbar .ql-picker-options {
           background: white;
           border: 1px solid rgb(229 231 235);
+          z-index: 1000;
+          position: absolute !important;
+          box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+          border-radius: 0.375rem;
+          margin-top: 0.25rem;
         }
         
         .dark .rich-text-editor .ql-toolbar .ql-picker-options {
