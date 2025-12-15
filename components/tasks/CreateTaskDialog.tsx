@@ -271,7 +271,7 @@ export function CreateTaskDialog({
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-[auto_auto_1fr] gap-4">
             <div className="space-y-2">
               <Label htmlFor="task-priority" className="text-xs sm:text-sm">{t('tasks.priority')}</Label>
               <Select 
@@ -279,7 +279,7 @@ export function CreateTaskDialog({
                 onValueChange={(value: 'low' | 'medium' | 'high') => setPriority(value)}
                 disabled={loading}
               >
-                <SelectTrigger id="task-priority" className="text-sm sm:text-base">
+                <SelectTrigger id="task-priority" className="text-sm sm:text-base lg:w-[140px]">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -299,22 +299,21 @@ export function CreateTaskDialog({
                 value={estimatedDuration}
                 onChange={(e) => setEstimatedDuration(e.target.value)}
                 disabled={loading}
+                className="text-sm sm:text-base lg:w-[140px]"
+              />
+            </div>
+
+            <div className="space-y-2 min-w-0">
+              <Label htmlFor="task-tags" className="text-xs sm:text-sm">{t('tasks.tags')}</Label>
+              <Input
+                id="task-tags"
+                placeholder={t('tasks.tagsPlaceholder')}
+                value={tags}
+                onChange={(e) => setTags(e.target.value)}
+                disabled={loading}
                 className="text-sm sm:text-base"
               />
             </div>
-          </div>
-
-          <div className="space-y-2 min-w-0">
-            <Label htmlFor="task-tags" className="text-xs sm:text-sm">{t('tasks.tags')}</Label>
-            <Input
-              id="task-tags"
-              placeholder={t('tasks.tagsPlaceholder')}
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-              disabled={loading}
-              className="text-sm sm:text-base"
-            />
-            <p className="text-xs text-gray-500 dark:text-gray-400">{t('tasks.separateTagsWithCommas')}</p>
           </div>
             </div>
           </div>

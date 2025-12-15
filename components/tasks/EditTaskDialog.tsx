@@ -125,7 +125,7 @@ export function EditTaskDialog({
             </DialogHeader>
           </div>
 
-          <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-4 sm:pb-6 min-h-0">
+          <div className="flex-1 overflow-y-auto px-4 sm:px-6 pb-2 sm:pb-2 min-h-0">
             <div className="space-y-3 sm:space-y-4 min-w-0">
               <div className="space-y-2">
                 <Label htmlFor="edit-task-title" className="text-xs sm:text-sm">
@@ -154,7 +154,7 @@ export function EditTaskDialog({
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-[auto_auto_1fr] gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="edit-task-priority" className="text-xs sm:text-sm">{t('tasks.priority')}</Label>
                   <Select 
@@ -162,7 +162,7 @@ export function EditTaskDialog({
                     onValueChange={(value: 'low' | 'medium' | 'high') => setPriority(value)}
                     disabled={loading || readOnly}
                   >
-                    <SelectTrigger id="edit-task-priority" className="text-sm sm:text-base">
+                    <SelectTrigger id="edit-task-priority" className="text-sm sm:text-base lg:w-[140px]">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -183,23 +183,22 @@ export function EditTaskDialog({
                     onChange={(e) => setEstimatedDuration(e.target.value)}
                     disabled={loading || readOnly}
                     readOnly={readOnly}
+                    className="text-sm sm:text-base lg:w-[140px]"
+                  />
+                </div>
+
+                <div className="space-y-2 min-w-0">
+                  <Label htmlFor="edit-task-tags" className="text-xs sm:text-sm">{t('tasks.tags')}</Label>
+                  <Input
+                    id="edit-task-tags"
+                    placeholder={t('tasks.tagsPlaceholder')}
+                    value={tags}
+                    onChange={(e) => setTags(e.target.value)}
+                    disabled={loading || readOnly}
+                    readOnly={readOnly}
                     className="text-sm sm:text-base"
                   />
                 </div>
-              </div>
-
-              <div className="space-y-2 min-w-0">
-                <Label htmlFor="edit-task-tags" className="text-xs sm:text-sm">{t('tasks.tags')}</Label>
-                <Input
-                  id="edit-task-tags"
-                  placeholder={t('tasks.tagsPlaceholder')}
-                  value={tags}
-                  onChange={(e) => setTags(e.target.value)}
-                  disabled={loading || readOnly}
-                  readOnly={readOnly}
-                  className="text-sm sm:text-base"
-                />
-                <p className="text-xs text-gray-500 dark:text-gray-400">{t('tasks.separateTagsWithCommas')}</p>
               </div>
 
               {/* Progress Section */}
