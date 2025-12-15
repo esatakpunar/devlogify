@@ -59,7 +59,7 @@ export function RichTextEditor({
   placeholder = 'Start writing...',
   className,
   readOnly = false,
-  minHeight = '300px'
+  minHeight = '420px'
 }: RichTextEditorProps) {
   return (
     <div className={cn('rich-text-editor w-full', className)}>
@@ -111,6 +111,7 @@ export function RichTextEditor({
         .rich-text-editor .ql-editor {
           flex: 1 1 0%;
           min-height: ${minHeight};
+          max-height: ${minHeight};
           font-size: 0.9375rem;
           line-height: 1.6;
           color: rgb(17 24 39);
@@ -122,7 +123,7 @@ export function RichTextEditor({
           max-width: 100%;
           width: 100%;
           box-sizing: border-box;
-          height: 100%;
+          height: ${minHeight};
         }
         
         .rich-text-editor .ql-editor * {

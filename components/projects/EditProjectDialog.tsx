@@ -219,8 +219,7 @@ export function EditProjectDialog({
                 value={description}
                 onChange={setDescription}
                 placeholder={t('projects.whatIsThisProjectAbout')}
-                minHeight="300px"
-                className="h-[300px] sm:h-[400px] lg:h-[500px]"
+                className="flex-1 min-h-[350px] sm:min-h-[400px] min-w-0"
               />
             </div>
 

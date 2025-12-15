@@ -149,7 +149,7 @@ export function EditTaskDialog({
                   value={description}
                   onChange={setDescription}
                   placeholder={t('tasks.addMoreDetails')}
-                  className="flex-1 min-h-[300px] sm:min-h-[350px] min-w-0"
+                  className="flex-1 min-h-[350px] sm:min-h-[400px] min-w-0"
                   readOnly={readOnly}
                 />
               </div>
