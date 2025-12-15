@@ -27,6 +27,7 @@ import { useDraggable } from '@dnd-kit/core'
 import { cn } from '@/lib/utils'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { useConfirmModal } from '@/lib/hooks/useConfirmModal'
+import { getPlainTextFromHTML } from '@/components/ui/HTMLContent'
 
 type Task = {
   id: string
@@ -414,7 +415,7 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
         {/* Description */}
         {localTask.description && (
           <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 line-clamp-1 leading-snug">
-            {localTask.description}
+            {getPlainTextFromHTML(localTask.description)}
           </p>
         )}
 

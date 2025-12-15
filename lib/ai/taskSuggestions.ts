@@ -62,7 +62,7 @@ Return a JSON object with the following structure:
   "suggestions": [
     {
       "title": "Task title (required, concise and actionable)",
-      "description": "Detailed description explaining what needs to be done and why",
+      "description": "Detailed description in HTML format explaining what needs to be done and why",
       "priority": "low|medium|high (based on urgency and relation to existing tasks)",
       "estimated_duration": number in minutes (optional, estimate how long the task might take),
       "reason": "Brief explanation of why this task is suggested (e.g., 'Follow-up to task X', 'Missing dependency for task Y', 'Natural next step')",
@@ -76,6 +76,8 @@ Guidelines:
 - Focus on actionable, specific tasks
 - Prioritize tasks that are clearly related to existing work
 - Avoid suggesting tasks that are too similar to existing ones
+- Format description as HTML using tags: <p>, <strong>, <em>, <ul>, <ol>, <li>, <h1>-<h4>, <blockquote>, <code>
+- Use <ul> or <ol> for lists in descriptions
 - Include context in the description about why this task is needed
 - Use "high" priority for critical missing dependencies
 - Use "medium" for normal follow-up tasks

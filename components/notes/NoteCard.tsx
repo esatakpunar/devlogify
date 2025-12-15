@@ -21,6 +21,7 @@ import Link from 'next/link'
 import { usePremium } from '@/lib/hooks/usePremium'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { useConfirmModal } from '@/lib/hooks/useConfirmModal'
+import { getPlainTextFromHTML } from '@/components/ui/HTMLContent'
 
 interface Note {
   id: string
@@ -189,7 +190,7 @@ export function NoteCard({ note, projects, userId, onNoteUpdated, onNoteDeleted,
 
         {/* Content Preview */}
         <p className="text-xs sm:text-sm text-gray-700 line-clamp-3 sm:line-clamp-4 mb-2 sm:mb-3 whitespace-pre-wrap break-words">
-          {note.content}
+          {getPlainTextFromHTML(note.content)}
         </p>
 
         {/* Footer */}

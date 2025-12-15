@@ -110,7 +110,7 @@ Return a JSON object with the following structure:
   "tasks": [
     {
       "title": "Task title (required, concise and actionable - should represent a complete work item)",
-      "description": "Detailed description (REQUIRED - must include context, steps, or important details)",
+      "description": "Detailed description in HTML format (REQUIRED - must include context, steps, or important details)",
       "priority": "low|medium|high (based on urgency and importance)",
       "estimated_duration": number in minutes (optional, estimate how long the task might take)
     }
@@ -124,12 +124,14 @@ CRITICAL GUIDELINES:
    - Example: Instead of "Send email", "Schedule meeting", "Prepare agenda" → Create ONE task: "Schedule and prepare team meeting" with description including all steps
    - A task should represent a complete work item that can be tracked independently
 
-2. DESCRIPTION REQUIREMENTS:
+2. DESCRIPTION REQUIREMENTS (HTML FORMAT):
    - Description is REQUIRED for EVERY task - never leave it empty
-   - Include relevant context, steps, requirements, or important details
-   - If the task involves multiple steps, list them in the description
+   - Format description as HTML using these tags: <p>, <strong>, <em>, <ul>, <ol>, <li>, <h1>-<h4>, <blockquote>, <code>
+   - Use <ul> or <ol> for lists of steps or requirements
+   - Use <strong> for important keywords or emphasis
+   - Use <p> for paragraphs
+   - Example: "<p>Review and update the API documentation for the new authentication endpoints.</p><ul><li>Include code examples</li><li>Error handling scenarios</li><li>Rate limiting information</li></ul>"
    - Provide enough information so someone can understand what needs to be done
-   - Example: "Review and update the API documentation for the new authentication endpoints. Include code examples, error handling scenarios, and rate limiting information."
 
 3. TASK QUALITY:
    - Each task should be substantial enough to be meaningful (not micro-tasks)
@@ -151,6 +153,7 @@ CRITICAL GUIDELINES:
    - If no meaningful tasks can be extracted, return an empty tasks array
    - Aim for 3-8 substantial tasks rather than 10+ micro-tasks
    - Quality over quantity
+   - ALWAYS format descriptions as valid HTML
 
 Return ONLY valid JSON, no additional text or markdown formatting.`
 
