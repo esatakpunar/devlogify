@@ -35,11 +35,11 @@ export function SettingsPageContent({ user }: SettingsPageContentProps) {
   const tabs: { id: SettingsTab; label: string; icon: typeof UserIcon }[] = [
     { id: 'profile', label: t('settings.profile'), icon: UserIcon },
     { id: 'preferences', label: t('settings.preferences'), icon: SettingsIcon },
-    { id: 'notifications', label: t('settings.notifications') || 'Notifications', icon: Bell },
-    { id: 'premium', label: t('premium.title') || 'Premium', icon: Crown },
-    { id: 'shortcuts', label: 'Shortcuts', icon: Keyboard },
-    { id: 'data', label: 'Data', icon: Download },
-    { id: 'account', label: t('account.title') || 'Account', icon: Shield },
+    { id: 'notifications', label: t('settings.notifications'), icon: Bell },
+    { id: 'premium', label: t('premium.title'), icon: Crown },
+    { id: 'shortcuts', label: t('settings.shortcuts'), icon: Keyboard },
+    { id: 'data', label: t('settings.data'), icon: Download },
+    { id: 'account', label: t('account.title'), icon: Shield },
   ]
 
   return (
@@ -48,7 +48,7 @@ export function SettingsPageContent({ user }: SettingsPageContentProps) {
       <div className="mb-6">
         <h1 className="text-3xl font-bold">{t('settings.title')}</h1>
         <p className="text-gray-600 dark:text-gray-400 mt-1">
-          {t('settings.manageAccountAndPreferences') || 'Manage your account and preferences'}
+          {t('settings.manageAccountAndPreferences')}
         </p>
       </div>
 
@@ -193,4 +193,3 @@ export function SettingsPageContent({ user }: SettingsPageContentProps) {
     </div>
   )
 }
-

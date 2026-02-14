@@ -65,7 +65,8 @@
     "analytics": "Analytics",
     "timeline": "Timeline",
     "company": "Company",
-    "settings": "Settings"
+    "settings": "Settings",
+    "more": "More"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -127,6 +128,8 @@
     "preferences": "Preferences",
     "account": "Account",
     "premium": "Premium",
+    "shortcuts": "Shortcuts",
+    "data": "Data",
     "manageAccountAndPreferences": "Manage your account and preferences",
     "theme": "Theme",
     "themeDescription": "Choose your preferred theme",

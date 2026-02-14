@@ -20,7 +20,11 @@ const dictionaries: Record<Locale, Dictionary> = {
  * Get dictionary for a specific locale
  */
 export function getDictionary(locale: Locale): Dictionary {
-  return dictionaries[locale] || dictionaries.en
+  const dictionary = dictionaries[locale]
+  if (!dictionary) {
+    throw new Error(`Dictionary not found for locale: ${locale}`)
+  }
+  return dictionary
 }
 
 /**
@@ -29,15 +33,14 @@ export function getDictionary(locale: Locale): Dictionary {
  */
 export function getNestedValue(
   obj: any,
-  path: string,
-  defaultValue?: string
-): string {
+  path: string
+): string | undefined {
   const keys = path.split('.')
   let value = obj
 
   for (const key of keys) {
     if (value === null || value === undefined) {
-      return defaultValue || path
+      return undefined
     }
     value = value[key]
   }
@@ -46,6 +49,5 @@ export function getNestedValue(
     return value
   }
 
-  return defaultValue || path
+  return undefined
 }
-

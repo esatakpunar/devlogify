@@ -17,7 +17,15 @@ export function useTranslation() {
   const dictionary = useMemo(() => getDictionary(locale), [locale])
 
   const t = (key: string, params?: Record<string, string | number>): string => {
-    let translation = getNestedValue(dictionary, key, key)
+    const resolved = getNestedValue(dictionary, key)
+    if (!resolved) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.warn(`[i18n] Missing translation key: ${key} (${locale})`)
+      }
+      return ''
+    }
+
+    let translation = resolved
 
     // Replace parameters in translation
     if (params) {
@@ -42,4 +50,3 @@ export function useDictionary(): Dictionary {
   const { locale } = useLanguage()
   return useMemo(() => getDictionary(locale), [locale])
 }
-

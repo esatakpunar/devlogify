@@ -1,9 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Menu, Search, Bell, Check, ChevronDown, ChevronRight } from 'lucide-react'
+import { Menu, Search, Check, ChevronDown, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
 import { KeyboardHint } from '@/components/ui/KeyboardHint'
 import {
   DropdownMenu,
@@ -28,9 +27,10 @@ interface NavbarProps {
     email?: string
   }
   onMenuClick?: () => void
+  onSearchClick?: () => void
 }
 
-export function Navbar({ user, onMenuClick }: NavbarProps) {
+export function Navbar({ user, onMenuClick, onSearchClick }: NavbarProps) {
   const t = useTranslation()
   const { locale, setLocale } = useLanguage()
   const [isLanguageOpen, setIsLanguageOpen] = useState(false)
@@ -66,13 +66,16 @@ export function Navbar({ user, onMenuClick }: NavbarProps) {
       {/* Search */}
       <div className="flex-1 min-w-0 max-w-md group">
         <div className="relative">
-          <Search className="absolute left-2 top-2 sm:left-2.5 sm:top-2.5 h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-500" />
-          <Input
-            type="search"
-            placeholder={t('common.searchPlaceholder')}
-            className="pl-7 sm:pl-8 pr-16 sm:pr-20 w-full h-8 sm:h-9 text-xs sm:text-sm"
-          />
-          <div className="absolute right-2 top-1/2 -translate-y-1/2 hidden sm:block">
+          <Button
+            variant="outline"
+            type="button"
+            onClick={onSearchClick}
+            className="w-full h-8 sm:h-9 justify-start pl-7 sm:pl-8 pr-16 sm:pr-20 text-xs sm:text-sm font-normal text-muted-foreground"
+          >
+            <Search className="absolute left-2 top-2 sm:left-2.5 sm:top-2.5 h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-500" />
+            <span className="truncate">{t('common.searchPlaceholder')}</span>
+          </Button>
+          <div className="absolute right-2 top-1/2 -translate-y-1/2 hidden sm:block pointer-events-none">
             <KeyboardHint shortcutId="search" size="sm" showOnHover />
           </div>
         </div>

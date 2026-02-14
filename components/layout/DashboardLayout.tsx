@@ -136,7 +136,11 @@ export function DashboardLayout({
 
         {/* Main Content */}
         <div className="flex flex-1 flex-col overflow-hidden">
-          <Navbar user={user} onMenuClick={() => setMobileMenuOpen(true)} />
+          <Navbar
+            user={user}
+            onMenuClick={() => setMobileMenuOpen(true)}
+            onSearchClick={() => setGlobalSearchOpen(true)}
+          />
           <main className="flex-1 overflow-y-auto p-4 md:p-6 pb-20 md:pb-6">
             {children}
           </main>
@@ -149,7 +153,7 @@ export function DashboardLayout({
       {/* Offline Indicator */}
       <OfflineIndicator />
       
-      <Toaster position="bottom-right" />
+      <Toaster position="top-right" />
       
       {/* Command Palette */}
       {user && (

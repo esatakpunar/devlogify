@@ -65,7 +65,8 @@
     "analytics": "Analitik",
     "timeline": "Zaman Çizelgesi",
     "company": "Şirket",
-    "settings": "Ayarlar"
+    "settings": "Ayarlar",
+    "more": "Daha Fazla"
   },
   "dashboard": {
     "title": "Kontrol Paneli",
@@ -127,6 +128,8 @@
     "preferences": "Tercihler",
     "account": "Hesap",
     "premium": "Premium",
+    "shortcuts": "Kısayollar",
+    "data": "Veri",
     "theme": "Tema",
     "themeDescription": "Tercih ettiğiniz temayı seçin",
     "light": "Açık",

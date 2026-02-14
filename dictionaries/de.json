@@ -65,7 +65,8 @@
     "analytics": "Analysen",
     "timeline": "Zeitachse",
     "company": "Unternehmen",
-    "settings": "Einstellungen"
+    "settings": "Einstellungen",
+    "more": "Mehr"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -127,6 +128,8 @@
     "preferences": "Einstellungen",
     "account": "Konto",
     "premium": "Premium",
+    "shortcuts": "Tastenkürzel",
+    "data": "Daten",
     "theme": "Design",
     "themeDescription": "Wählen Sie Ihr bevorzugtes Design",
     "light": "Hell",

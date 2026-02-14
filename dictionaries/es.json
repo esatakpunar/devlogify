@@ -65,7 +65,8 @@
     "analytics": "Analíticas",
     "timeline": "Línea de tiempo",
     "company": "Empresa",
-    "settings": "Configuración"
+    "settings": "Configuración",
+    "more": "Más"
   },
   "dashboard": {
     "title": "Panel",
@@ -127,6 +128,8 @@
     "preferences": "Preferencias",
     "account": "Cuenta",
     "premium": "Premium",
+    "shortcuts": "Atajos",
+    "data": "Datos",
     "theme": "Tema",
     "themeDescription": "Elige tu tema preferido",
     "light": "Claro",
