@@ -733,6 +733,8 @@
     "email": "E-posta",
     "emailPlaceholder": "ornek@email.com",
     "password": "Şifre",
+    "showPassword": "Şifreyi göster",
+    "hidePassword": "Şifreyi gizle",
     "passwordPlaceholder": "Min. 6 karakter",
     "forgotPassword": "Şifrenizi mi unuttunuz?",
     "signingIn": "Giriş yapılıyor...",

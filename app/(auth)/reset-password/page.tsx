@@ -4,11 +4,9 @@ import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { KeyRound, Loader2 } from 'lucide-react'
+import { AuthCard } from '@/components/auth/AuthCard'
+import { PasswordInput } from '@/components/auth/PasswordInput'
+import { KeyRound } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 
 export default function ResetPasswordPage() {
@@ -110,67 +108,45 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <Card className="flex flex-col border shadow-sm lg:min-h-[460px]">
-      <CardHeader className="space-y-1">
-        <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-          <KeyRound className="h-5 w-5 text-primary" />
-        </div>
-        <CardTitle className="text-2xl font-bold">{t('auth.resetPasswordTitle')}</CardTitle>
-        <CardDescription>
-          {t('auth.enterNewPassword')}
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit} className="flex h-full flex-1 flex-col">
-        <CardContent className="flex-1 space-y-4 pb-6">
-          {error && !passwordResetSuccess && (
-            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-              {error}
-            </div>
-          )}
-          {message && (
-            <div className="rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
-              {message}
-            </div>
-          )}
-          <div className="space-y-2">
-            <Label htmlFor="password">{t('auth.newPassword')}</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder={t('auth.newPasswordPlaceholder')}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              disabled={loading}
-              minLength={6}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="confirm-password">{t('auth.confirmPassword')}</Label>
-            <Input
-              id="confirm-password"
-              type="password"
-              placeholder={t('auth.confirmPasswordPlaceholder')}
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              disabled={loading}
-              minLength={6}
-            />
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            {loading ? t('auth.updatingPassword') : t('auth.updatePassword')}
-          </Button>
-          <p className="text-center text-sm text-muted-foreground">
-            <Link href="/login" className="text-primary hover:underline">
-              {t('auth.backToLogin')}
-            </Link>
-          </p>
-        </CardFooter>
-      </form>
-    </Card>
+    <AuthCard
+      icon={<KeyRound className="h-5 w-5 text-primary" />}
+      title={t('auth.resetPasswordTitle')}
+      description={t('auth.enterNewPassword')}
+      onSubmit={handleSubmit}
+      error={error && !passwordResetSuccess ? error : null}
+      success={message}
+      loading={loading}
+      submitDisabled={loading}
+      submitLabel={t('auth.updatePassword')}
+      loadingLabel={t('auth.updatingPassword')}
+      footer={(
+        <p className="text-center text-sm text-muted-foreground">
+          <Link href="/login" className="text-primary hover:underline">
+            {t('auth.backToLogin')}
+          </Link>
+        </p>
+      )}
+    >
+      <PasswordInput
+        id="password"
+        label={t('auth.newPassword')}
+        placeholder={t('auth.newPasswordPlaceholder')}
+        value={password}
+        onChange={setPassword}
+        required
+        disabled={loading}
+        minLength={6}
+      />
+      <PasswordInput
+        id="confirm-password"
+        label={t('auth.confirmPassword')}
+        placeholder={t('auth.confirmPasswordPlaceholder')}
+        value={confirmPassword}
+        onChange={setConfirmPassword}
+        required
+        disabled={loading}
+        minLength={6}
+      />
+    </AuthCard>
   )
 }

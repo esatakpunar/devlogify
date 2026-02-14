@@ -733,6 +733,8 @@
     "email": "Correo electrónico",
     "emailPlaceholder": "nombre@ejemplo.com",
     "password": "Contraseña",
+    "showPassword": "Mostrar contraseña",
+    "hidePassword": "Ocultar contraseña",
     "passwordPlaceholder": "Mín. 6 caracteres",
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "signingIn": "Iniciando sesión...",
