@@ -970,10 +970,10 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
           </DragOverlay>
         </DndContext>
       ) : (
-        <div className="rounded-lg border bg-white dark:bg-gray-900 overflow-hidden">
-          <div className="overflow-x-auto">
+        <div className="rounded-lg border bg-white dark:bg-gray-900 overflow-hidden flex flex-col max-h-[calc(100vh-20rem)]">
+          <div className="flex-1 min-h-0 overflow-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 dark:bg-gray-800/50 border-b">
+              <thead className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800/50 border-b">
                 <tr className="text-left">
                   <th className="px-3 py-2 font-medium">
                     <button className="inline-flex items-center gap-1" onClick={() => toggleSort('title')}>

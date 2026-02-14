@@ -118,7 +118,7 @@ export function KanbanColumn({
   const strokeDashoffset = circumference * (1 - animatedProgress / 100)
 
   return (
-    <div className="flex flex-col h-full max-h-[calc(100vh-26rem)]">
+    <div className="flex flex-col h-full max-h-[calc(100vh-22rem)]">
       <div className="flex items-center justify-between mb-4 px-2 flex-shrink-0">
         <div className="flex items-center gap-2">
           <div className={`p-1.5 rounded-lg ${statusColors[status]}`}>
