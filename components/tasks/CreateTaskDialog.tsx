@@ -27,33 +27,42 @@ import {
 import { FileText, X } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { UserPicker } from '@/components/shared/UserPicker'
+import { useCompanyStore } from '@/lib/store/companyStore'
+import { useUserProfileStore } from '@/lib/store/userProfileStore'
 
 interface CreateTaskDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   projectId: string
   userId: string
+  companyId?: string
   onTaskCreated: (task: any) => void
 }
 
-export function CreateTaskDialog({ 
-  open, 
-  onOpenChange, 
-  projectId, 
+export function CreateTaskDialog({
+  open,
+  onOpenChange,
+  projectId,
   userId,
-  onTaskCreated 
+  companyId,
+  onTaskCreated
 }: CreateTaskDialogProps) {
   const [title, setTitle] = useState('')
   const [description, setDescription] = useState('')
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>('medium')
   const [estimatedDuration, setEstimatedDuration] = useState('')
   const [tags, setTags] = useState('')
+  const [assigneeId, setAssigneeId] = useState<string | null>(null)
+  const [responsibleId, setResponsibleId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [templates, setTemplates] = useState<TaskTemplate[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<TaskTemplate | null>(null)
   const [showTemplates, setShowTemplates] = useState(false)
   const t = useTranslation()
+  const { members } = useCompanyStore()
+  const { profile } = useUserProfileStore()
 
   // Load templates when dialog opens
   useEffect(() => {
@@ -109,8 +118,11 @@ export function CreateTaskDialog({
         priority,
         estimated_duration: estimatedDuration ? parseInt(estimatedDuration) : null,
         status: 'todo',
-        order_index: 0, // Will be updated by the database trigger or manually
+        order_index: 0,
         tags: tagsArray.length > 0 ? tagsArray : null,
+        company_id: companyId || profile?.company_id || null,
+        assignee_id: assigneeId,
+        responsible_id: responsibleId,
       })
   
       // Activity log ekle
@@ -130,6 +142,8 @@ export function CreateTaskDialog({
       setPriority('medium')
       setEstimatedDuration('')
       setTags('')
+      setAssigneeId(null)
+      setResponsibleId(null)
       setSelectedTemplate(null)
       onOpenChange(false)
     } catch (err: any) {
@@ -315,6 +329,32 @@ export function CreateTaskDialog({
               />
             </div>
           </div>
+
+          {/* Assignee & Responsible */}
+          {members.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-xs sm:text-sm">{t('tasks.assignee')}</Label>
+                <UserPicker
+                  members={members}
+                  selectedUserId={assigneeId}
+                  onSelect={setAssigneeId}
+                  placeholder={t('tasks.selectAssignee')}
+                  disabled={loading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs sm:text-sm">{t('tasks.responsible')}</Label>
+                <UserPicker
+                  members={members}
+                  selectedUserId={responsibleId}
+                  onSelect={setResponsibleId}
+                  placeholder={t('tasks.selectResponsible')}
+                  disabled={loading}
+                />
+              </div>
+            </div>
+          )}
             </div>
           </div>
 

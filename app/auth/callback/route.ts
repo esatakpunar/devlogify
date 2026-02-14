@@ -12,12 +12,24 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
       // If it's a password recovery, redirect to reset password page
-      // The reset password page will handle PASSWORD_RECOVERY event
       if (type === 'recovery') {
         return NextResponse.redirect(`${origin}/reset-password`)
       }
-      
-      // Normal flow - redirect to dashboard or next
+
+      // Check if user has a company
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('company_id')
+          .eq('id', user.id)
+          .single()
+
+        if (!profile?.company_id) {
+          return NextResponse.redirect(`${origin}/onboarding`)
+        }
+      }
+
       return NextResponse.redirect(`${origin}${next}`)
     }
   }

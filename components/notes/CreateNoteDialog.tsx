@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { useCompanyStore } from '@/lib/store/companyStore'
 import { RichTextEditor } from './RichTextEditor'
 
 interface Project {
@@ -51,6 +52,7 @@ export function CreateNoteDialog({
   const [tags, setTags] = useState('')
   const [loading, setLoading] = useState(false)
   const t = useTranslation()
+  const { company } = useCompanyStore()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -70,9 +72,10 @@ export function CreateNoteDialog({
 
       const newNote = await createNote({
         user_id: userId,
+        company_id: company?.id || null,
         title: title.trim() || null,
         content: content,
-        project_id: projectId || null,  
+        project_id: projectId || null,
         tags: tagsArray.length > 0 ? tagsArray : null,
       })
 

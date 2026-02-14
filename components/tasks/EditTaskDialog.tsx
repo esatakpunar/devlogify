@@ -22,6 +22,9 @@ import {
 import { TimeProgressIndicator } from './TimeProgressIndicator'
 import { Slider } from '@/components/ui/slider'
 import { RichTextEditor } from '@/components/notes/RichTextEditor'
+import { UserPicker } from '@/components/shared/UserPicker'
+import { ReviewPanel } from '@/components/tasks/ReviewPanel'
+import { useCompanyStore } from '@/lib/store/companyStore'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { cn } from '@/lib/utils'
@@ -39,6 +42,10 @@ type Task = {
   order_index: number
   created_at: string
   tags?: string[] | null
+  assignee_id?: string | null
+  responsible_id?: string | null
+  review_status?: 'pending' | 'approved' | 'rejected' | 'changes_requested' | null
+  review_note?: string | null
 }
 
 interface EditTaskDialogProps {
@@ -47,14 +54,18 @@ interface EditTaskDialogProps {
   task: Task
   onTaskUpdated: (task: Task) => void
   readOnly?: boolean
+  companyId?: string
+  userId?: string
 }
 
-export function EditTaskDialog({ 
-  open, 
-  onOpenChange, 
-  task, 
+export function EditTaskDialog({
+  open,
+  onOpenChange,
+  task,
   onTaskUpdated,
-  readOnly = false
+  readOnly = false,
+  companyId,
+  userId,
 }: EditTaskDialogProps) {
   const [title, setTitle] = useState(task.title)
   const [description, setDescription] = useState(task.description || '')
@@ -62,8 +73,13 @@ export function EditTaskDialog({
   const [estimatedDuration, setEstimatedDuration] = useState(task.estimated_duration?.toString() || '')
   const [progress, setProgress] = useState(task.progress)
   const [tags, setTags] = useState(task.tags?.join(', ') || '')
+  const [assigneeId, setAssigneeId] = useState(task.assignee_id || '')
+  const [responsibleId, setResponsibleId] = useState(task.responsible_id || '')
   const [loading, setLoading] = useState(false)
   const t = useTranslation()
+
+  const isResponsible = userId && task.responsible_id === userId
+  const { members } = useCompanyStore()
 
   // Update state when task prop changes
   useEffect(() => {
@@ -73,6 +89,8 @@ export function EditTaskDialog({
     setEstimatedDuration(task.estimated_duration?.toString() || '')
     setProgress(task.progress)
     setTags(task.tags?.join(', ') || '')
+    setAssigneeId(task.assignee_id || '')
+    setResponsibleId(task.responsible_id || '')
   }, [task])
 
   const handleProgressUpdate = (newProgress: number) => {
@@ -99,6 +117,8 @@ export function EditTaskDialog({
         estimated_duration: estimatedDuration ? parseInt(estimatedDuration) : null,
         progress,
         tags: tagsArray.length > 0 ? tagsArray : null,
+        assignee_id: assigneeId || null,
+        responsible_id: responsibleId || null,
       })
 
       onTaskUpdated(updatedTask)
@@ -200,6 +220,49 @@ export function EditTaskDialog({
                   />
                 </div>
               </div>
+
+              {/* Assignee & Responsible */}
+              {members.length > 0 && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-xs sm:text-sm">{t('tasks.assignee')}</Label>
+                    <UserPicker
+                      members={members}
+                      selectedUserId={assigneeId || null}
+                      onSelect={(id) => setAssigneeId(id || '')}
+                      placeholder={t('tasks.selectAssignee')}
+                      disabled={loading || readOnly}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-xs sm:text-sm">{t('tasks.responsible')}</Label>
+                    <UserPicker
+                      members={members}
+                      selectedUserId={responsibleId || null}
+                      onSelect={(id) => setResponsibleId(id || '')}
+                      placeholder={t('tasks.selectResponsible')}
+                      disabled={loading || readOnly}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Review Panel */}
+              {companyId && userId && task.review_status && (
+                <ReviewPanel
+                  taskId={task.id}
+                  taskTitle={task.title}
+                  userId={userId}
+                  companyId={companyId}
+                  assigneeId={task.assignee_id || null}
+                  reviewStatus={task.review_status}
+                  reviewNote={task.review_note || null}
+                  isResponsible={!!isResponsible}
+                  onReviewUpdated={() => {
+                    onOpenChange(false)
+                  }}
+                />
+              )}
 
               {/* Progress Section */}
               <div className="space-y-3">

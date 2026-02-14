@@ -15,35 +15,74 @@ export type TaskWithProject = Task & {
   }
 }
 
+// Task with assignee/responsible profile info
+export type TaskWithAssignees = Task & {
+  assignee?: {
+    id: string
+    full_name: string | null
+    avatar_url: string | null
+    email: string
+  } | null
+  responsible?: {
+    id: string
+    full_name: string | null
+    avatar_url: string | null
+    email: string
+  } | null
+}
+
+export type TaskWithProjectAndAssignees = TaskWithProject & {
+  assignee?: {
+    id: string
+    full_name: string | null
+    avatar_url: string | null
+    email: string
+  } | null
+  responsible?: {
+    id: string
+    full_name: string | null
+    avatar_url: string | null
+    email: string
+  } | null
+}
+
 export async function getTasks(projectId: string, supabaseClient?: SupabaseClient<Database>) {
   const supabase = supabaseClient || createBrowserClient()
-  
+
   const { data, error } = await supabase
     .from('tasks')
-    .select('*')
+    .select(`
+      *,
+      assignee:profiles!tasks_assignee_id_fkey(id, full_name, avatar_url, email),
+      responsible:profiles!tasks_responsible_id_fkey(id, full_name, avatar_url, email)
+    `)
     .eq('project_id', projectId)
     .order('order_index', { ascending: true })
 
   if (error) throw error
-  return data
+  return data as TaskWithAssignees[]
 }
 
 export async function getTask(id: string) {
   const supabase = createBrowserClient()
-  
+
   const { data, error } = await supabase
     .from('tasks')
-    .select('*')
+    .select(`
+      *,
+      assignee:profiles!tasks_assignee_id_fkey(id, full_name, avatar_url, email),
+      responsible:profiles!tasks_responsible_id_fkey(id, full_name, avatar_url, email)
+    `)
     .eq('id', id)
     .single()
 
   if (error) throw error
-  return data
+  return data as TaskWithAssignees
 }
 
 export async function createTask(task: TaskInsert, supabaseClient?: SupabaseClient<Database>) {
   const supabase = supabaseClient || createBrowserClient()
-  
+
   const { data, error } = await supabase
     .from('tasks')
     .insert(task)
@@ -59,7 +98,7 @@ export async function createTask(task: TaskInsert, supabaseClient?: SupabaseClie
  */
 export async function createTasks(tasks: TaskInsert[]) {
   const supabase = createBrowserClient()
-  
+
   if (tasks.length === 0) {
     return []
   }
@@ -75,7 +114,7 @@ export async function createTasks(tasks: TaskInsert[]) {
 
 export async function updateTask(id: string, updates: TaskUpdate) {
   const supabase = createBrowserClient()
-  
+
   const { data, error } = await supabase
     .from('tasks')
     .update(updates)
@@ -89,7 +128,7 @@ export async function updateTask(id: string, updates: TaskUpdate) {
 
 export async function deleteTask(id: string) {
   const supabase = createBrowserClient()
-  
+
   const { error } = await supabase
     .from('tasks')
     .delete()
@@ -100,14 +139,14 @@ export async function deleteTask(id: string) {
 
 export async function updateTaskStatus(id: string, status: 'todo' | 'in_progress' | 'done') {
   const supabase = createBrowserClient()
-  
+
   const updates: TaskUpdate = {
     status,
-    ...(status === 'done' 
-      ? { 
+    ...(status === 'done'
+      ? {
           completed_at: new Date().toISOString(),
           progress: 100
-        } 
+        }
       : { completed_at: null })
   }
 
@@ -124,7 +163,7 @@ export async function updateTaskStatus(id: string, status: 'todo' | 'in_progress
 
 export async function updateTaskOrder(taskId: string, newOrder: number) {
   const supabase = createBrowserClient()
-  
+
   const { data, error } = await supabase
     .from('tasks')
     .update({ order_index: newOrder })
@@ -138,10 +177,9 @@ export async function updateTaskOrder(taskId: string, newOrder: number) {
 
 export async function updateTaskProgress(id: string, progress: number) {
   const supabase = createBrowserClient()
-  
-  // Ensure progress is within valid range
+
   const clampedProgress = Math.max(0, Math.min(100, progress))
-  
+
   const { data, error } = await supabase
     .from('tasks')
     .update({ progress: clampedProgress })
@@ -155,12 +193,11 @@ export async function updateTaskProgress(id: string, progress: number) {
 
 export async function updateTasksOrder(taskUpdates: { id: string; order_index: number }[]) {
   const supabase = createBrowserClient()
-  
+
   if (taskUpdates.length === 0) {
     return []
   }
 
-  // Update all tasks in parallel
   const updatePromises = taskUpdates.map(({ id, order_index }) =>
     supabase
       .from('tasks')
@@ -171,8 +208,7 @@ export async function updateTasksOrder(taskUpdates: { id: string; order_index: n
   )
 
   const results = await Promise.all(updatePromises)
-  
-  // Check for errors
+
   for (let i = 0; i < results.length; i++) {
     const result = results[i]
     if (result.error) {
@@ -185,59 +221,187 @@ export async function updateTasksOrder(taskUpdates: { id: string; order_index: n
 }
 
 /**
- * Get recent incomplete tasks for dashboard
+ * Get recent incomplete tasks for dashboard (company-based)
  */
-export async function getRecentIncompleteTasks(userId: string, limit: number = 5, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithProject[]> {
+export async function getRecentIncompleteTasks(companyId: string, limit: number = 5, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithProjectAndAssignees[]> {
   const supabase = supabaseClient || createBrowserClient()
-  
+
   const { data, error } = await supabase
     .from('tasks')
     .select(`
       *,
-      project:projects!inner(
-        id,
-        title,
-        color
-      )
+      project:projects!inner(id, title, color),
+      assignee:profiles!tasks_assignee_id_fkey(id, full_name, avatar_url, email),
+      responsible:profiles!tasks_responsible_id_fkey(id, full_name, avatar_url, email)
     `)
-    .eq('user_id', userId)
+    .eq('company_id', companyId)
     .neq('status', 'done')
     .order('updated_at', { ascending: false })
     .limit(limit)
 
   if (error) throw error
-  return data as TaskWithProject[]
+  return data as TaskWithProjectAndAssignees[]
 }
 
 /**
- * Get tasks completed today for dashboard
+ * Get tasks completed today for dashboard (company-based)
  */
-export async function getTodayCompletedTasks(userId: string, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithProject[]> {
+export async function getTodayCompletedTasks(companyId: string, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithProjectAndAssignees[]> {
   const supabase = supabaseClient || createBrowserClient()
-  
+
   const today = new Date()
   today.setHours(0, 0, 0, 0)
   const tomorrow = new Date(today)
   tomorrow.setDate(tomorrow.getDate() + 1)
-  
+
   const { data, error } = await supabase
     .from('tasks')
     .select(`
       *,
-      project:projects!inner(
-        id,
-        title,
-        color
-      )
+      project:projects!inner(id, title, color),
+      assignee:profiles!tasks_assignee_id_fkey(id, full_name, avatar_url, email),
+      responsible:profiles!tasks_responsible_id_fkey(id, full_name, avatar_url, email)
     `)
-    .eq('user_id', userId)
+    .eq('company_id', companyId)
     .eq('status', 'done')
     .gte('completed_at', today.toISOString())
     .lt('completed_at', tomorrow.toISOString())
     .order('completed_at', { ascending: false })
 
   if (error) throw error
-  return data as TaskWithProject[]
+  return data as TaskWithProjectAndAssignees[]
+}
+
+/**
+ * Get tasks assigned to a specific user
+ */
+export async function getMyTasks(userId: string, companyId: string, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithProjectAndAssignees[]> {
+  const supabase = supabaseClient || createBrowserClient()
+
+  const { data, error } = await supabase
+    .from('tasks')
+    .select(`
+      *,
+      project:projects!inner(id, title, color),
+      assignee:profiles!tasks_assignee_id_fkey(id, full_name, avatar_url, email),
+      responsible:profiles!tasks_responsible_id_fkey(id, full_name, avatar_url, email)
+    `)
+    .eq('company_id', companyId)
+    .eq('assignee_id', userId)
+    .neq('status', 'done')
+    .order('updated_at', { ascending: false })
+
+  if (error) throw error
+  return data as TaskWithProjectAndAssignees[]
+}
+
+/**
+ * Get tasks waiting for review by a specific responsible user
+ */
+export async function getTasksToReview(userId: string, companyId: string, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithProjectAndAssignees[]> {
+  const supabase = supabaseClient || createBrowserClient()
+
+  const { data, error } = await supabase
+    .from('tasks')
+    .select(`
+      *,
+      project:projects!inner(id, title, color),
+      assignee:profiles!tasks_assignee_id_fkey(id, full_name, avatar_url, email),
+      responsible:profiles!tasks_responsible_id_fkey(id, full_name, avatar_url, email)
+    `)
+    .eq('company_id', companyId)
+    .eq('responsible_id', userId)
+    .eq('review_status', 'pending')
+    .order('updated_at', { ascending: false })
+
+  if (error) throw error
+  return data as TaskWithProjectAndAssignees[]
+}
+
+/**
+ * Approve a task (by responsible)
+ */
+export async function approveTask(taskId: string, userId: string, note?: string) {
+  const supabase = createBrowserClient()
+
+  const { data, error } = await supabase
+    .from('tasks')
+    .update({
+      review_status: 'approved',
+      review_note: note || null,
+    })
+    .eq('id', taskId)
+    .eq('responsible_id', userId)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+/**
+ * Reject a task (by responsible)
+ */
+export async function rejectTask(taskId: string, userId: string, note?: string) {
+  const supabase = createBrowserClient()
+
+  const { data, error } = await supabase
+    .from('tasks')
+    .update({
+      review_status: 'rejected',
+      review_note: note || null,
+    })
+    .eq('id', taskId)
+    .eq('responsible_id', userId)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+/**
+ * Request changes on a task (by responsible)
+ */
+export async function requestChanges(taskId: string, userId: string, note?: string) {
+  const supabase = createBrowserClient()
+
+  const { data, error } = await supabase
+    .from('tasks')
+    .update({
+      review_status: 'changes_requested',
+      review_note: note || null,
+      status: 'in_progress',
+    })
+    .eq('id', taskId)
+    .eq('responsible_id', userId)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+/**
+ * Submit task for review (by assignee, moves to done with pending review)
+ */
+export async function submitForReview(taskId: string) {
+  const supabase = createBrowserClient()
+
+  const { data, error } = await supabase
+    .from('tasks')
+    .update({
+      status: 'done',
+      review_status: 'pending',
+      completed_at: new Date().toISOString(),
+      progress: 100,
+    })
+    .eq('id', taskId)
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
 }
 
 /**
@@ -245,8 +409,7 @@ export async function getTodayCompletedTasks(userId: string, supabaseClient?: Su
  */
 export async function addTagsToTasks(taskIds: string[], tags: string[], supabaseClient?: SupabaseClient<Database>) {
   const supabase = supabaseClient || createBrowserClient()
-  
-  // Get current tasks
+
   const { data: existingTasks, error: fetchError } = await supabase
     .from('tasks')
     .select('id, tags')
@@ -256,23 +419,21 @@ export async function addTagsToTasks(taskIds: string[], tags: string[], supabase
     console.error('Error fetching tasks:', fetchError)
     throw fetchError
   }
-  
+
   if (!existingTasks || existingTasks.length === 0) {
     console.error('No tasks found for IDs:', taskIds)
     throw new Error(`Tasks not found for IDs: ${taskIds.join(', ')}`)
   }
 
-  // Update each task with new tags (merge with existing)
   const updates = existingTasks.map(task => {
     const existingTags = (task.tags || []) as string[]
-    const newTags = [...new Set([...existingTags, ...tags])] // Remove duplicates
+    const newTags = [...new Set([...existingTags, ...tags])]
     return {
       id: task.id,
       tags: newTags
     }
   })
 
-  // Update tasks
   const updatePromises = updates.map(update =>
     supabase
       .from('tasks')
@@ -282,8 +443,7 @@ export async function addTagsToTasks(taskIds: string[], tags: string[], supabase
   )
 
   const results = await Promise.all(updatePromises)
-  
-  // Check for errors
+
   for (let i = 0; i < results.length; i++) {
     const result = results[i]
     if (result.error) {
@@ -293,6 +453,6 @@ export async function addTagsToTasks(taskIds: string[], tags: string[], supabase
   }
 
   const updatedTasks = results.map(r => r.data).filter(Boolean).flat()
-  
+
   return updatedTasks
 }

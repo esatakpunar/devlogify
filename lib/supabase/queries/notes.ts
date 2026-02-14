@@ -6,16 +6,16 @@ export type Note = Database['public']['Tables']['notes']['Row']
 export type NoteInsert = Database['public']['Tables']['notes']['Insert']
 export type NoteUpdate = Database['public']['Tables']['notes']['Update']
 
-export async function getNotes(userId: string, supabaseClient?: SupabaseClient<Database>) {
+export async function getNotes(companyId: string, supabaseClient?: SupabaseClient<Database>) {
   const supabase = supabaseClient || createBrowserClient()
-  
+
   const { data, error } = await supabase
     .from('notes')
     .select(`
       *,
       project:projects(id, title, color)
     `)
-    .eq('user_id', userId)
+    .eq('company_id', companyId)
     .order('is_pinned', { ascending: false })
     .order('created_at', { ascending: false })
 
@@ -25,7 +25,7 @@ export async function getNotes(userId: string, supabaseClient?: SupabaseClient<D
 
 export async function getNote(id: string) {
   const supabase = createBrowserClient()
-  
+
   const { data, error } = await supabase
     .from('notes')
     .select(`
@@ -41,7 +41,7 @@ export async function getNote(id: string) {
 
 export async function createNote(note: NoteInsert) {
   const supabase = createBrowserClient()
-  
+
   const { data, error } = await supabase
     .from('notes')
     .insert(note)
@@ -54,7 +54,7 @@ export async function createNote(note: NoteInsert) {
 
 export async function updateNote(id: string, updates: NoteUpdate) {
   const supabase = createBrowserClient()
-  
+
   const { data, error } = await supabase
     .from('notes')
     .update(updates)
@@ -68,7 +68,7 @@ export async function updateNote(id: string, updates: NoteUpdate) {
 
 export async function deleteNote(id: string) {
   const supabase = createBrowserClient()
-  
+
   const { error } = await supabase
     .from('notes')
     .delete()
@@ -79,7 +79,7 @@ export async function deleteNote(id: string) {
 
 export async function togglePinNote(id: string, isPinned: boolean) {
   const supabase = createBrowserClient()
-  
+
   const { data, error } = await supabase
     .from('notes')
     .update({ is_pinned: isPinned })

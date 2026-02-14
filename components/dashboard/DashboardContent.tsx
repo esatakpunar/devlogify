@@ -26,6 +26,7 @@ interface DashboardContentProps {
     id: string
     email?: string
   }
+  companyId: string
   projectCount: number
   todayStats: {
     tasksCompleted: number
@@ -43,6 +44,7 @@ interface DashboardContentProps {
 
 export function DashboardContent({
   user,
+  companyId,
   projectCount,
   todayStats,
   weeklyStats,

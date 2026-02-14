@@ -3,19 +3,22 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
-import { 
-  LayoutDashboard, 
-  FolderKanban, 
-  Clock, 
-  BarChart3, 
+import {
+  LayoutDashboard,
+  FolderKanban,
+  Clock,
+  BarChart3,
   StickyNote,
   Settings,
-  ChevronLeft
+  ChevronLeft,
+  Building2
 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { useSidebarCollapse } from '@/lib/hooks/useSidebarCollapse'
+import { useCompanyStore } from '@/lib/store/companyStore'
+import { useUserProfileStore } from '@/lib/store/userProfileStore'
 
 const navigation = [
   { key: 'dashboard', href: '/dashboard', icon: LayoutDashboard },
@@ -23,6 +26,7 @@ const navigation = [
   { key: 'timeline', href: '/timeline', icon: Clock },
   { key: 'analytics', href: '/analytics', icon: BarChart3 },
   { key: 'notes', href: '/notes', icon: StickyNote },
+  { key: 'company', href: '/company', icon: Building2 },
 ]
 
 interface SidebarProps {

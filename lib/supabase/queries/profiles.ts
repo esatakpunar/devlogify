@@ -11,6 +11,7 @@ export type Profile = {
   week_starts_on: 'monday' | 'sunday'
   language: 'tr' | 'en' | 'de' | 'es'
   is_premium: boolean
+  company_id: string | null
   created_at: string
   updated_at: string
 }
@@ -23,6 +24,7 @@ export type ProfileUpdate = {
   notifications_enabled?: boolean
   week_starts_on?: 'monday' | 'sunday'
   language?: 'tr' | 'en' | 'de' | 'es'
+  company_id?: string | null
 }
 
 /**

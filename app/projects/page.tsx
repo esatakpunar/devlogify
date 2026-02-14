@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import { getProjects } from '@/lib/supabase/queries/projects'
 import { ProjectCard } from '@/components/projects/ProjectCard'
 import { ProjectsFilter } from '@/components/projects/ProjectsFilter'
@@ -11,11 +12,11 @@ interface ProjectsPageProps {
   searchParams: Promise<{ status?: string }>
 }
 
-async function ProjectsList({ status, userId }: { status: string; userId: string }) {
+async function ProjectsList({ status, userId, companyId }: { status: string; userId: string; companyId: string }) {
   const supabase = await createClient()
 
   const projects = await getProjects(
-    userId,
+    companyId,
     status !== 'all' ? status : undefined,
     supabase
   )
@@ -46,11 +47,23 @@ async function ProjectsList({ status, userId }: { status: string; userId: string
 export default async function ProjectsPage({ searchParams }: ProjectsPageProps) {
   const params = await searchParams
   const status = params?.status || 'active'
-  
+
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   if (!user) return null
+
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('company_id')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile?.company_id) {
+    redirect('/onboarding')
+  }
+
+  const companyId = profile.company_id
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -64,7 +77,7 @@ export default async function ProjectsPage({ searchParams }: ProjectsPageProps) 
 
       {/* Projects Grid */}
       <Suspense fallback={<ProjectsSkeleton />}>
-        <ProjectsList status={status} userId={user.id} />
+        <ProjectsList status={status} userId={user.id} companyId={companyId} />
       </Suspense>
     </div>
   )

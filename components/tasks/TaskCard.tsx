@@ -28,6 +28,7 @@ import { cn } from '@/lib/utils'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { useConfirmModal } from '@/lib/hooks/useConfirmModal'
 import { getPlainTextFromHTML } from '@/components/ui/HTMLContent'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 type Task = {
   id: string
@@ -42,6 +43,11 @@ type Task = {
   order_index: number
   created_at: string
   tags?: string[] | null
+  assignee_id?: string | null
+  responsible_id?: string | null
+  review_status?: 'pending' | 'approved' | 'rejected' | 'changes_requested' | null
+  assignee?: { id: string; full_name: string | null; avatar_url: string | null; email: string } | null
+  responsible?: { id: string; full_name: string | null; avatar_url: string | null; email: string } | null
 }
 
 interface TaskCardProps {
@@ -472,10 +478,43 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
             )}
           </div>
           
-          {/* Created Date */}
-          <span className="text-[10px] text-gray-400 dark:text-gray-500 whitespace-nowrap">
-            {formatDistanceToNow(new Date(localTask.created_at), { addSuffix: true })}
-          </span>
+          {/* Assignee/Responsible Avatars + Review Status */}
+          <div className="flex items-center gap-1.5">
+            {localTask.review_status && (
+              <Badge variant="outline" className={cn(
+                "text-[10px] px-1.5 py-0.5 h-5",
+                localTask.review_status === 'pending' && 'bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-400',
+                localTask.review_status === 'approved' && 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400',
+                localTask.review_status === 'rejected' && 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400',
+                localTask.review_status === 'changes_requested' && 'bg-orange-100 text-orange-700 border-orange-200 dark:bg-orange-900/30 dark:text-orange-400',
+              )}>
+                {t(`tasks.reviewStatus.${localTask.review_status}`)}
+              </Badge>
+            )}
+            {localTask.assignee && (
+              <div title={`${t('tasks.assignee')}: ${localTask.assignee.full_name || localTask.assignee.email}`}>
+                <Avatar className="h-5 w-5 border-2 border-blue-300 dark:border-blue-600">
+                  <AvatarImage src={localTask.assignee.avatar_url || undefined} />
+                  <AvatarFallback className="text-[8px] bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">
+                    {(localTask.assignee.full_name || localTask.assignee.email)[0].toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+            )}
+            {localTask.responsible && (
+              <div title={`${t('tasks.responsible')}: ${localTask.responsible.full_name || localTask.responsible.email}`}>
+                <Avatar className="h-5 w-5 border-2 border-purple-300 dark:border-purple-600">
+                  <AvatarImage src={localTask.responsible.avatar_url || undefined} />
+                  <AvatarFallback className="text-[8px] bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300">
+                    {(localTask.responsible.full_name || localTask.responsible.email)[0].toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </div>
+            )}
+            <span className="text-[10px] text-gray-400 dark:text-gray-500 whitespace-nowrap">
+              {formatDistanceToNow(new Date(localTask.created_at), { addSuffix: true })}
+            </span>
+          </div>
         </div>
       </div>
 

@@ -3,7 +3,7 @@ import type { Database } from '@/types/supabase'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 export async function getActivities(
-  userId: string,
+  companyId: string,
   limit: number = 50,
   offset: number = 0,
   supabaseClient?: SupabaseClient<Database>
@@ -15,9 +15,10 @@ export async function getActivities(
     .select(`
       *,
       project:projects(id, title, color),
-      task:tasks(id, title)
+      task:tasks(id, title),
+      user:profiles!activity_logs_user_id_fkey(id, full_name, avatar_url, email)
     `)
-    .eq('user_id', userId)
+    .eq('company_id', companyId)
     .order('created_at', { ascending: false })
     .range(offset, offset + limit - 1)
 
@@ -26,7 +27,7 @@ export async function getActivities(
 }
 
 export async function getActivitiesByDateRange(
-  userId: string,
+  companyId: string,
   startDate: string | Date,
   endDate: string | Date
 ) {
@@ -40,9 +41,10 @@ export async function getActivitiesByDateRange(
     .select(`
       *,
       project:projects(id, title, color),
-      task:tasks(id, title)
+      task:tasks(id, title),
+      user:profiles!activity_logs_user_id_fkey(id, full_name, avatar_url, email)
     `)
-    .eq('user_id', userId)
+    .eq('company_id', companyId)
     .gte('created_at', start)
     .lte('created_at', end)
     .order('created_at', { ascending: false })
@@ -51,24 +53,22 @@ export async function getActivitiesByDateRange(
   return data
 }
 
-export async function getTodayStats(userId: string, supabaseClient?: SupabaseClient<Database>) {
+export async function getTodayStats(companyId: string, supabaseClient?: SupabaseClient<Database>) {
   const supabase = supabaseClient || createBrowserClient()
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 
-  // Bugün tamamlanan task sayısı
   const { count: completedTasks } = await supabase
     .from('tasks')
     .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
+    .eq('company_id', companyId)
     .eq('status', 'done')
     .gte('completed_at', today.toISOString())
 
-  // Bugün harcanan süre
   const { data: timeEntries } = await supabase
     .from('time_entries')
     .select('duration')
-    .eq('user_id', userId)
+    .eq('company_id', companyId)
     .gte('started_at', today.toISOString())
     .not('duration', 'is', null)
 
@@ -90,18 +90,28 @@ export type ActivityType =
   | 'task_status_changed'
   | 'task_progress_updated'
   | 'task_progress_milestone'
+  | 'task_assigned'
+  | 'task_review_requested'
+  | 'task_approved'
+  | 'task_rejected'
+  | 'task_changes_requested'
   | 'time_logged'
   | 'project_created'
   | 'project_updated'
   | 'project_deleted'
   | 'note_created'
+  | 'member_joined'
+  | 'member_removed'
+  | 'team_created'
+  | 'team_updated'
 
 export async function logActivity(
   userId: string,
   projectId: string | null,
   taskId: string | null,
   actionType: ActivityType,
-  metadata?: any
+  metadata?: any,
+  companyId?: string | null
 ) {
   const supabase = createBrowserClient()
 
@@ -113,6 +123,7 @@ export async function logActivity(
       task_id: taskId,
       action_type: actionType,
       metadata: metadata || {},
+      company_id: companyId || null,
     })
 
   if (error) {
@@ -130,13 +141,14 @@ export async function logTimeActivity(
   taskId: string,
   duration: number,
   taskTitle: string,
-  isManual: boolean = false
+  isManual: boolean = false,
+  companyId?: string | null
 ) {
   return logActivity(userId, projectId, taskId, 'time_logged', {
     duration,
     task_title: taskTitle,
     is_manual: isManual
-  })
+  }, companyId)
 }
 
 /**
@@ -145,11 +157,12 @@ export async function logTimeActivity(
 export async function logProjectCreated(
   userId: string,
   projectId: string,
-  projectTitle: string
+  projectTitle: string,
+  companyId?: string | null
 ) {
   return logActivity(userId, projectId, null, 'project_created', {
     project_title: projectTitle
-  })
+  }, companyId)
 }
 
 /**
@@ -159,12 +172,13 @@ export async function logProjectUpdated(
   userId: string,
   projectId: string,
   projectTitle: string,
-  changes: any
+  changes: any,
+  companyId?: string | null
 ) {
   return logActivity(userId, projectId, null, 'project_updated', {
     project_title: projectTitle,
     changes
-  })
+  }, companyId)
 }
 
 /**
@@ -173,11 +187,12 @@ export async function logProjectUpdated(
 export async function logProjectDeleted(
   userId: string,
   projectId: string,
-  projectTitle: string
+  projectTitle: string,
+  companyId?: string | null
 ) {
   return logActivity(userId, projectId, null, 'project_deleted', {
     project_title: projectTitle
-  })
+  }, companyId)
 }
 
 /**
@@ -189,13 +204,14 @@ export async function logTaskProgressUpdate(
   taskId: string,
   oldProgress: number,
   newProgress: number,
-  taskTitle: string
+  taskTitle: string,
+  companyId?: string | null
 ) {
   const isMilestone = [25, 50, 75, 100].includes(newProgress)
   const isSignificant = Math.abs(newProgress - oldProgress) >= 20
-  
+
   const activityType = isMilestone ? 'task_progress_milestone' : 'task_progress_updated'
-  
+
   return logActivity(userId, projectId, taskId, activityType, {
     old_progress: oldProgress,
     new_progress: newProgress,
@@ -203,5 +219,5 @@ export async function logTaskProgressUpdate(
     task_title: taskTitle,
     is_milestone: isMilestone,
     is_significant: isSignificant
-  })
+  }, companyId)
 }

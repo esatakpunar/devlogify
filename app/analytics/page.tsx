@@ -1,11 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import { WeeklySummary } from '@/components/analytics/WeeklySummary'
 import { TimeChart } from '@/components/analytics/TimeChart'
 import { ProjectDistribution } from '@/components/analytics/ProjectDistribution'
 import { ProductivityInsights } from '@/components/analytics/ProductivityInsights'
 import { AnalyticsPageContent } from '@/components/analytics/AnalyticsPageContent'
-import { 
-  getWeeklyStats, 
+import {
+  getWeeklyStats,
   getDailyTimeForWeek,
   getProjectTimeDistribution,
   getMostProductiveDay,
@@ -18,6 +19,18 @@ export default async function AnalyticsPage() {
 
   if (!user) return null
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('company_id')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile?.company_id) {
+    redirect('/onboarding')
+  }
+
+  const companyId = profile.company_id
+
   // Fetch all analytics data in parallel
   const [
     weeklyStats,
@@ -26,11 +39,11 @@ export default async function AnalyticsPage() {
     mostProductiveDay,
     avgTaskDuration
   ] = await Promise.all([
-    getWeeklyStats(user.id),
-    getDailyTimeForWeek(user.id),
-    getProjectTimeDistribution(user.id),
-    getMostProductiveDay(user.id),
-    getAverageTaskDuration(user.id)
+    getWeeklyStats(companyId, user.id),
+    getDailyTimeForWeek(companyId, user.id),
+    getProjectTimeDistribution(companyId, user.id),
+    getMostProductiveDay(companyId, user.id),
+    getAverageTaskDuration(companyId)
   ])
 
   return (

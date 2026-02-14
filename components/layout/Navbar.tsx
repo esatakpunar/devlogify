@@ -15,6 +15,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { GlobalTimerIndicator } from '@/components/timer/GlobalTimerIndicator'
+import { NotificationDropdown } from '@/components/layout/NotificationDropdown'
 import { ThemeToggle } from '@/components/ui/ThemeToggle'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { useLanguage } from '@/components/providers/LanguageProvider'
@@ -86,10 +87,7 @@ export function Navbar({ user, onMenuClick }: NavbarProps) {
         <ThemeToggle userId={user.id} />
 
         {/* Notifications */}
-        <Button variant="ghost" size="icon" className="relative h-8 w-8 sm:h-9 sm:w-9">
-          <Bell className="h-4 w-4 sm:h-5 sm:w-5" />
-          <span className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 w-1.5 h-1.5 sm:w-2 sm:h-2 bg-red-500 rounded-full" />
-        </Button>
+        <NotificationDropdown />
 
         {/* User menu */}
         <DropdownMenu

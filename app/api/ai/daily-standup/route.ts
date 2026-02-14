@@ -52,7 +52,7 @@ export async function GET(request: NextRequest) {
       if (tasks) {
         // Filter for today's tasks (incomplete or in progress)
         const todayProjectTasks = tasks.filter(
-          (task) => task.status !== 'completed'
+          (task) => task.status !== 'done'
         )
         todayTasks.push(...todayProjectTasks)
       }

@@ -29,6 +29,7 @@ import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 import { Plus } from 'lucide-react'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { useCompanyStore } from '@/lib/store/companyStore'
 
 const COLORS = [
   '#6366f1', // Indigo
@@ -61,6 +62,7 @@ export function CreateProjectDialog({
   const [status, setStatus] = useState<'active' | 'archived' | 'completed'>('active')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { company } = useCompanyStore()
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -86,6 +88,7 @@ export function CreateProjectDialog({
 
       const newProject = await createProject({
         user_id: userId,
+        company_id: company?.id || null,
         title,
         description: description || null,
         color,

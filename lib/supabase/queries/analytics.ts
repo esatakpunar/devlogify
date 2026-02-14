@@ -2,54 +2,42 @@ import { createClient as createServerClient } from '@/lib/supabase/server'
 import { startOfWeek, endOfWeek, subWeeks, startOfDay, endOfDay } from 'date-fns'
 import { toZonedTime, fromZonedTime, format } from 'date-fns-tz'
 
-// Default timezone - Türkiye saati
 const DEFAULT_TIMEZONE = 'Europe/Istanbul'
 
-/**
- * Get user's timezone preference or default to Europe/Istanbul
- */
 async function getUserTimezone(userId: string): Promise<string> {
   const supabase = await createServerClient()
-  
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('timezone')
     .eq('id', userId)
     .single()
-  
+
   return profile?.timezone || DEFAULT_TIMEZONE
 }
 
-/**
- * Get timezone-aware week boundaries
- */
 async function getWeekBoundaries(userId: string) {
   const timezone = await getUserTimezone(userId)
   const now = new Date()
-  
-  // Convert current time to user's timezone
+
   const zonedNow = toZonedTime(now, timezone)
-  
-  // Calculate week boundaries in user's timezone
-  const weekStart = startOfWeek(zonedNow, { weekStartsOn: 1 }) // Monday
+
+  const weekStart = startOfWeek(zonedNow, { weekStartsOn: 1 })
   const weekEnd = endOfWeek(zonedNow, { weekStartsOn: 1 })
-  
-  // Convert back to UTC for database queries
+
   const weekStartUTC = fromZonedTime(weekStart, timezone)
   const weekEndUTC = fromZonedTime(weekEnd, timezone)
-  
+
   return { weekStartUTC, weekEndUTC, timezone }
 }
 
-export async function getWeeklyStats(userId: string) {
+export async function getWeeklyStats(companyId: string, userId: string) {
   const supabase = await createServerClient()
   const { weekStartUTC, weekEndUTC, timezone } = await getWeekBoundaries(userId)
-  
-  // Calculate last week boundaries
+
   const lastWeekStartUTC = subWeeks(weekStartUTC, 1)
   const lastWeekEndUTC = subWeeks(weekEndUTC, 1)
-  
-  // Parallel queries for all weekly stats
+
   const [
     currentWeekEntriesResult,
     lastWeekEntriesResult,
@@ -59,28 +47,28 @@ export async function getWeeklyStats(userId: string) {
     supabase
       .from('time_entries')
       .select('duration')
-      .eq('user_id', userId)
+      .eq('company_id', companyId)
       .gte('started_at', weekStartUTC.toISOString())
       .lte('started_at', weekEndUTC.toISOString())
       .not('duration', 'is', null),
     supabase
       .from('time_entries')
       .select('duration')
-      .eq('user_id', userId)
+      .eq('company_id', companyId)
       .gte('started_at', lastWeekStartUTC.toISOString())
       .lte('started_at', lastWeekEndUTC.toISOString())
       .not('duration', 'is', null),
     supabase
       .from('tasks')
       .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
+      .eq('company_id', companyId)
       .eq('status', 'done')
       .gte('completed_at', weekStartUTC.toISOString())
       .lte('completed_at', weekEndUTC.toISOString()),
     supabase
       .from('tasks')
       .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
+      .eq('company_id', companyId)
       .eq('status', 'done')
       .gte('completed_at', lastWeekStartUTC.toISOString())
       .lte('completed_at', lastWeekEndUTC.toISOString())
@@ -101,43 +89,40 @@ export async function getWeeklyStats(userId: string) {
   }
 }
 
-export async function getDailyTimeForWeek(userId: string) {
+export async function getDailyTimeForWeek(companyId: string, userId: string) {
   const supabase = await createServerClient()
   const { weekStartUTC, weekEndUTC, timezone } = await getWeekBoundaries(userId)
 
   const { data: timeEntries } = await supabase
     .from('time_entries')
     .select('started_at, duration')
-    .eq('user_id', userId)
+    .eq('company_id', companyId)
     .gte('started_at', weekStartUTC.toISOString())
     .lte('started_at', weekEndUTC.toISOString())
     .not('duration', 'is', null)
 
-  // Create array for 7 days starting from Monday
   const dailyData = Array.from({ length: 7 }, (_, i) => {
     const date = new Date(weekStartUTC)
     date.setDate(date.getDate() + i)
     const zonedDate = toZonedTime(date, timezone)
     return {
-      day: format(zonedDate, 'EEE', { timeZone: timezone }), // Mon, Tue, etc.
+      day: format(zonedDate, 'EEE', { timeZone: timezone }),
       minutes: 0,
     }
   })
 
   timeEntries?.forEach(entry => {
-    // Convert UTC time to user's timezone to determine which day it belongs to
     const entryDateUTC = new Date(entry.started_at)
     const entryDateZoned = toZonedTime(entryDateUTC, timezone)
-    
-    // Calculate day index (0 = Monday, 6 = Sunday)
-    const dayIndex = (entryDateZoned.getDay() + 6) % 7 // Convert Sunday=0 to Monday=0
+
+    const dayIndex = (entryDateZoned.getDay() + 6) % 7
     dailyData[dayIndex].minutes += entry.duration || 0
   })
 
   return dailyData
 }
 
-export async function getProjectTimeDistribution(userId: string) {
+export async function getProjectTimeDistribution(companyId: string, userId: string) {
   const supabase = await createServerClient()
   const { weekStartUTC, timezone } = await getWeekBoundaries(userId)
 
@@ -149,11 +134,10 @@ export async function getProjectTimeDistribution(userId: string) {
         project:projects!inner(id, title, color)
       )
     `)
-    .eq('user_id', userId)
+    .eq('company_id', companyId)
     .gte('started_at', weekStartUTC.toISOString())
     .not('duration', 'is', null)
 
-  // Group by project
   const projectMap = new Map<string, { title: string; color: string; minutes: number }>()
 
   timeEntries?.forEach((entry: any) => {
@@ -168,24 +152,23 @@ export async function getProjectTimeDistribution(userId: string) {
   return Array.from(projectMap.values())
 }
 
-export async function getMostProductiveDay(userId: string) {
+export async function getMostProductiveDay(companyId: string, userId: string) {
   const supabase = await createServerClient()
   const { weekStartUTC, timezone } = await getWeekBoundaries(userId)
 
   const { data: timeEntries } = await supabase
     .from('time_entries')
     .select('started_at, duration')
-    .eq('user_id', userId)
+    .eq('company_id', companyId)
     .gte('started_at', weekStartUTC.toISOString())
     .not('duration', 'is', null)
 
   const dayTotals = new Map<string, number>()
-  
+
   timeEntries?.forEach(entry => {
-    // Convert UTC time to user's timezone to determine the day
     const entryDateUTC = new Date(entry.started_at)
     const entryDateZoned = toZonedTime(entryDateUTC, timezone)
-    const day = format(entryDateZoned, 'EEEE', { timeZone: timezone }) // Monday, Tuesday, etc.
+    const day = format(entryDateZoned, 'EEEE', { timeZone: timezone })
     dayTotals.set(day, (dayTotals.get(day) || 0) + (entry.duration || 0))
   })
 
@@ -202,13 +185,13 @@ export async function getMostProductiveDay(userId: string) {
   return { day: maxDay || 'N/A', minutes: maxMinutes }
 }
 
-export async function getAverageTaskDuration(userId: string) {
+export async function getAverageTaskDuration(companyId: string) {
   const supabase = await createServerClient()
 
   const { data: tasks } = await supabase
     .from('tasks')
     .select('actual_duration')
-    .eq('user_id', userId)
+    .eq('company_id', companyId)
     .eq('status', 'done')
     .gt('actual_duration', 0)
 
@@ -218,35 +201,31 @@ export async function getAverageTaskDuration(userId: string) {
   return Math.round(total / tasks.length)
 }
 
-export async function getTodayStats(userId: string) {
+export async function getTodayStats(companyId: string, userId: string) {
   const supabase = await createServerClient()
   const timezone = await getUserTimezone(userId)
   const now = new Date()
-  
-  // Convert current time to user's timezone
+
   const zonedNow = toZonedTime(now, timezone)
-  
-  // Calculate day boundaries in user's timezone
+
   const dayStart = startOfDay(zonedNow)
   const dayEnd = endOfDay(zonedNow)
-  
-  // Convert back to UTC for database queries
+
   const dayStartUTC = fromZonedTime(dayStart, timezone)
   const dayEndUTC = fromZonedTime(dayEnd, timezone)
 
-  // Parallel queries for today's stats
   const [tasksResult, timeEntriesResult] = await Promise.all([
     supabase
       .from('tasks')
       .select('*', { count: 'exact', head: true })
-      .eq('user_id', userId)
+      .eq('company_id', companyId)
       .eq('status', 'done')
       .gte('completed_at', dayStartUTC.toISOString())
       .lte('completed_at', dayEndUTC.toISOString()),
     supabase
       .from('time_entries')
       .select('duration')
-      .eq('user_id', userId)
+      .eq('company_id', companyId)
       .gte('started_at', dayStartUTC.toISOString())
       .lte('started_at', dayEndUTC.toISOString())
       .not('duration', 'is', null)

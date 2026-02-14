@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import { getNotes } from '@/lib/supabase/queries/notes'
 import { getProjects } from '@/lib/supabase/queries/projects'
 import { NotesHeader } from '@/components/notes/NotesHeader'
@@ -10,8 +11,22 @@ export default async function NotesPage() {
 
   if (!user) return null
 
-  const notes = await getNotes(user.id, supabase)
-  const projects = await getProjects(user.id, 'active', supabase)
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('company_id')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile?.company_id) {
+    redirect('/onboarding')
+  }
+
+  const companyId = profile.company_id
+
+  const [notes, projects] = await Promise.all([
+    getNotes(companyId, supabase),
+    getProjects(companyId, 'active', supabase),
+  ])
 
   return (
     <div className="space-y-6">

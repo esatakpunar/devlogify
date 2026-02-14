@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import { getProject } from '@/lib/supabase/queries/projects'
 import { getTasks } from '@/lib/supabase/queries/tasks'
 import { notFound } from 'next/navigation'
@@ -20,12 +21,24 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     notFound()
   }
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('company_id')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile?.company_id) {
+    redirect('/onboarding')
+  }
+
+  const companyId = profile.company_id
+
   // Get project
   try {
     const project = await getProject(id, supabase)
 
-    // Verify ownership
-    if (project.user_id !== user.id) {
+    // Verify company ownership
+    if (project.company_id !== companyId && project.user_id !== user.id) {
       notFound()
     }
 
@@ -35,9 +48,9 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     return (
       <div className="space-y-4 sm:space-y-6">
         <ProjectHeader project={project} userId={user.id} />
-        <ProjectContent 
-          projectId={id} 
-          initialTasks={tasks || []} 
+        <ProjectContent
+          projectId={id}
+          initialTasks={tasks || []}
           userId={user.id}
           project={{ id: project.id, title: project.title, color: project.color }}
         />

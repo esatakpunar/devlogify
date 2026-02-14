@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import { getTodayStats, getActivities } from '@/lib/supabase/queries/activities'
 import { TimelinePageContent } from '@/components/timeline/TimelinePageContent'
 
@@ -8,11 +9,23 @@ export default async function TimelinePage() {
 
   if (!user) return null
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('company_id')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile?.company_id) {
+    redirect('/onboarding')
+  }
+
+  const companyId = profile.company_id
+
   // Bugün tamamlanan task sayısı ve harcanan süre
-  const { completedTasks, totalMinutes } = await getTodayStats(user.id, supabase)
+  const { completedTasks, totalMinutes } = await getTodayStats(companyId, supabase)
 
   // Aktiviteler
-  const activities = await getActivities(user.id, 50, 0, supabase)
+  const activities = await getActivities(companyId, 50, 0, supabase)
 
   return (
     <TimelinePageContent

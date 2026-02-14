@@ -22,6 +22,7 @@ import { ArrowLeft, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { useCompanyStore } from '@/lib/store/companyStore'
 
 const COLORS = [
   '#6366f1', // Indigo
@@ -50,6 +51,7 @@ export function CreateProjectForm() {
   const [draftSaved, setDraftSaved] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+  const { company } = useCompanyStore()
   const { isPremium, loading: premiumLoading } = usePremium(userId || undefined)
   const t = useTranslation()
 
@@ -109,7 +111,8 @@ export function CreateProjectForm() {
     } else {
       setTitleError(null)
     }
-  }, [title, t])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [title])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -141,6 +144,7 @@ export function CreateProjectForm() {
 
       const newProject = await createProject({
         user_id: user.id,
+        company_id: company?.id || null,
         title,
         description: description || null,
         color,

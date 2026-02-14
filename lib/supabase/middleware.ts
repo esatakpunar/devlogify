@@ -1,6 +1,10 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// Routes that don't require company membership
+const PUBLIC_ROUTES = ['/login', '/signup', '/reset-password', '/forgot-password', '/onboarding', '/auth', '/share']
+const AUTH_ROUTES = ['/login', '/signup', '/reset-password', '/forgot-password']
+
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
     request: {
@@ -62,7 +66,40 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
+  const pathname = request.nextUrl.pathname
+
+  // Check if current route is public
+  const isPublicRoute = PUBLIC_ROUTES.some(route => pathname.startsWith(route))
+  const isAuthRoute = AUTH_ROUTES.some(route => pathname.startsWith(route))
+  const isApiRoute = pathname.startsWith('/api')
+  const isRootPage = pathname === '/'
+
+  // If not authenticated and trying to access protected route
+  if (!user && !isPublicRoute && !isApiRoute && !isRootPage) {
+    const redirectUrl = new URL('/login', request.url)
+    return NextResponse.redirect(redirectUrl)
+  }
+
+  // If authenticated and on auth routes, redirect to dashboard
+  if (user && isAuthRoute) {
+    const redirectUrl = new URL('/dashboard', request.url)
+    return NextResponse.redirect(redirectUrl)
+  }
+
+  // If authenticated, check for company membership on protected routes
+  if (user && !isPublicRoute && !isApiRoute && !isRootPage) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('company_id')
+      .eq('id', user.id)
+      .single()
+
+    if (!profile?.company_id) {
+      const redirectUrl = new URL('/onboarding', request.url)
+      return NextResponse.redirect(redirectUrl)
+    }
+  }
 
   return response
 }

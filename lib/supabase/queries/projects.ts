@@ -12,7 +12,7 @@ export type ProjectWithTasks = Project & {
   tasks: { count: number }[]
 }
 
-export async function getProjects(userId: string, status?: string, supabaseClient?: SupabaseClient<Database>): Promise<ProjectWithTasks[]> {
+export async function getProjects(companyId: string, status?: string, supabaseClient?: SupabaseClient<Database>): Promise<ProjectWithTasks[]> {
   const supabase = supabaseClient || createBrowserClient()
 
   let query = supabase
@@ -21,7 +21,7 @@ export async function getProjects(userId: string, status?: string, supabaseClien
       *,
       tasks:tasks(count)
     `)
-    .eq('user_id', userId)
+    .eq('company_id', companyId)
     .order('created_at', { ascending: false })
 
   if (status) {
@@ -36,7 +36,7 @@ export async function getProjects(userId: string, status?: string, supabaseClien
 
 export async function getProject(id: string, supabaseClient?: SupabaseClient<Database>) {
   const supabase = supabaseClient || createBrowserClient()
-  
+
   const { data, error } = await supabase
     .from('projects')
     .select('*')
@@ -49,7 +49,7 @@ export async function getProject(id: string, supabaseClient?: SupabaseClient<Dat
 
 export async function createProject(project: ProjectInsert) {
   const supabase = createBrowserClient()
-  
+
   const { data, error } = await supabase
     .from('projects')
     .insert(project)
@@ -62,7 +62,7 @@ export async function createProject(project: ProjectInsert) {
 
 export async function updateProject(id: string, updates: ProjectUpdate) {
   const supabase = createBrowserClient()
-  
+
   const { data, error } = await supabase
     .from('projects')
     .update(updates)
@@ -103,15 +103,15 @@ export async function archiveProject(id: string) {
 }
 
 /**
- * Get project count for a user by status
+ * Get project count for a company by status
  */
-export async function getProjectCount(userId: string, status?: string, supabaseClient?: SupabaseClient<Database>) {
+export async function getProjectCount(companyId: string, status?: string, supabaseClient?: SupabaseClient<Database>) {
   const supabase = supabaseClient || createBrowserClient()
 
   let query = supabase
     .from('projects')
     .select('*', { count: 'exact', head: true })
-    .eq('user_id', userId)
+    .eq('company_id', companyId)
 
   if (status) {
     query = query.eq('status', status)
@@ -124,15 +124,15 @@ export async function getProjectCount(userId: string, status?: string, supabaseC
 }
 
 /**
- * Get projects with task relations for a specific user
+ * Get projects for notes (company-based)
  */
-export async function getProjectsWithNotes(userId: string) {
+export async function getProjectsWithNotes(companyId: string) {
   const supabase = createBrowserClient()
 
   const { data, error } = await supabase
     .from('projects')
     .select('*')
-    .eq('user_id', userId)
+    .eq('company_id', companyId)
     .order('created_at', { ascending: false })
 
   if (error) throw error
@@ -142,7 +142,7 @@ export async function getProjectsWithNotes(userId: string) {
 /**
  * Get pinned projects for dashboard
  */
-export async function getPinnedProjects(userId: string, supabaseClient?: SupabaseClient<Database>): Promise<ProjectWithTasks[]> {
+export async function getPinnedProjects(companyId: string, supabaseClient?: SupabaseClient<Database>): Promise<ProjectWithTasks[]> {
   const supabase = supabaseClient || createBrowserClient()
 
   try {
@@ -152,7 +152,7 @@ export async function getPinnedProjects(userId: string, supabaseClient?: Supabas
         *,
         tasks:tasks(count)
       `)
-      .eq('user_id', userId)
+      .eq('company_id', companyId)
       .eq('is_pinned', true)
       .eq('status', 'active')
       .order('updated_at', { ascending: false })
@@ -161,7 +161,6 @@ export async function getPinnedProjects(userId: string, supabaseClient?: Supabas
     if (error) throw error
     return data as ProjectWithTasks[]
   } catch (error: any) {
-    // If is_pinned column doesn't exist yet, return empty array
     if (error.code === '42703') {
       console.warn('is_pinned column not found, returning empty pinned projects')
       return []
@@ -177,7 +176,6 @@ export async function toggleProjectPin(projectId: string, supabaseClient?: Supab
   const supabase = supabaseClient || createBrowserClient()
 
   try {
-    // First get current pin status
     const { data: project, error: fetchError } = await supabase
       .from('projects')
       .select('is_pinned')
@@ -192,7 +190,6 @@ export async function toggleProjectPin(projectId: string, supabaseClient?: Supab
 
     const currentPinStatus = (project as { is_pinned: boolean }).is_pinned
 
-    // Toggle the pin status - use updateProject if no client provided, otherwise use direct update
     if (supabaseClient) {
       const { data, error } = await (supabaseClient as any)
         .from('projects')
@@ -204,11 +201,9 @@ export async function toggleProjectPin(projectId: string, supabaseClient?: Supab
       if (error) throw error
       return data
     } else {
-      // Use the helper function when no client is provided
       return await updateProject(projectId, { is_pinned: !currentPinStatus })
     }
   } catch (error: any) {
-    // If is_pinned column doesn't exist yet, show error message
     if (error.code === '42703') {
       throw new Error('Project pinning feature is not available yet. Please run the database migration.')
     }
