@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { MoreVertical, Calendar, ListTodo, Edit, Archive, Trash, Pin, PinOff } from 'lucide-react'
@@ -42,13 +42,18 @@ export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
   const [loading, setLoading] = useState(false)
   const [pinLoading, setPinLoading] = useState(false)
   const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const [localIsPinned, setLocalIsPinned] = useState(project.is_pinned || false)
   const router = useRouter()
   const supabase = createClient()
   const t = useTranslation()
   const { confirm, confirmWithAction, Modal: ConfirmModal } = useConfirmModal()
 
   const taskCount = project.tasks?.[0]?.count ?? 0
-  const isPinned = project.is_pinned || false
+  const isPinned = localIsPinned
+
+  useEffect(() => {
+    setLocalIsPinned(project.is_pinned || false)
+  }, [project.is_pinned])
 
   const handleArchive = async (e: React.MouseEvent) => {
     e.preventDefault()
@@ -106,12 +111,14 @@ export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
     e.preventDefault()
     e.stopPropagation()
     
+    const nextPinned = !isPinned
+    setLocalIsPinned(nextPinned)
     setPinLoading(true)
     try {
       await toggleProjectPin(project.id)
-      toast.success(isPinned ? t('projects.projectUnpinned') : t('projects.projectPinned'))
-      router.refresh()
+      toast.success(nextPinned ? t('projects.projectPinned') : t('projects.projectUnpinned'))
     } catch (error) {
+      setLocalIsPinned(!nextPinned)
       toast.error(t('projects.failedToUpdatePinStatus'))
       console.error('Pin toggle error:', error)
     } finally {

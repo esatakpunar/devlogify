@@ -91,6 +91,7 @@ type MultiSelectOption = {
   label: string
 }
 type DesktopFilterKey = 'project' | 'status' | 'priority' | 'assignee' | 'responsible'
+const LIST_PAGE_SIZE = 100
 
 function sortByUpdatedAtDesc(tasks: TaskItem[]): TaskItem[] {
   return [...tasks].sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
@@ -197,6 +198,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
   const [draftPriorities, setDraftPriorities] = useState<string[]>([])
   const [draftAssigneeIds, setDraftAssigneeIds] = useState<string[]>([])
   const [draftResponsibleIds, setDraftResponsibleIds] = useState<string[]>([])
+  const [listRenderCount, setListRenderCount] = useState(LIST_PAGE_SIZE)
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isAICreateDialogOpen, setIsAICreateDialogOpen] = useState(false)
@@ -307,6 +309,15 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
       return 0
     })
   }, [filteredTasks, sortKey, sortDirection])
+
+  const visibleListTasks = useMemo(
+    () => sortedListTasks.slice(0, listRenderCount),
+    [sortedListTasks, listRenderCount]
+  )
+
+  useEffect(() => {
+    setListRenderCount(LIST_PAGE_SIZE)
+  }, [viewMode, sortKey, sortDirection, filteredTasks.length])
 
   const memberOptions = useMemo(() => {
     return members.map((member) => ({
@@ -1039,7 +1050,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
                 </tr>
               </thead>
               <tbody>
-                {sortedListTasks.map((task) => (
+                {visibleListTasks.map((task) => (
                   <tr key={task.id} className="border-b last:border-b-0">
                     <td className="px-3 py-2 min-w-[220px]">
                       <button
@@ -1158,6 +1169,18 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
           {sortedListTasks.length === 0 && (
             <div className="p-8 text-center text-sm text-muted-foreground">
               {t('common.noResults')}
+            </div>
+          )}
+
+          {sortedListTasks.length > visibleListTasks.length && (
+            <div className="border-t p-3 flex justify-center">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setListRenderCount((prev) => prev + LIST_PAGE_SIZE)}
+              >
+                {t('common.loadMore') || 'Load more'}
+              </Button>
             </div>
           )}
         </div>

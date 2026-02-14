@@ -1,11 +1,12 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ActivityFeed } from './ActivityFeed'
 import { ActivityFilters, type ActivityFilter } from './ActivityFilters'
 import { applyFilters, groupByDate } from '@/lib/utils/activityUtils'
 import { format } from 'date-fns'
 import { useLanguage } from '@/components/providers/LanguageProvider'
+import { Button } from '@/components/ui/button'
 import { tr } from 'date-fns/locale/tr'
 import { enUS } from 'date-fns/locale/en-US'
 import { de } from 'date-fns/locale/de'
@@ -41,11 +42,13 @@ const localeMap = {
 
 export function TimelineContent({ initialActivities, userId }: TimelineContentProps) {
   const { locale } = useLanguage()
+  const GROUP_PAGE_SIZE = 7
   const [filter, setFilter] = useState<ActivityFilter>({
     type: 'all',
     dateRange: 'all',
     search: '',
   })
+  const [visibleGroupCount, setVisibleGroupCount] = useState(GROUP_PAGE_SIZE)
 
   const filteredActivities = applyFilters(initialActivities, filter)
 
@@ -61,6 +64,11 @@ export function TimelineContent({ initialActivities, userId }: TimelineContentPr
   const groupedActivities = groupByDate(filteredActivities)
   const sortedGroupedActivities = Object.entries(groupedActivities)
     .sort(([a], [b]) => b.localeCompare(a))
+  const visibleGroups = sortedGroupedActivities.slice(0, visibleGroupCount)
+
+  useEffect(() => {
+    setVisibleGroupCount(GROUP_PAGE_SIZE)
+  }, [filter.type, filter.dateRange, filter.search])
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -76,14 +84,27 @@ export function TimelineContent({ initialActivities, userId }: TimelineContentPr
         {sortedGroupedActivities.length === 0 ? (
           <ActivityFeed activities={[]} />
         ) : (
-          sortedGroupedActivities.map(([date, activities]) => (
-            <div key={date}>
-              <h3 className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
-                {format(new Date(date), 'EEEE, MMMM dd, yyyy', { locale: localeMap[locale] })}
-              </h3>
-              <ActivityFeed activities={activities} />
-            </div>
-          ))
+          <>
+            {visibleGroups.map(([date, activities]) => (
+              <div key={date}>
+                <h3 className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                  {format(new Date(date), 'EEEE, MMMM dd, yyyy', { locale: localeMap[locale] })}
+                </h3>
+                <ActivityFeed activities={activities} />
+              </div>
+            ))}
+            {sortedGroupedActivities.length > visibleGroups.length && (
+              <div className="flex justify-center pt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setVisibleGroupCount((prev) => prev + GROUP_PAGE_SIZE)}
+                >
+                  Load more
+                </Button>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

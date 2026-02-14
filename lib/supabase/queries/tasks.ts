@@ -260,6 +260,23 @@ export async function updateTasksOrder(taskUpdates: { id: string; order_index: n
     return []
   }
 
+  // Prefer a single RPC call for better network/database efficiency.
+  const { error: rpcError } = await supabase.rpc('bulk_update_task_order', {
+    order_updates: taskUpdates,
+  })
+
+  if (!rpcError) {
+    const updatedIds = taskUpdates.map((task) => task.id)
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('*')
+      .in('id', updatedIds)
+
+    if (error) throw error
+    return (data || []) as Task[]
+  }
+
+  // Fallback for environments where RPC is not deployed yet.
   const updatePromises = taskUpdates.map(({ id, order_index }) =>
     supabase
       .from('tasks')
@@ -270,7 +287,6 @@ export async function updateTasksOrder(taskUpdates: { id: string; order_index: n
   )
 
   const results = await Promise.all(updatePromises)
-
   for (let i = 0; i < results.length; i++) {
     const result = results[i]
     if (result.error) {
@@ -279,7 +295,7 @@ export async function updateTasksOrder(taskUpdates: { id: string; order_index: n
     }
   }
 
-  return results.map(r => r.data).filter(Boolean) as Task[]
+  return results.map((r: any) => r.data).filter(Boolean) as Task[]
 }
 
 /**
