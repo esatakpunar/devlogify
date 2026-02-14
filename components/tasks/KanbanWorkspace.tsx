@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import {
   DndContext,
   DragEndEvent,
@@ -170,6 +171,9 @@ function MultiSelectFilter({
 
 export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: KanbanWorkspaceProps) {
   const t = useTranslation()
+  const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const { isPremium } = usePremium(userId)
   const { members, fetchMembers } = useCompanyStore()
 
@@ -198,6 +202,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
 
   const [selectedTask, setSelectedTask] = useState<TaskItem | null>(null)
   const [activeTask, setActiveTask] = useState<TaskItem | null>(null)
+  const openTaskId = searchParams.get('task')
 
   useEffect(() => {
     setTasks(sortByUpdatedAtDesc(initialTasks))
@@ -206,6 +211,14 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
   useEffect(() => {
     fetchMembers(companyId)
   }, [companyId, fetchMembers])
+
+  useEffect(() => {
+    if (!openTaskId) return
+    const taskToOpen = tasks.find((task) => task.id === openTaskId)
+    if (taskToOpen) {
+      setSelectedTask(taskToOpen)
+    }
+  }, [openTaskId, tasks])
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -1173,6 +1186,10 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
           onOpenChange={(open) => {
             if (!open) {
               setSelectedTask(null)
+              const params = new URLSearchParams(searchParams.toString())
+              params.delete('task')
+              const queryString = params.toString()
+              router.replace(queryString ? `${pathname}?${queryString}` : pathname, { scroll: false })
             }
           }}
           task={selectedTask}

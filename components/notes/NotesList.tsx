@@ -1,8 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { NoteCard } from './NoteCard'
 import { CreateNoteDialog } from './CreateNoteDialog'
+import { EditNoteDialog } from './EditNoteDialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Plus, Search, StickyNote } from 'lucide-react'
@@ -40,7 +42,11 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
   const [notes, setNotes] = useState<Note[]>(initialNotes)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const searchParams = useSearchParams()
+  const router = useRouter()
   const t = useTranslation()
+  const openNoteId = searchParams.get('note')
+  const openNote = openNoteId ? notes.find((note) => note.id === openNoteId) : undefined
 
   const filteredNotes = notes.filter(note => {
     const searchLower = searchQuery.toLowerCase()
@@ -167,6 +173,21 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
         userId={userId}
         onNoteCreated={handleNoteCreated}
       />
+
+      {openNote && (
+        <EditNoteDialog
+          open={true}
+          onOpenChange={(isOpen) => {
+            if (!isOpen) {
+              router.replace('/notes', { scroll: false })
+            }
+          }}
+          note={openNote}
+          projects={projects}
+          userId={userId}
+          onNoteUpdated={handleNoteUpdated}
+        />
+      )}
     </div>
   )
 }

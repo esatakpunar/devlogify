@@ -86,7 +86,7 @@ export function GlobalSearch({ open, onOpenChange, userId }: GlobalSearchProps) 
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] overflow-hidden">
         <DialogHeader>
           <DialogTitle>Global Search</DialogTitle>
           <DialogDescription>
@@ -120,34 +120,38 @@ export function GlobalSearch({ open, onOpenChange, userId }: GlobalSearchProps) 
           )}
 
           {!loading && results.length > 0 && (
-            <div className="space-y-1 max-h-[400px] overflow-y-auto">
+            <div
+              className="space-y-1 max-h-[400px] overflow-y-auto overflow-x-hidden pr-2"
+              style={{ scrollbarGutter: 'stable' }}
+            >
               {results.map((result) => (
                 <button
                   key={`${result.type}-${result.id}`}
                   onClick={() => handleSelect(result)}
                   className={cn(
-                    'w-full flex items-center gap-3 p-3 rounded-lg border border-gray-200',
+                    'w-full max-w-full flex items-center gap-3 p-3 rounded-lg border border-gray-200 overflow-hidden',
                     'hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors text-left',
                     'dark:border-gray-800'
                   )}
                 >
                   <div className={cn(
                     'flex items-center justify-center w-8 h-8 rounded',
+                    'shrink-0',
                     result.type === 'project' && 'bg-blue-100 dark:bg-blue-900/20',
                     result.type === 'task' && 'bg-green-100 dark:bg-green-900/20',
                     result.type === 'note' && 'bg-purple-100 dark:bg-purple-900/20'
                   )}>
                     {getIcon(result.type)}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-medium truncate">{result.title}</p>
-                      <span className="text-xs text-gray-500 px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded">
+                  <div className="flex-1 min-w-0 w-0 overflow-hidden">
+                    <div className="flex items-center gap-2 min-w-0 w-full overflow-hidden">
+                      <p className="text-sm font-medium min-w-0 flex-1 truncate">{result.title}</p>
+                      <span className="text-xs text-gray-500 px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded shrink-0">
                         {getTypeLabel(result.type)}
                       </span>
                     </div>
                     {result.subtitle && (
-                      <p className="text-xs text-gray-500 truncate mt-1">
+                      <p className="mt-1 block w-full overflow-hidden text-ellipsis whitespace-nowrap text-xs text-gray-500">
                         {result.subtitle}
                       </p>
                     )}
@@ -167,4 +171,3 @@ export function GlobalSearch({ open, onOpenChange, userId }: GlobalSearchProps) 
     </Dialog>
   )
 }
-

@@ -28,7 +28,7 @@ const notificationIcons: Record<string, string> = {
   member_joined: '🎉',
 }
 
-// Notification types that link to a task/project
+// Notification types that link to a task context
 const taskRelatedTypes = [
   'task_assigned',
   'task_status_changed',
@@ -42,10 +42,8 @@ function getNotificationLink(notification: Notification): string | null {
   const metadata = notification.metadata as Record<string, any> | null
   if (!metadata) return null
 
-  if (taskRelatedTypes.includes(notification.type) && metadata.project_id) {
-    // Navigate to the project page where the task lives
-    // The task_id can be used to auto-open the task via query param
-    const base = `/projects/${metadata.project_id}`
+  if (taskRelatedTypes.includes(notification.type)) {
+    const base = '/kanban'
     return metadata.task_id ? `${base}?task=${metadata.task_id}` : base
   }
 

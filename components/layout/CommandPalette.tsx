@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import {
   CommandDialog,
@@ -18,6 +18,7 @@ import { AICreateTasksDialog } from '@/components/tasks/AICreateTasksDialog'
 import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 import { FolderKanban, FileText, CheckSquare, Sparkles, Plus, Search, KanbanSquare } from 'lucide-react'
 import { usePremium } from '@/lib/hooks/usePremium'
+import { useUserProfileStore } from '@/lib/store/userProfileStore'
 import { staleWhileRevalidate, cacheKey, CACHE_TTL } from '@/lib/utils/cache'
 import { KeyboardHint } from '@/components/ui/KeyboardHint'
 import { useTranslation } from '@/lib/i18n/useTranslation'
@@ -38,31 +39,40 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
   const [loading, setLoading] = useState(false)
   const [aiDialogOpen, setAiDialogOpen] = useState(false)
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
+  const { profile, fetchProfile } = useUserProfileStore()
 
-  useEffect(() => {
-    if (open) {
-      loadData()
-    }
-  }, [open, userId])
+  const resolveCompanyId = useCallback(async () => {
+    if (profile?.company_id) return profile.company_id
+    await fetchProfile(userId)
+    return useUserProfileStore.getState().profile?.company_id || null
+  }, [profile?.company_id, fetchProfile, userId])
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setLoading(true)
     try {
+      const companyId = await resolveCompanyId()
+      if (!companyId) {
+        setProjects([])
+        setTasks([])
+        setNotes([])
+        return
+      }
+
       // Use stale-while-revalidate pattern for better UX
       const [projectsData, tasksData, notesData] = await Promise.all([
         staleWhileRevalidate(
-          cacheKey('command-palette', 'projects', userId),
-          () => getProjects(userId, 'active'),
+          cacheKey('command-palette', 'projects', companyId),
+          () => getProjects(companyId, 'active'),
           CACHE_TTL.PROJECTS
         ),
         staleWhileRevalidate(
-          cacheKey('command-palette', 'tasks', userId),
-          () => getRecentIncompleteTasks(userId, 10),
+          cacheKey('command-palette', 'tasks', companyId),
+          () => getRecentIncompleteTasks(companyId, 10),
           CACHE_TTL.TASKS
         ),
         staleWhileRevalidate(
-          cacheKey('command-palette', 'notes', userId),
-          () => getNotes(userId),
+          cacheKey('command-palette', 'notes', companyId),
+          () => getNotes(companyId),
           CACHE_TTL.NOTES
         ),
       ])
@@ -74,7 +84,13 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
     } finally {
       setLoading(false)
     }
-  }
+  }, [resolveCompanyId])
+
+  useEffect(() => {
+    if (open) {
+      loadData()
+    }
+  }, [open, loadData])
 
   const handleSelect = (value: string) => {
     onOpenChange(false)
@@ -119,15 +135,16 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
     if (value.startsWith('task:')) {
       const taskId = value.replace('task:', '')
       const task = tasks.find(t => t.id === taskId)
-      if (task?.project_id) {
-        router.push(`/projects/${task.project_id}`)
+      if (task?.id) {
+        router.push(`/kanban?task=${task.id}`)
       }
       return
     }
 
     // Open note
     if (value.startsWith('note:')) {
-      router.push('/notes')
+      const noteId = value.replace('note:', '')
+      router.push(`/notes?note=${noteId}`)
       return
     }
   }

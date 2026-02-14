@@ -4,6 +4,7 @@ import { useState, useCallback } from 'react'
 import { getProjects } from '@/lib/supabase/queries/projects'
 import { getRecentIncompleteTasks } from '@/lib/supabase/queries/tasks'
 import { getNotes } from '@/lib/supabase/queries/notes'
+import { useUserProfileStore } from '@/lib/store/userProfileStore'
 import type { Project } from '@/lib/supabase/queries/projects'
 import type { TaskWithProject } from '@/lib/supabase/queries/tasks'
 import type { Note } from '@/lib/supabase/queries/notes'
@@ -17,11 +18,30 @@ export interface SearchResult {
   metadata?: Record<string, any>
 }
 
+function htmlToPlainText(content: string): string {
+  if (!content) return ''
+
+  if (typeof window === 'undefined') {
+    return content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
+  }
+
+  const tmp = document.createElement('div')
+  tmp.innerHTML = content
+  return (tmp.textContent || tmp.innerText || '').replace(/\s+/g, ' ').trim()
+}
+
 export function useGlobalSearch(userId: string) {
   const [query, setQuery] = useState('')
   const [results, setResults] = useState<SearchResult[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const { profile, fetchProfile } = useUserProfileStore()
+
+  const resolveCompanyId = useCallback(async () => {
+    if (profile?.company_id) return profile.company_id
+    await fetchProfile(userId)
+    return useUserProfileStore.getState().profile?.company_id || null
+  }, [profile?.company_id, fetchProfile, userId])
 
   const search = useCallback(async (searchQuery: string) => {
     if (!searchQuery.trim()) {
@@ -34,10 +54,16 @@ export function useGlobalSearch(userId: string) {
     setQuery(searchQuery)
 
     try {
+      const companyId = await resolveCompanyId()
+      if (!companyId) {
+        setResults([])
+        return
+      }
+
       const [projects, tasks, notes] = await Promise.all([
-        getProjects(userId, 'active'),
-        getRecentIncompleteTasks(userId, 50),
-        getNotes(userId),
+        getProjects(companyId, 'active'),
+        getRecentIncompleteTasks(companyId, 50),
+        getNotes(companyId),
       ])
 
       const searchLower = searchQuery.toLowerCase()
@@ -45,15 +71,16 @@ export function useGlobalSearch(userId: string) {
 
       // Search projects
       projects?.forEach((project: Project) => {
+        const projectPlainDescription = htmlToPlainText(project.description || '')
         if (
           project.title.toLowerCase().includes(searchLower) ||
-          project.description?.toLowerCase().includes(searchLower)
+          projectPlainDescription.toLowerCase().includes(searchLower)
         ) {
           allResults.push({
             type: 'project',
             id: project.id,
             title: project.title,
-            subtitle: project.description || undefined,
+            subtitle: projectPlainDescription || undefined,
             url: `/projects/${project.id}`,
             metadata: { color: project.color, status: project.status },
           })
@@ -72,7 +99,7 @@ export function useGlobalSearch(userId: string) {
             id: task.id,
             title: task.title,
             subtitle: task.project?.title || task.description || undefined,
-            url: `/projects/${task.project_id}`,
+            url: `/kanban?task=${task.id}`,
             metadata: {
               status: task.status,
               priority: task.priority,
@@ -84,17 +111,18 @@ export function useGlobalSearch(userId: string) {
 
       // Search notes
       notes?.forEach((note: Note) => {
+        const notePlainContent = htmlToPlainText(note.content)
         if (
           note.title?.toLowerCase().includes(searchLower) ||
-          note.content.toLowerCase().includes(searchLower) ||
+          notePlainContent.toLowerCase().includes(searchLower) ||
           note.tags?.some(tag => tag.toLowerCase().includes(searchLower))
         ) {
           allResults.push({
             type: 'note',
             id: note.id,
             title: note.title || 'Untitled Note',
-            subtitle: note.content.substring(0, 100) || undefined,
-            url: '/notes',
+            subtitle: notePlainContent.substring(0, 100) || undefined,
+            url: `/notes?note=${note.id}`,
             metadata: { isPinned: note.is_pinned },
           })
         }
@@ -116,7 +144,7 @@ export function useGlobalSearch(userId: string) {
     } finally {
       setLoading(false)
     }
-  }, [userId])
+  }, [resolveCompanyId])
 
   const clear = useCallback(() => {
     setQuery('')
@@ -133,4 +161,3 @@ export function useGlobalSearch(userId: string) {
     clear,
   }
 }
-
