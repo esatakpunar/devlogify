@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import {
   LayoutDashboard,
   FolderKanban,
+  KanbanSquare,
   Clock,
   BarChart3,
   StickyNote,
@@ -23,6 +24,7 @@ import { useUserProfileStore } from '@/lib/store/userProfileStore'
 const navigation = [
   { key: 'dashboard', href: '/dashboard', icon: LayoutDashboard },
   { key: 'projects', href: '/projects', icon: FolderKanban },
+  { key: 'kanban', href: '/kanban', icon: KanbanSquare },
   { key: 'timeline', href: '/timeline', icon: Clock },
   { key: 'analytics', href: '/analytics', icon: BarChart3 },
   { key: 'notes', href: '/notes', icon: StickyNote },

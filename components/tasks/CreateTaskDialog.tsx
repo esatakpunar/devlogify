@@ -34,7 +34,8 @@ import { useUserProfileStore } from '@/lib/store/userProfileStore'
 interface CreateTaskDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  projectId: string
+  projectId?: string
+  projects?: { id: string; title: string; color: string }[]
   userId: string
   companyId?: string
   onTaskCreated: (task: any) => void
@@ -44,6 +45,7 @@ export function CreateTaskDialog({
   open,
   onOpenChange,
   projectId,
+  projects,
   userId,
   companyId,
   onTaskCreated
@@ -60,6 +62,7 @@ export function CreateTaskDialog({
   const [templates, setTemplates] = useState<TaskTemplate[]>([])
   const [selectedTemplate, setSelectedTemplate] = useState<TaskTemplate | null>(null)
   const [showTemplates, setShowTemplates] = useState(false)
+  const [selectedProjectId, setSelectedProjectId] = useState(projectId || '')
   const t = useTranslation()
   const { members } = useCompanyStore()
   const { profile } = useUserProfileStore()
@@ -68,8 +71,9 @@ export function CreateTaskDialog({
   useEffect(() => {
     if (open) {
       loadTemplates()
+      setSelectedProjectId(projectId || projects?.[0]?.id || '')
     }
-  }, [open, userId])
+  }, [open, userId, projectId, projects])
 
   const loadTemplates = async () => {
     try {
@@ -110,8 +114,15 @@ export function CreateTaskDialog({
         .map(t => t.trim())
         .filter(t => t.length > 0)
 
+      const finalProjectId = projectId || selectedProjectId
+      if (!finalProjectId) {
+        setError(t('tasks.projectRequired'))
+        setLoading(false)
+        return
+      }
+
       const newTask = await createTask({
-        project_id: projectId,
+        project_id: finalProjectId,
         user_id: userId,
         title,
         description: description || null,
@@ -128,7 +139,7 @@ export function CreateTaskDialog({
       // Activity log ekle
       await logActivity(
         userId,
-        projectId,
+        finalProjectId,
         newTask.id,
         'task_created',
         { task_title: title }
@@ -145,6 +156,7 @@ export function CreateTaskDialog({
       setAssigneeId(null)
       setResponsibleId(null)
       setSelectedTemplate(null)
+      setSelectedProjectId(projectId || projects?.[0]?.id || '')
       onOpenChange(false)
     } catch (err: any) {
       setError(err.message)
@@ -171,6 +183,26 @@ export function CreateTaskDialog({
           {error && (
             <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-2.5 sm:p-3 rounded-md text-xs sm:text-sm">
               {error}
+            </div>
+          )}
+
+          {projects && projects.length > 0 && (
+            <div className="space-y-2">
+              <Label htmlFor="task-project" className="text-xs sm:text-sm">
+                {t('tasks.project')} <span className="text-red-500">*</span>
+              </Label>
+              <Select value={selectedProjectId} onValueChange={setSelectedProjectId} disabled={loading}>
+                <SelectTrigger id="task-project" className="text-sm sm:text-base">
+                  <SelectValue placeholder={t('tasks.selectProject')} />
+                </SelectTrigger>
+                <SelectContent>
+                  {projects.map((project) => (
+                    <SelectItem key={project.id} value={project.id}>
+                      {project.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
 

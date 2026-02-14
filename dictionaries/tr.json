@@ -59,6 +59,7 @@
   "nav": {
     "dashboard": "Kontrol Paneli",
     "projects": "Projeler",
+    "kanban": "Kanban",
     "tasks": "Görevler",
     "notes": "Notlar",
     "analytics": "Analitik",
@@ -265,6 +266,7 @@
     "whatNeedsToBeDone": "Ne yapılması gerekiyor?",
     "addMoreDetails": "Daha fazla detay ekleyin...",
     "priority": "Öncelik",
+    "status": "Durum",
     "estimatedTime": "Tahmini Süre (dk)",
     "tags": "Etiketler (isteğe bağlı)",
     "tagsPlaceholder": "api, frontend, bug (virgülle ayırın)",
@@ -312,6 +314,8 @@
     "failedToCreateTemplate": "Şablon oluşturulamadı",
     "description": "Açıklama",
     "estimatedDuration": "Tahmini Süre (dk)",
+    "project": "Proje",
+    "selectProject": "Proje seç",
     "assignee": "Atanan Kişi",
     "responsible": "Sorumlu",
     "selectAssignee": "Atanan kişi seçin",
@@ -368,6 +372,7 @@
     },
     "addReviewNote": "Inceleme notu ekleyin...",
     "clearSelection": "Secimi temizle",
+    "projectRequired": "Proje seçimi zorunludur",
     "failedToApprove": "Gorev onaylanamadi",
     "failedToReject": "Gorev reddedilemedi",
     "failedToRequestChanges": "Degisiklik talebi gonderilemedi",
@@ -521,7 +526,14 @@
     "group": "grup",
     "groups": "gruplar",
     "tag": "etiket",
-    "tags": "etiketler"
+    "tags": "etiketler",
+    "globalDescription": "Tüm projelerdeki görevleri takip edin",
+    "listView": "Liste Görünümü",
+    "allProjects": "Tüm projeler",
+    "allStatuses": "Tüm durumlar",
+    "allPriorities": "Tüm öncelikler",
+    "allAssignees": "Tüm atananlar",
+    "allResponsibles": "Tüm sorumlular"
   },
   "profile": {
     "profileSettings": "Profil Ayarları",

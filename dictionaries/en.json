@@ -59,6 +59,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "projects": "Projects",
+    "kanban": "Kanban",
     "tasks": "Tasks",
     "notes": "Notes",
     "analytics": "Analytics",
@@ -269,6 +270,7 @@
     "whatNeedsToBeDone": "What needs to be done?",
     "addMoreDetails": "Add more details...",
     "priority": "Priority",
+    "status": "Status",
     "estimatedTime": "Estimated Time (min)",
     "tags": "Tags (optional)",
     "tagsPlaceholder": "api, frontend, bug (separate with commas)",
@@ -314,6 +316,9 @@
     "estimatedDuration": "Estimated Duration (min)",
     "assignee": "Assignee",
     "responsible": "Responsible",
+    "project": "Project",
+    "selectProject": "Select project",
+    "projectRequired": "Project is required",
     "selectAssignee": "Select assignee",
     "selectResponsible": "Select responsible",
     "unassigned": "Unassigned",
@@ -521,7 +526,14 @@
     "group": "group",
     "groups": "groups",
     "tag": "tag",
-    "tags": "tags"
+    "tags": "tags",
+    "globalDescription": "Track tasks across all projects",
+    "listView": "List View",
+    "allProjects": "All projects",
+    "allStatuses": "All statuses",
+    "allPriorities": "All priorities",
+    "allAssignees": "All assignees",
+    "allResponsibles": "All responsibles"
   },
   "profile": {
     "profileSettings": "Profile Settings",

@@ -59,6 +59,7 @@
   "nav": {
     "dashboard": "Dashboard",
     "projects": "Projekte",
+    "kanban": "Kanban",
     "tasks": "Aufgaben",
     "notes": "Notizen",
     "analytics": "Analysen",
@@ -265,6 +266,7 @@
     "whatNeedsToBeDone": "Was muss erledigt werden?",
     "addMoreDetails": "Weitere Details hinzufügen...",
     "priority": "Priorität",
+    "status": "Status",
     "estimatedTime": "Geschätzte Zeit (Min)",
     "tags": "Tags (optional)",
     "tagsPlaceholder": "api, frontend, bug (durch Kommas trennen)",
@@ -312,6 +314,8 @@
     "failedToCreateTemplate": "Vorlage konnte nicht erstellt werden",
     "description": "Beschreibung",
     "estimatedDuration": "Geschätzte Dauer (Min)",
+    "project": "Projekt",
+    "selectProject": "Projekt auswählen",
     "assignee": "Bearbeiter",
     "responsible": "Verantwortlicher",
     "selectAssignee": "Bearbeiter auswählen",
@@ -368,6 +372,7 @@
     },
     "addReviewNote": "Prufungsnotiz hinzufugen...",
     "clearSelection": "Auswahl aufheben",
+    "projectRequired": "Projekt ist erforderlich",
     "failedToApprove": "Aufgabe konnte nicht freigegeben werden",
     "failedToReject": "Aufgabe konnte nicht abgelehnt werden",
     "failedToRequestChanges": "Anderungen konnten nicht angefordert werden",
@@ -521,7 +526,14 @@
     "group": "Gruppe",
     "groups": "Gruppen",
     "tag": "Tag",
-    "tags": "Tags"
+    "tags": "Tags",
+    "globalDescription": "Verfolge Aufgaben aus allen Projekten",
+    "listView": "Listenansicht",
+    "allProjects": "Alle Projekte",
+    "allStatuses": "Alle Status",
+    "allPriorities": "Alle Prioritäten",
+    "allAssignees": "Alle Zugewiesenen",
+    "allResponsibles": "Alle Verantwortlichen"
   },
   "profile": {
     "profileSettings": "Profileinstellungen",

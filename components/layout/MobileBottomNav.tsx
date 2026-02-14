@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname, useRouter } from 'next/navigation'
-import { Home, FolderKanban, FileText, BarChart3, Clock, Settings } from 'lucide-react'
+import { Home, FolderKanban, KanbanSquare, FileText, BarChart3, Clock, Settings } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 
@@ -13,6 +13,7 @@ export function MobileBottomNav() {
   const navItems = [
     { path: '/dashboard', icon: Home, label: t('nav.dashboard') },
     { path: '/projects', icon: FolderKanban, label: t('nav.projects') },
+    { path: '/kanban', icon: KanbanSquare, label: t('nav.kanban') },
     { path: '/notes', icon: FileText, label: t('nav.notes') },
     { path: '/analytics', icon: BarChart3, label: t('nav.analytics') },
     { path: '/timeline', icon: Clock, label: t('nav.timeline') },
@@ -25,7 +26,7 @@ export function MobileBottomNav() {
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 md:hidden">
-      <div className="grid grid-cols-6 h-16">
+      <div className="grid grid-cols-7 h-16">
         {navItems.map((item) => {
           const Icon = item.icon
           const isActive = pathname === item.path || pathname?.startsWith(item.path + '/')
@@ -50,4 +51,3 @@ export function MobileBottomNav() {
     </nav>
   )
 }
-

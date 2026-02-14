@@ -16,7 +16,7 @@ import { getRecentIncompleteTasks } from '@/lib/supabase/queries/tasks'
 import { getNotes } from '@/lib/supabase/queries/notes'
 import { AICreateTasksDialog } from '@/components/tasks/AICreateTasksDialog'
 import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
-import { FolderKanban, FileText, CheckSquare, Sparkles, Plus, Search } from 'lucide-react'
+import { FolderKanban, FileText, CheckSquare, Sparkles, Plus, Search, KanbanSquare } from 'lucide-react'
 import { usePremium } from '@/lib/hooks/usePremium'
 import { staleWhileRevalidate, cacheKey, CACHE_TTL } from '@/lib/utils/cache'
 import { KeyboardHint } from '@/components/ui/KeyboardHint'
@@ -182,6 +182,10 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
             <FolderKanban className="mr-2 h-4 w-4" />
             <span>{t('commandPalette.goToProjects')}</span>
           </CommandItem>
+          <CommandItem value="nav:/kanban" onSelect={handleSelect}>
+            <KanbanSquare className="mr-2 h-4 w-4" />
+            <span>{t('nav.kanban')}</span>
+          </CommandItem>
           <CommandItem value="nav:/notes" onSelect={handleSelect}>
             <FileText className="mr-2 h-4 w-4" />
             <span>{t('commandPalette.goToNotes')}</span>
@@ -290,4 +294,3 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
   </>
   )
 }
-

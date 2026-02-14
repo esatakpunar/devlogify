@@ -147,6 +147,7 @@ export function useKeyboardShortcuts(config: {
     const navShortcuts = [
       { id: 'nav-dashboard', path: '/dashboard' },
       { id: 'nav-projects', path: '/projects' },
+      { id: 'nav-kanban', path: '/kanban' },
       { id: 'nav-timeline', path: '/timeline' },
       { id: 'nav-analytics', path: '/analytics' },
       { id: 'nav-notes', path: '/notes' },
@@ -319,4 +320,3 @@ export function getKeyboardShortcuts() {
     category: s.category,
   }))
 }
-

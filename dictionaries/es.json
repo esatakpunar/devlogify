@@ -59,6 +59,7 @@
   "nav": {
     "dashboard": "Panel",
     "projects": "Proyectos",
+    "kanban": "Kanban",
     "tasks": "Tareas",
     "notes": "Notas",
     "analytics": "Analíticas",
@@ -265,6 +266,7 @@
     "whatNeedsToBeDone": "¿Qué necesita hacerse?",
     "addMoreDetails": "Agrega más detalles...",
     "priority": "Prioridad",
+    "status": "Estado",
     "estimatedTime": "Tiempo Estimado (min)",
     "tags": "Etiquetas (opcional)",
     "tagsPlaceholder": "api, frontend, bug (separar con comas)",
@@ -312,6 +314,8 @@
     "failedToCreateTemplate": "Error al crear plantilla",
     "description": "Descripción",
     "estimatedDuration": "Duración Estimada (min)",
+    "project": "Proyecto",
+    "selectProject": "Seleccionar proyecto",
     "assignee": "Asignado",
     "responsible": "Responsable",
     "selectAssignee": "Seleccionar asignado",
@@ -368,6 +372,7 @@
     },
     "addReviewNote": "Agregar nota de revision...",
     "clearSelection": "Limpiar seleccion",
+    "projectRequired": "El proyecto es obligatorio",
     "failedToApprove": "No se pudo aprobar la tarea",
     "failedToReject": "No se pudo rechazar la tarea",
     "failedToRequestChanges": "No se pudieron solicitar cambios",
@@ -521,7 +526,14 @@
     "group": "grupo",
     "groups": "grupos",
     "tag": "etiqueta",
-    "tags": "etiquetas"
+    "tags": "etiquetas",
+    "globalDescription": "Sigue tareas de todos los proyectos",
+    "listView": "Vista de Lista",
+    "allProjects": "Todos los proyectos",
+    "allStatuses": "Todos los estados",
+    "allPriorities": "Todas las prioridades",
+    "allAssignees": "Todos los asignados",
+    "allResponsibles": "Todos los responsables"
   },
   "profile": {
     "profileSettings": "Configuración de Perfil",

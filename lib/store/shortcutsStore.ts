@@ -57,6 +57,13 @@ const defaultShortcuts: ShortcutBinding[] = [
     category: 'navigation',
   },
   {
+    id: 'nav-kanban',
+    keys: ['g', 'k'],
+    defaultKeys: ['g', 'k'],
+    description: 'Go to Kanban',
+    category: 'navigation',
+  },
+  {
     id: 'nav-timeline',
     keys: ['g', 't'],
     defaultKeys: ['g', 't'],
@@ -135,4 +142,3 @@ export const useShortcutsStore = create<ShortcutsState>()(
     }
   )
 )
-

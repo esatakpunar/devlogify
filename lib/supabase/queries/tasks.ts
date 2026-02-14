@@ -46,6 +46,27 @@ export type TaskWithProjectAndAssignees = TaskWithProject & {
   } | null
 }
 
+export type TaskWithDetails = Task & {
+  project: {
+    id: string
+    title: string
+    color: string
+    status: string
+  } | null
+  assignee?: {
+    id: string
+    full_name: string | null
+    avatar_url: string | null
+    email: string
+  } | null
+  responsible?: {
+    id: string
+    full_name: string | null
+    avatar_url: string | null
+    email: string
+  } | null
+}
+
 export async function getTasks(projectId: string, supabaseClient?: SupabaseClient<Database>) {
   const supabase = supabaseClient || createBrowserClient()
 
@@ -61,6 +82,27 @@ export async function getTasks(projectId: string, supabaseClient?: SupabaseClien
 
   if (error) throw error
   return data as TaskWithAssignees[]
+}
+
+/**
+ * Get all tasks in a company across all projects (including archived projects)
+ */
+export async function getCompanyTasks(companyId: string, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithDetails[]> {
+  const supabase = supabaseClient || createBrowserClient()
+
+  const { data, error } = await supabase
+    .from('tasks')
+    .select(`
+      *,
+      project:projects(id, title, color, status),
+      assignee:profiles!tasks_assignee_id_fkey(id, full_name, avatar_url, email),
+      responsible:profiles!tasks_responsible_id_fkey(id, full_name, avatar_url, email)
+    `)
+    .eq('company_id', companyId)
+    .order('updated_at', { ascending: false })
+
+  if (error) throw error
+  return data as TaskWithDetails[]
 }
 
 export async function getTask(id: string) {
