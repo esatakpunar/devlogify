@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Building2, Users, ArrowRight, Loader2 } from 'lucide-react'
+import { Building2, Users, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -19,13 +19,10 @@ interface OnboardingContentProps {
 export function OnboardingContent({ userId, userEmail }: OnboardingContentProps) {
   const router = useRouter()
   const t = useTranslation()
-  const [mode, setMode] = useState<'select' | 'create' | 'join'>('select')
+  const [mode, setMode] = useState<'create' | 'join'>('create')
   const [loading, setLoading] = useState(false)
 
-  // Create company form
   const [companyName, setCompanyName] = useState('')
-
-  // Join company form
   const [joinCode, setJoinCode] = useState('')
 
   const handleCreateCompany = async (e: React.FormEvent) => {
@@ -62,157 +59,113 @@ export function OnboardingContent({ userId, userEmail }: OnboardingContentProps)
     }
   }
 
-  if (mode === 'select') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <div className="w-full max-w-2xl space-y-8">
-          <div className="text-center space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight">
-              {t('onboarding.welcome')}
-            </h1>
-            <p className="text-muted-foreground text-lg">
-              {t('onboarding.getStarted')}
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-background via-background to-muted/30 px-4 py-8 sm:py-12">
+      <div className="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-5xl items-center">
+        <div className="grid w-full grid-cols-1 gap-6 lg:grid-cols-2">
+          <div className="hidden rounded-2xl border bg-card/60 p-8 lg:block">
+            <div className="mb-8 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10">
+              <Building2 className="h-6 w-6 text-primary" />
+            </div>
+            <h1 className="text-3xl font-bold tracking-tight">{t('onboarding.welcome')}</h1>
+            <p className="mt-3 text-muted-foreground">{t('onboarding.getStarted')}</p>
+            <div className="mt-8 space-y-3 text-sm text-muted-foreground">
+              <div className="rounded-lg border bg-background/70 px-4 py-3">
+                {t('onboarding.createCompanyDescription')}
+              </div>
+              <div className="rounded-lg border bg-background/70 px-4 py-3">
+                {t('onboarding.joinCompanyDescription')}
+              </div>
+            </div>
+            <p className="mt-8 text-sm text-muted-foreground">
+              {userEmail}
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card
-              className="cursor-pointer hover:border-primary/50 transition-colors"
-              onClick={() => setMode('create')}
-            >
-              <CardHeader className="text-center pb-2">
-                <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                  <Building2 className="w-6 h-6 text-primary" />
-                </div>
-                <CardTitle className="text-lg">
-                  {t('onboarding.createCompany')}
-                </CardTitle>
-                <CardDescription>
-                  {t('onboarding.createCompanyDescription')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-center">
-                <Button variant="outline" size="sm">
-                  {t('onboarding.createNew')}
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card
-              className="cursor-pointer hover:border-primary/50 transition-colors"
-              onClick={() => setMode('join')}
-            >
-              <CardHeader className="text-center pb-2">
-                <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-2">
-                  <Users className="w-6 h-6 text-primary" />
-                </div>
-                <CardTitle className="text-lg">
-                  {t('onboarding.joinCompany')}
-                </CardTitle>
-                <CardDescription>
-                  {t('onboarding.joinCompanyDescription')}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="text-center">
-                <Button variant="outline" size="sm">
-                  {t('onboarding.joinExisting')}
-                  <ArrowRight className="w-4 h-4 ml-1" />
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (mode === 'create') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>{t('onboarding.createCompany')}</CardTitle>
-            <CardDescription>
-              {t('onboarding.createCompanyFormDescription')}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleCreateCompany} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="companyName">{t('onboarding.companyName')}</Label>
-                <Input
-                  id="companyName"
-                  value={companyName}
-                  onChange={(e) => setCompanyName(e.target.value)}
-                  placeholder={t('onboarding.companyNamePlaceholder')}
-                  required
-                  autoFocus
-                />
+          <Card className="w-full border shadow-sm">
+            <CardHeader className="space-y-4">
+              <div className="space-y-1 lg:hidden">
+                <CardTitle className="text-2xl">{t('onboarding.welcome')}</CardTitle>
+                <CardDescription>{t('onboarding.getStarted')}</CardDescription>
               </div>
-              <div className="flex gap-2">
+              <div className="grid grid-cols-2 gap-2 rounded-xl bg-muted p-1">
                 <Button
                   type="button"
-                  variant="outline"
-                  onClick={() => setMode('select')}
-                  disabled={loading}
+                  variant={mode === 'create' ? 'default' : 'ghost'}
+                  className="h-10"
+                  onClick={() => setMode('create')}
                 >
-                  {t('common.back')}
+                  <Building2 className="mr-2 h-4 w-4" />
+                  {t('onboarding.createNew')}
                 </Button>
-                <Button type="submit" disabled={loading || !companyName.trim()} className="flex-1">
-                  {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                  {t('onboarding.createCompany')}
+                <Button
+                  type="button"
+                  variant={mode === 'join' ? 'default' : 'ghost'}
+                  className="h-10"
+                  onClick={() => setMode('join')}
+                >
+                  <Users className="mr-2 h-4 w-4" />
+                  {t('onboarding.joinExisting')}
                 </Button>
               </div>
-            </form>
-          </CardContent>
-        </Card>
+              <div>
+                <CardTitle>{mode === 'create' ? t('onboarding.createCompany') : t('onboarding.joinCompany')}</CardTitle>
+                <CardDescription>
+                  {mode === 'create'
+                    ? t('onboarding.createCompanyFormDescription')
+                    : t('onboarding.joinCompanyFormDescription')}
+                </CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {mode === 'create' ? (
+                <form onSubmit={handleCreateCompany} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="companyName">{t('onboarding.companyName')}</Label>
+                    <Input
+                      id="companyName"
+                      value={companyName}
+                      onChange={(e) => setCompanyName(e.target.value)}
+                      placeholder={t('onboarding.companyNamePlaceholder')}
+                      required
+                      autoFocus
+                      disabled={loading}
+                    />
+                  </div>
+                  <Button type="submit" disabled={loading || !companyName.trim()} className="w-full">
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t('onboarding.createCompany')}
+                  </Button>
+                </form>
+              ) : (
+                <form onSubmit={handleJoinCompany} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="joinCode">{t('onboarding.joinCode')}</Label>
+                    <Input
+                      id="joinCode"
+                      value={joinCode}
+                      onChange={(e) => setJoinCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''))}
+                      placeholder={t('onboarding.joinCodePlaceholder')}
+                      required
+                      autoFocus
+                      maxLength={8}
+                      disabled={loading}
+                      className="text-center text-lg tracking-[0.3em] font-mono"
+                    />
+                  </div>
+                  <Button type="submit" disabled={loading || !joinCode.trim()} className="w-full">
+                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    {t('onboarding.joinCompany')}
+                  </Button>
+                </form>
+              )}
+              <p className="mt-4 text-center text-xs text-muted-foreground lg:hidden">
+                {userEmail}
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    )
-  }
-
-  // mode === 'join'
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>{t('onboarding.joinCompany')}</CardTitle>
-          <CardDescription>
-            {t('onboarding.joinCompanyFormDescription')}
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleJoinCompany} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="joinCode">{t('onboarding.joinCode')}</Label>
-              <Input
-                id="joinCode"
-                value={joinCode}
-                onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-                placeholder={t('onboarding.joinCodePlaceholder')}
-                required
-                autoFocus
-                maxLength={8}
-                className="text-center text-lg tracking-widest font-mono"
-              />
-            </div>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => setMode('select')}
-                disabled={loading}
-              >
-                {t('common.back')}
-              </Button>
-              <Button type="submit" disabled={loading || !joinCode.trim()} className="flex-1">
-                {loading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-                {t('onboarding.joinCompany')}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
     </div>
   )
 }
