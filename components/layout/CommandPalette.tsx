@@ -11,7 +11,7 @@ import {
   CommandList,
   CommandSeparator,
 } from '@/components/ui/command'
-import { getProjects } from '@/lib/supabase/queries/projects'
+import { getProjectOptions } from '@/lib/supabase/queries/projects'
 import { getRecentIncompleteTasks } from '@/lib/supabase/queries/tasks'
 import { getNotes } from '@/lib/supabase/queries/notes'
 import { AICreateTasksDialog } from '@/components/tasks/AICreateTasksDialog'
@@ -62,7 +62,7 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
       const [projectsData, tasksData, notesData] = await Promise.all([
         staleWhileRevalidate(
           cacheKey('command-palette', 'projects', companyId),
-          () => getProjects(companyId, 'active'),
+          () => getProjectOptions(companyId, 'active'),
           CACHE_TTL.PROJECTS
         ),
         staleWhileRevalidate(

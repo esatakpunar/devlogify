@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import dynamic from 'next/dynamic'
 import { FolderKanban, Clock, CheckCircle2, TrendingUp, Zap, Calendar, Target } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { AnimatedCard } from '@/components/ui/AnimatedCard'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { RecentTasks } from '@/components/dashboard/RecentTasks'
+import type { RecentTaskItem } from '@/components/dashboard/RecentTasks'
 import { TodayCompleted } from '@/components/dashboard/TodayCompleted'
 import { PinnedProjects } from '@/components/dashboard/PinnedProjects'
 import { QuickTimerCard } from '@/components/dashboard/QuickTimerCard'
@@ -57,9 +58,27 @@ export function DashboardContent({
   const t = useTranslation()
   const router = useRouter()
   const [createProjectDialogOpen, setCreateProjectDialogOpen] = useState(false)
+  const [recentTasksState, setRecentTasksState] = useState<TaskWithProject[]>(recentTasks || [])
+  const [todayCompletedTasksState, setTodayCompletedTasksState] = useState<TaskWithProject[]>(todayCompletedTasks || [])
 
   const handleProjectCreated = () => {
     router.refresh()
+  }
+
+  useEffect(() => {
+    setRecentTasksState(recentTasks || [])
+  }, [recentTasks])
+
+  useEffect(() => {
+    setTodayCompletedTasksState(todayCompletedTasks || [])
+  }, [todayCompletedTasks])
+
+  const handleTaskCompleted = (completedTask: RecentTaskItem & { completed_at: string }) => {
+    setRecentTasksState((prev) => prev.filter((task) => task.id !== completedTask.id))
+    setTodayCompletedTasksState((prev) => [
+      completedTask as TaskWithProject,
+      ...prev.filter((task) => task.id !== completedTask.id),
+    ])
   }
 
   // Format time display
@@ -177,8 +196,8 @@ export function DashboardContent({
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <RecentTasks tasks={recentTasks || []} userId={user.id} />
-            <TodayCompleted tasks={todayCompletedTasks || []} />
+            <RecentTasks tasks={recentTasksState} userId={user.id} onTaskCompleted={handleTaskCompleted} />
+            <TodayCompleted tasks={todayCompletedTasksState} />
           </div>
         </CardContent>
       </Card>

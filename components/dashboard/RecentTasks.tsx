@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { Play, Check, Clock, MoreHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -13,7 +12,7 @@ import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { formatSupabaseError, isRetryableError } from '@/lib/utils/errorHandler'
 
-interface Task {
+export interface RecentTaskItem {
   id: string
   task_number: number
   title: string
@@ -28,13 +27,13 @@ interface Task {
 }
 
 interface RecentTasksProps {
-  tasks: Task[]
+  tasks: RecentTaskItem[]
   userId: string
+  onTaskCompleted?: (task: RecentTaskItem & { completed_at: string }) => void
 }
 
-export function RecentTasks({ tasks, userId }: RecentTasksProps) {
-  const router = useRouter()
-  const [localTasks, setLocalTasks] = useState<Task[]>(tasks)
+export function RecentTasks({ tasks, userId, onTaskCompleted }: RecentTasksProps) {
+  const [localTasks, setLocalTasks] = useState<RecentTaskItem[]>(tasks)
   const [loadingTasks, setLoadingTasks] = useState<Set<string>>(new Set())
   const { isRunning, taskId: activeTaskId, startTimer } = useTimerStore()
   const t = useTranslation()
@@ -62,7 +61,7 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
     return `${diffInDays}d ${t('common.ago')}`
   }
 
-  const handleStartTimer = async (task: Task) => {
+  const handleStartTimer = async (task: RecentTaskItem) => {
     if (isRunning) {
       toast.error(t('tasks.stopCurrentTimerFirst'))
       return
@@ -93,8 +92,13 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
     try {
       await updateTaskStatus(taskId, 'done')
       toast.success(t('tasks.taskMarkedAsComplete'))
-      // Refresh the page to update Today's Completed section
-      router.refresh()
+      const completedTask = tasks.find(task => task.id === taskId)
+      if (completedTask) {
+        onTaskCompleted?.({
+          ...completedTask,
+          completed_at: new Date().toISOString(),
+        })
+      }
     } catch (error: any) {
       // Revert optimistic update on error
       setLocalTasks(tasks)

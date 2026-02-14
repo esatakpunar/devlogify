@@ -75,14 +75,18 @@ export function NotificationDropdown() {
   }, [profile?.id, companyId])
 
   useEffect(() => {
-    fetchData()
-    const interval = setInterval(fetchData, 30000)
-    return () => clearInterval(interval)
-  }, [fetchData])
+    if (!profile?.id || !companyId) return
 
-  useEffect(() => {
-    if (open) fetchData()
-  }, [open, fetchData])
+    fetchData()
+    const intervalMs = open ? 15000 : 120000
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        fetchData()
+      }
+    }, intervalMs)
+
+    return () => clearInterval(interval)
+  }, [fetchData, open, profile?.id, companyId])
 
   const handleNotificationClick = async (notification: Notification) => {
     // Mark as read

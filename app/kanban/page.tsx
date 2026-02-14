@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { getUserCompanyId } from '@/lib/supabase/queries/companyMembership'
-import { getProjects } from '@/lib/supabase/queries/projects'
+import { getProjectOptions } from '@/lib/supabase/queries/projects'
 import { getCompanyTasks } from '@/lib/supabase/queries/tasks'
 import { KanbanWorkspace } from '@/components/tasks/KanbanWorkspace'
 
@@ -22,7 +22,7 @@ export default async function KanbanPage() {
   }
 
   const [projects, tasks] = await Promise.all([
-    getProjects(companyId, undefined, supabase),
+    getProjectOptions(companyId, undefined, supabase),
     getCompanyTasks(companyId, supabase),
   ])
 

@@ -72,7 +72,7 @@ type TaskItem = {
     id: string
     title: string
     color: string
-    status: string
+    status?: string
   } | null
 }
 

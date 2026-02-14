@@ -12,6 +12,52 @@ export type ProjectWithTasks = Project & {
   tasks: { count: number }[]
 }
 
+export async function getProjectsBasic(
+  companyId: string,
+  status?: string,
+  supabaseClient?: SupabaseClient<Database>
+): Promise<Pick<Project, 'id' | 'title' | 'description' | 'color' | 'status'>[]> {
+  const supabase = (supabaseClient || createBrowserClient()) as any
+
+  let query = supabase
+    .from('projects')
+    .select('id, title, description, color, status')
+    .eq('company_id', companyId)
+    .order('created_at', { ascending: false })
+
+  if (status) {
+    query = query.eq('status', status)
+  }
+
+  const { data, error } = await query
+
+  if (error) throw error
+  return data as Pick<Project, 'id' | 'title' | 'description' | 'color' | 'status'>[]
+}
+
+export async function getProjectOptions(
+  companyId: string,
+  status?: string,
+  supabaseClient?: SupabaseClient<Database>
+): Promise<Pick<Project, 'id' | 'title' | 'color'>[]> {
+  const supabase = (supabaseClient || createBrowserClient()) as any
+
+  let query = supabase
+    .from('projects')
+    .select('id, title, color')
+    .eq('company_id', companyId)
+    .order('created_at', { ascending: false })
+
+  if (status) {
+    query = query.eq('status', status)
+  }
+
+  const { data, error } = await query
+
+  if (error) throw error
+  return data as Pick<Project, 'id' | 'title' | 'color'>[]
+}
+
 export async function getProjects(companyId: string, status?: string, supabaseClient?: SupabaseClient<Database>): Promise<ProjectWithTasks[]> {
   const supabase = (supabaseClient || createBrowserClient()) as any
 

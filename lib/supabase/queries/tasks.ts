@@ -51,7 +51,7 @@ export type TaskWithDetails = Task & {
     id: string
     title: string
     color: string
-    status: string
+    status?: string
   } | null
   assignee?: {
     id: string
@@ -93,8 +93,28 @@ export async function getCompanyTasks(companyId: string, supabaseClient?: Supaba
   const { data, error } = await supabase
     .from('tasks')
     .select(`
-      *,
-      project:projects(id, title, color, status),
+      id,
+      project_id,
+      user_id,
+      title,
+      description,
+      status,
+      priority,
+      estimated_duration,
+      actual_duration,
+      progress,
+      task_number,
+      order_index,
+      tags,
+      completed_at,
+      company_id,
+      assignee_id,
+      responsible_id,
+      review_status,
+      review_note,
+      created_at,
+      updated_at,
+      project:projects(id, title, color),
       assignee:profiles!tasks_assignee_id_fkey(id, full_name, avatar_url, email),
       responsible:profiles!tasks_responsible_id_fkey(id, full_name, avatar_url, email)
     `)
@@ -271,10 +291,28 @@ export async function getRecentIncompleteTasks(companyId: string, limit: number 
   const { data, error } = await supabase
     .from('tasks')
     .select(`
-      *,
-      project:projects!inner(id, title, color),
-      assignee:profiles!tasks_assignee_id_fkey(id, full_name, avatar_url, email),
-      responsible:profiles!tasks_responsible_id_fkey(id, full_name, avatar_url, email)
+      id,
+      project_id,
+      user_id,
+      title,
+      description,
+      status,
+      priority,
+      estimated_duration,
+      actual_duration,
+      progress,
+      task_number,
+      order_index,
+      tags,
+      completed_at,
+      company_id,
+      assignee_id,
+      responsible_id,
+      review_status,
+      review_note,
+      created_at,
+      updated_at,
+      project:projects!inner(id, title, color)
     `)
     .eq('company_id', companyId)
     .neq('status', 'done')
@@ -299,10 +337,28 @@ export async function getTodayCompletedTasks(companyId: string, supabaseClient?:
   const { data, error } = await supabase
     .from('tasks')
     .select(`
-      *,
-      project:projects!inner(id, title, color),
-      assignee:profiles!tasks_assignee_id_fkey(id, full_name, avatar_url, email),
-      responsible:profiles!tasks_responsible_id_fkey(id, full_name, avatar_url, email)
+      id,
+      project_id,
+      user_id,
+      title,
+      description,
+      status,
+      priority,
+      estimated_duration,
+      actual_duration,
+      progress,
+      task_number,
+      order_index,
+      tags,
+      completed_at,
+      company_id,
+      assignee_id,
+      responsible_id,
+      review_status,
+      review_note,
+      created_at,
+      updated_at,
+      project:projects!inner(id, title, color)
     `)
     .eq('company_id', companyId)
     .eq('status', 'done')

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
-import { getProjects } from '@/lib/supabase/queries/projects'
+import { getProjectsBasic } from '@/lib/supabase/queries/projects'
 import { getRecentIncompleteTasks } from '@/lib/supabase/queries/tasks'
 import { getNotes } from '@/lib/supabase/queries/notes'
 import { useUserProfileStore } from '@/lib/store/userProfileStore'
@@ -61,7 +61,7 @@ export function useGlobalSearch(userId: string) {
       }
 
       const [projects, tasks, notes] = await Promise.all([
-        getProjects(companyId, 'active'),
+        getProjectsBasic(companyId, 'active'),
         getRecentIncompleteTasks(companyId, 50),
         getNotes(companyId),
       ])
@@ -70,7 +70,7 @@ export function useGlobalSearch(userId: string) {
       const allResults: SearchResult[] = []
 
       // Search projects
-      projects?.forEach((project: Project) => {
+      projects?.forEach((project: Pick<Project, 'id' | 'title' | 'description' | 'color' | 'status'>) => {
         const projectPlainDescription = htmlToPlainText(project.description || '')
         if (
           project.title.toLowerCase().includes(searchLower) ||
