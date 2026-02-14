@@ -24,6 +24,7 @@ interface AddManualTimeDialogProps {
   taskId: string
   taskTitle: string
   userId: string
+  companyId?: string
   onTimeAdded: (minutes: number) => void
 }
 
@@ -33,6 +34,7 @@ export function AddManualTimeDialog({
   taskId,
   taskTitle,
   userId,
+  companyId,
   onTimeAdded 
 }: AddManualTimeDialogProps) {
   const [hours, setHours] = useState('')
@@ -55,7 +57,7 @@ export function AddManualTimeDialog({
 
     try {
       // Add manual time entry and update task duration
-      const { projectId } = await addManualTimeEntry(
+      const { projectId, companyId: resolvedCompanyId } = await addManualTimeEntry(
         taskId,
         userId,
         totalMinutes,
@@ -69,7 +71,8 @@ export function AddManualTimeDialog({
         taskId,
         totalMinutes,
         taskTitle,
-        true
+        true,
+        companyId || resolvedCompanyId || null
       )
 
       onTimeAdded(totalMinutes)

@@ -144,7 +144,8 @@ export function CreateTaskDialog({
         finalProjectId,
         newTask.id,
         'task_created',
-        { task_title: title }
+        { task_title: title },
+        companyId || profile?.company_id || null
       )
 
       const taskCompanyId = companyId || profile?.company_id

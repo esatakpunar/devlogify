@@ -12,6 +12,7 @@ interface ProgressSliderProps {
   taskId: string
   projectId: string
   userId: string
+  companyId?: string | null
   taskTitle: string
   currentProgress: number
   onProgressUpdate: (newProgress: number) => void
@@ -25,6 +26,7 @@ export function ProgressSlider({
   taskId,
   projectId,
   userId,
+  companyId,
   taskTitle,
   currentProgress,
   onProgressUpdate,
@@ -65,7 +67,8 @@ export function ProgressSlider({
           taskId,
           currentProgress,
           newProgress,
-          taskTitle
+          taskTitle,
+          companyId || null
         )
 
         onProgressUpdate(newProgress)
@@ -99,7 +102,7 @@ export function ProgressSlider({
         setIsUpdating(false)
       }
     }, 500),
-    [taskId, projectId, userId, taskTitle, currentProgress, onProgressUpdate, autoSave]
+    [taskId, projectId, userId, companyId, taskTitle, currentProgress, onProgressUpdate, autoSave]
   )
 
   const handleSliderChange = (value: number) => {

@@ -210,6 +210,8 @@ export function KanbanBoard({
       if (activeTask.status === newStatus) return
 
       try {
+        const activityCompanyId = activeTask.company_id || profile?.company_id || null
+
         // Optimistically update the UI
         const updatedTask = { 
           ...activeTask, 
@@ -232,7 +234,8 @@ export function KanbanBoard({
             old_status: activeTask.status,
             new_status: newStatus,
             task_title: activeTask.title
-          }
+          },
+          activityCompanyId
         )
 
         // Send notifications
@@ -255,6 +258,7 @@ export function KanbanBoard({
         // Cross-column movement
         const newStatus = overTask.status as 'todo' | 'in_progress' | 'done'
         try {
+          const activityCompanyId = activeTask.company_id || profile?.company_id || null
           const updatedTask = { 
             ...activeTask, 
             status: newStatus,
@@ -274,7 +278,8 @@ export function KanbanBoard({
               old_status: activeTask.status,
               new_status: newStatus,
               task_title: activeTask.title
-            }
+            },
+            activityCompanyId
           )
 
           // Send notifications

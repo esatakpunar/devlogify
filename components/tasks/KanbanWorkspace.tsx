@@ -57,6 +57,7 @@ type TaskItem = {
   order_index: number
   created_at: string
   updated_at: string
+  company_id?: string | null
   tags?: string[] | null
   assignee_id?: string | null
   responsible_id?: string | null
@@ -469,7 +470,8 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
           old_status: currentTask.status,
           new_status: targetStatus,
           task_title: currentTask.title,
-        }
+        },
+        companyId
       )
       toast.success(t('tasks.taskMarkedAsComplete'))
     } catch (error) {
@@ -502,7 +504,8 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
           old_status: previous.status,
           new_status: status,
           task_title: task.title,
-        }
+        },
+        companyId
       )
       toast.success(t('tasks.taskUpdatedSuccessfully'))
     } catch (error) {

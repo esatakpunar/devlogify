@@ -20,6 +20,7 @@ type Task = {
   progress: number
   order_index: number
   created_at: string
+  company_id?: string | null
 }
 
 interface KanbanColumnProps {

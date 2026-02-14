@@ -42,6 +42,7 @@ type Task = {
   progress: number
   order_index: number
   created_at: string
+  company_id?: string | null
   tags?: string[] | null
   assignee_id?: string | null
   responsible_id?: string | null
@@ -128,7 +129,8 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
           old_status: previousTask.status,
           new_status: newStatus,
           task_title: localTask.title
-        }
+        },
+        localTask.company_id || null
       )
       
       // Update with real data
@@ -222,7 +224,7 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
     e.stopPropagation()
     setTimerLoading(true)
     try {
-      await stopTimer(userId)
+      await stopTimer(userId, undefined, localTask.company_id || undefined)
 
       const updatedTask = await getTask(task.id)
 
@@ -535,6 +537,7 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
           taskId={localTask.id}
           taskTitle={localTask.title}
           userId={userId}
+          companyId={localTask.company_id || undefined}
           onTimeAdded={handleTimeAdded}
         />
       )}

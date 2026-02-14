@@ -79,7 +79,7 @@ export async function stopTimeEntry(
   // Get task info and update actual duration
   const { data: task, error: taskError } = await supabase
     .from('tasks')
-    .select('actual_duration, project_id')
+    .select('actual_duration, project_id, company_id')
     .eq('id', taskId)
     .single()
 
@@ -94,7 +94,7 @@ export async function stopTimeEntry(
 
   if (updateError) throw updateError
 
-  return { projectId: task.project_id, duration: durationMinutes }
+  return { projectId: task.project_id, companyId: task.company_id, duration: durationMinutes }
 }
 
 /**
@@ -128,7 +128,7 @@ export async function addManualTimeEntry(
   // Get task info and update actual duration
   const { data: task, error: taskError } = await supabase
     .from('tasks')
-    .select('actual_duration, project_id')
+    .select('actual_duration, project_id, company_id')
     .eq('id', taskId)
     .single()
 
@@ -143,7 +143,7 @@ export async function addManualTimeEntry(
 
   if (updateError) throw updateError
 
-  return { projectId: task.project_id, duration: minutes }
+  return { projectId: task.project_id, companyId: task.company_id, duration: minutes }
 }
 
 /**

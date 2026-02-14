@@ -85,7 +85,8 @@ export function CreateNoteDialog({
         projectId || null,
         null,
         'note_created',
-        { note_title: title || t('notes.untitled') }
+        { note_title: title || t('notes.untitled') },
+        company?.id || null
       )
 
       onNoteCreated(newNote)

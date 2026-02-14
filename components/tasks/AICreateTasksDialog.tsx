@@ -255,7 +255,8 @@ export function AICreateTasksDialog({
           selectedProjectId,
           task.id,
           'task_created',
-          { task_title: task.title, source: 'ai_generated' }
+          { task_title: task.title, source: 'ai_generated' },
+          resolvedCompanyId
         )
       }
 

@@ -13,7 +13,7 @@ export interface TimerState {
 interface TimerStore extends TimerState {
   setTimer: (state: Partial<TimerState>) => void
   startTimer: (taskId: string, taskTitle: string, userId: string) => Promise<void>
-  stopTimer: (userId: string, note?: string) => Promise<void>
+  stopTimer: (userId: string, note?: string, companyId?: string) => Promise<void>
   updateElapsed: () => void
   loadFromStorage: () => void
   reset: () => void
@@ -80,14 +80,14 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
     }))
   },
 
-  stopTimer: async (userId: string, note?: string) => {
+  stopTimer: async (userId: string, note?: string, companyId?: string) => {
     const state = get()
     if (!state.taskId || !state.startTime) return
 
     const durationMinutes = Math.floor(state.elapsed / 60)
 
     // Time entry'yi güncelle ve task duration'ı güncelle
-    const { projectId } = await stopTimeEntry(
+    const { projectId, companyId: resolvedCompanyId } = await stopTimeEntry(
       state.taskId,
       userId,
       durationMinutes,
@@ -101,7 +101,8 @@ export const useTimerStore = create<TimerStore>((set, get) => ({
       state.taskId,
       durationMinutes,
       state.taskTitle || '',
-      false
+      false,
+      companyId || resolvedCompanyId || null
     )
 
     // State'i sıfırla
