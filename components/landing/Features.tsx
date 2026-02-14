@@ -4,10 +4,10 @@ import { motion } from 'framer-motion'
 import {
   BookOpen,
   Kanban,
+  Building2,
+  GitPullRequest,
   LineChart,
-  Timer,
-  Users,
-  Zap
+  Timer
 } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 
@@ -22,8 +22,18 @@ export function Features() {
     },
     {
       icon: Kanban,
-      title: t('landing.features.kanbanBoards'),
-      description: t('landing.features.kanbanBoardsDescription'),
+      title: t('landing.features.kanbanWorkspace'),
+      description: t('landing.features.kanbanWorkspaceDescription'),
+    },
+    {
+      icon: Building2,
+      title: t('landing.features.companyTeams'),
+      description: t('landing.features.companyTeamsDescription'),
+    },
+    {
+      icon: GitPullRequest,
+      title: t('landing.features.taskReviewFlow'),
+      description: t('landing.features.taskReviewFlowDescription'),
     },
     {
       icon: LineChart,
@@ -34,16 +44,6 @@ export function Features() {
       icon: Timer,
       title: t('landing.features.timelineView'),
       description: t('landing.features.timelineViewDescription'),
-    },
-    {
-      icon: Users,
-      title: t('landing.features.teamCollaboration'),
-      description: t('landing.features.teamCollaborationDescription'),
-    },
-    {
-      icon: Zap,
-      title: t('landing.features.lightningFast'),
-      description: t('landing.features.lightningFastDescription'),
     },
   ]
   return (

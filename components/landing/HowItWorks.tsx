@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { UserPlus, FolderPlus, Sparkles, TrendingUp } from 'lucide-react'
+import { Building2, KanbanSquare, Users, TrendingUp } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 
 export function HowItWorks() {
@@ -9,27 +9,27 @@ export function HowItWorks() {
   
   const steps = [
     {
-      icon: UserPlus,
-      title: t('landing.howItWorks.signUp'),
-      description: t('landing.howItWorks.signUpDescription'),
+      icon: Building2,
+      title: t('landing.howItWorks.setupWorkspace'),
+      description: t('landing.howItWorks.setupWorkspaceDescription'),
       step: '01',
     },
     {
-      icon: FolderPlus,
-      title: t('landing.howItWorks.createFirstProject'),
-      description: t('landing.howItWorks.createFirstProjectDescription'),
+      icon: KanbanSquare,
+      title: t('landing.howItWorks.planInKanban'),
+      description: t('landing.howItWorks.planInKanbanDescription'),
       step: '02',
     },
     {
-      icon: Sparkles,
-      title: t('landing.howItWorks.trackProgress'),
-      description: t('landing.howItWorks.trackProgressDescription'),
+      icon: Users,
+      title: t('landing.howItWorks.collaborateWithTeam'),
+      description: t('landing.howItWorks.collaborateWithTeamDescription'),
       step: '03',
     },
     {
       icon: TrendingUp,
-      title: t('landing.howItWorks.analyzeGrow'),
-      description: t('landing.howItWorks.analyzeGrowDescription'),
+      title: t('landing.howItWorks.measureImprove'),
+      description: t('landing.howItWorks.measureImproveDescription'),
       step: '04',
     },
   ]
