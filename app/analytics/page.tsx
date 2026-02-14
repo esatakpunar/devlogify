@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getUserCompanyId } from '@/lib/supabase/queries/companyMembership'
 import { redirect } from 'next/navigation'
 import { WeeklySummary } from '@/components/analytics/WeeklySummary'
 import { TimeChart } from '@/components/analytics/TimeChart'
@@ -19,17 +20,11 @@ export default async function AnalyticsPage() {
 
   if (!user) return null
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('company_id')
-    .eq('id', user.id)
-    .single()
+  const companyId = await getUserCompanyId(user.id, supabase)
 
-  if (!profile?.company_id) {
+  if (!companyId) {
     redirect('/onboarding')
   }
-
-  const companyId = profile.company_id
 
   // Fetch all analytics data in parallel
   const [

@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getUserCompanyId } from '@/lib/supabase/queries/companyMembership'
 import { NextResponse } from 'next/server'
 
 export async function GET(request: Request) {
@@ -19,13 +20,9 @@ export async function GET(request: Request) {
       // Check if user has a company
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('company_id')
-          .eq('id', user.id)
-          .single()
+        const companyId = await getUserCompanyId(user.id, supabase)
 
-        if (!profile?.company_id) {
+        if (!companyId) {
           return NextResponse.redirect(`${origin}/onboarding`)
         }
       }

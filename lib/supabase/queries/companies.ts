@@ -182,10 +182,14 @@ export async function removeMember(companyId: string, userId: string) {
   if (error) throw error
 
   // Clear company_id from profile
-  await supabase
+  const { error: clearProfileError } = await supabase
     .from('profiles')
     .update({ company_id: null })
     .eq('id', userId)
+
+  if (clearProfileError) {
+    console.warn('Failed to clear profile company_id after member removal:', clearProfileError)
+  }
 }
 
 export async function joinByCode(joinCode: string, userId: string) {

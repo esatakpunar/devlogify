@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getUserCompanyId } from '@/lib/supabase/queries/companyMembership'
 import { redirect } from 'next/navigation'
 import { getProjectCount, getPinnedProjects } from '@/lib/supabase/queries/projects'
 import { getTodayStats, getWeeklyStats } from '@/lib/supabase/queries/analytics'
@@ -11,18 +12,11 @@ export default async function DashboardPage() {
 
   if (!user) return null
 
-  // Get user's company_id
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('company_id')
-    .eq('id', user.id)
-    .single()
+  const companyId = await getUserCompanyId(user.id, supabase)
 
-  if (!profile?.company_id) {
+  if (!companyId) {
     redirect('/onboarding')
   }
-
-  const companyId = profile.company_id
 
   // Fetch all dashboard data in parallel to reduce total load time
   const [

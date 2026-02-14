@@ -37,13 +37,14 @@ export function DashboardLayout({
                      pathname?.startsWith('/signup') || 
                      pathname?.startsWith('/forgot-password') || 
                      pathname?.startsWith('/reset-password')
+  const isOnboardingPage = pathname?.startsWith('/onboarding')
   const isLandingPage = pathname === '/'
   const isSharePage = pathname?.startsWith('/share/')
 
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user && !isAuthPage && !isLandingPage && !isSharePage) {
+      if (!user && !isAuthPage && !isOnboardingPage && !isLandingPage && !isSharePage) {
         clearProfile()
         router.push('/login')
       } else {
@@ -73,7 +74,7 @@ export function DashboardLayout({
       subscription.unsubscribe()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [router, supabase.auth, isAuthPage, isLandingPage, isSharePage])
+  }, [router, supabase.auth, isAuthPage, isOnboardingPage, isLandingPage, isSharePage])
 
   // Keyboard shortcuts
   useKeyboardShortcuts({
@@ -101,7 +102,7 @@ export function DashboardLayout({
   })
 
   // Auth sayfaları, landing page ve share sayfaları için LanguageProvider ile birlikte render et
-  if (isAuthPage || isLandingPage || isSharePage) {
+  if (isAuthPage || isOnboardingPage || isLandingPage || isSharePage) {
     return (
       <LanguageProvider userId={undefined}>
         <LanguageHtml />

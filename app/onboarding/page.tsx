@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getUserCompanyId } from '@/lib/supabase/queries/companyMembership'
 import { redirect } from 'next/navigation'
 import { OnboardingContent } from '@/components/onboarding/OnboardingContent'
 
@@ -10,14 +11,10 @@ export default async function OnboardingPage() {
     redirect('/login')
   }
 
-  // Check if user already has a company
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('company_id')
-    .eq('id', user.id)
-    .single()
+  // Check if user already has a company membership
+  const companyId = await getUserCompanyId(user.id, supabase)
 
-  if (profile?.company_id) {
+  if (companyId) {
     redirect('/dashboard')
   }
 

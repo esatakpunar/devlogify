@@ -1,5 +1,6 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
+import { getUserCompanyId } from '@/lib/supabase/queries/companyMembership'
 
 // Routes that don't require company membership
 const PUBLIC_ROUTES = ['/login', '/signup', '/reset-password', '/forgot-password', '/onboarding', '/auth', '/share']
@@ -89,13 +90,9 @@ export async function updateSession(request: NextRequest) {
 
   // If authenticated, check for company membership on protected routes
   if (user && !isPublicRoute && !isApiRoute && !isRootPage) {
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('company_id')
-      .eq('id', user.id)
-      .single()
+    const companyId = await getUserCompanyId(user.id, supabase)
 
-    if (!profile?.company_id) {
+    if (!companyId) {
       const redirectUrl = new URL('/onboarding', request.url)
       return NextResponse.redirect(redirectUrl)
     }

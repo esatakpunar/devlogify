@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { getUserCompanyId } from '@/lib/supabase/queries/companyMembership'
 import { redirect } from 'next/navigation'
 import { getNotes } from '@/lib/supabase/queries/notes'
 import { getProjects } from '@/lib/supabase/queries/projects'
@@ -11,17 +12,11 @@ export default async function NotesPage() {
 
   if (!user) return null
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('company_id')
-    .eq('id', user.id)
-    .single()
+  const companyId = await getUserCompanyId(user.id, supabase)
 
-  if (!profile?.company_id) {
+  if (!companyId) {
     redirect('/onboarding')
   }
-
-  const companyId = profile.company_id
 
   const [notes, projects] = await Promise.all([
     getNotes(companyId, supabase),
