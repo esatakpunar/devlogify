@@ -66,13 +66,13 @@ export function Navbar({ user, onMenuClick, onSearchClick }: NavbarProps) {
       {/* Search */}
       <div className="flex-1 min-w-0 max-w-md group">
         <div className="relative">
+          <Search className="absolute left-2 sm:left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-500 pointer-events-none z-10" />
           <Button
             variant="outline"
             type="button"
             onClick={onSearchClick}
             className="w-full h-8 sm:h-9 justify-start pl-7 sm:pl-8 pr-16 sm:pr-20 text-xs sm:text-sm font-normal text-muted-foreground"
           >
-            <Search className="absolute left-2 top-2 sm:left-2.5 sm:top-2.5 h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-500" />
             <span className="truncate">{t('common.searchPlaceholder')}</span>
           </Button>
           <div className="absolute right-2 top-1/2 -translate-y-1/2 hidden sm:block pointer-events-none">
