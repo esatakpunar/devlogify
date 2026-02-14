@@ -3,8 +3,11 @@
 import { useState, useEffect } from 'react'
 import { type AITask } from '@/lib/ai/gemini'
 import { createTasks } from '@/lib/supabase/queries/tasks'
+import { getProject } from '@/lib/supabase/queries/projects'
+import type { Project as DbProject } from '@/lib/supabase/queries/projects'
 import { logActivity } from '@/lib/supabase/queries/activities'
 import type { TaskInsert } from '@/lib/supabase/queries/tasks'
+import type { Task } from '@/lib/supabase/queries/tasks'
 import {
   Dialog,
   DialogContent,
@@ -48,6 +51,7 @@ interface AICreateTasksDialogProps {
   onOpenChange: (open: boolean) => void
   projects: Project[]
   userId: string
+  companyId?: string
   initialNote?: Note | null
   initialSuggestion?: {
     title: string
@@ -67,6 +71,7 @@ export function AICreateTasksDialog({
   onOpenChange,
   projects,
   userId,
+  companyId,
   initialNote,
   initialSuggestion,
   onTasksCreated,
@@ -214,22 +219,34 @@ export function AICreateTasksDialog({
     setError(null)
 
     try {
+      let resolvedCompanyId = companyId || null
+      if (!resolvedCompanyId && selectedProjectId) {
+        try {
+          const selectedProject = (await getProject(selectedProjectId)) as DbProject
+          resolvedCompanyId = selectedProject?.company_id || null
+        } catch (projectError) {
+          console.error('Error resolving project company id:', projectError)
+        }
+      }
+
       // Convert to TaskInsert format
       const tasksToInsert: TaskInsert[] = tasks.map((task, index) => ({
         project_id: selectedProjectId,
         user_id: userId,
+        company_id: resolvedCompanyId,
         title: task.title.trim(),
         description: task.description.trim() || null, // Description is required but can be stored as null in DB if needed
         priority: task.priority,
         estimated_duration: task.estimated_duration || null,
         status: 'todo',
+        assignee_id: userId,
         order_index: index,
         progress: 0,
         actual_duration: 0,
       }))
 
       // Create tasks in batch
-      const createdTasks = await createTasks(tasksToInsert)
+      const createdTasks = (await createTasks(tasksToInsert)) as Task[]
 
       // Log activities for each task
       for (const task of createdTasks) {
@@ -529,4 +546,3 @@ export function AICreateTasksDialog({
     </Dialog>
   )
 }
-

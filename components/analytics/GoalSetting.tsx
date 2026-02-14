@@ -11,6 +11,7 @@ import { useTranslation } from '@/lib/i18n/useTranslation'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
 import { useConfirmModal } from '@/lib/hooks/useConfirmModal'
+import type { Database } from '@/types/supabase'
 
 interface Goal {
   id: string
@@ -70,6 +71,7 @@ export function GoalSetting({ userId }: GoalSettingProps) {
       weekStart.setHours(0, 0, 0, 0)
 
       const progressMap: Record<string, number> = {}
+      type TimeEntryDuration = Pick<Database['public']['Tables']['time_entries']['Row'], 'duration'>
 
       for (const goal of goals) {
         if (goal.period === 'weekly') {
@@ -82,12 +84,13 @@ export function GoalSetting({ userId }: GoalSettingProps) {
               .gte('completed_at', weekStart.toISOString())
             progressMap[goal.id] = count || 0
           } else if (goal.type === 'time') {
-            const { data: timeEntries } = await supabase
+            const { data: timeEntriesData } = await supabase
               .from('time_entries')
               .select('duration')
               .eq('user_id', userId)
               .gte('started_at', weekStart.toISOString())
               .not('duration', 'is', null)
+            const timeEntries = (timeEntriesData || []) as TimeEntryDuration[]
             const minutes = timeEntries?.reduce((sum, entry) => sum + (entry.duration || 0), 0) || 0
             progressMap[goal.id] = minutes
           } else if (goal.type === 'projects') {
@@ -111,12 +114,13 @@ export function GoalSetting({ userId }: GoalSettingProps) {
               .gte('completed_at', today.toISOString())
             progressMap[goal.id] = count || 0
           } else if (goal.type === 'time') {
-            const { data: timeEntries } = await supabase
+            const { data: timeEntriesData } = await supabase
               .from('time_entries')
               .select('duration')
               .eq('user_id', userId)
               .gte('started_at', today.toISOString())
               .not('duration', 'is', null)
+            const timeEntries = (timeEntriesData || []) as TimeEntryDuration[]
             const minutes = timeEntries?.reduce((sum, entry) => sum + (entry.duration || 0), 0) || 0
             progressMap[goal.id] = minutes
           }
@@ -374,4 +378,3 @@ export function GoalSetting({ userId }: GoalSettingProps) {
     </Card>
   )
 }
-

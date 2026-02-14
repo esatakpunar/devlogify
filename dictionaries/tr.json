@@ -536,7 +536,11 @@
     "allStatuses": "Tüm durumlar",
     "allPriorities": "Tüm öncelikler",
     "allAssignees": "Tüm atananlar",
-    "allResponsibles": "Tüm sorumlular"
+    "allResponsibles": "Tüm sorumlular",
+    "filters": "Filtreler",
+    "clearFilters": "Filtreleri temizle",
+    "clearAll": "Tumunu temizle",
+    "apply": "Uygula"
   },
   "profile": {
     "profileSettings": "Profil Ayarları",

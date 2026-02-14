@@ -13,7 +13,7 @@ export async function createTeam(
   description?: string,
   color?: string
 ) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('teams')
@@ -32,7 +32,7 @@ export async function createTeam(
 }
 
 export async function getTeams(companyId: string, supabaseClient?: SupabaseClient<Database>) {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { data, error } = await supabase
     .from('teams')
@@ -48,7 +48,7 @@ export async function getTeams(companyId: string, supabaseClient?: SupabaseClien
 }
 
 export async function getTeam(teamId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('teams')
@@ -61,7 +61,7 @@ export async function getTeam(teamId: string) {
 }
 
 export async function updateTeam(teamId: string, updates: Partial<TeamUpdate>) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('teams')
@@ -75,7 +75,7 @@ export async function updateTeam(teamId: string, updates: Partial<TeamUpdate>) {
 }
 
 export async function deleteTeam(teamId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { error } = await supabase
     .from('teams')
@@ -86,7 +86,7 @@ export async function deleteTeam(teamId: string) {
 }
 
 export async function addTeamMember(teamId: string, userId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('team_members')
@@ -102,7 +102,7 @@ export async function addTeamMember(teamId: string, userId: string) {
 }
 
 export async function removeTeamMember(teamId: string, userId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { error } = await supabase
     .from('team_members')
@@ -114,7 +114,7 @@ export async function removeTeamMember(teamId: string, userId: string) {
 }
 
 export async function getTeamMembers(teamId: string, supabaseClient?: SupabaseClient<Database>): Promise<TeamMemberWithProfile[]> {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { data, error } = await supabase
     .from('team_members')

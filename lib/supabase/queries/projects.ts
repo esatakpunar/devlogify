@@ -13,7 +13,7 @@ export type ProjectWithTasks = Project & {
 }
 
 export async function getProjects(companyId: string, status?: string, supabaseClient?: SupabaseClient<Database>): Promise<ProjectWithTasks[]> {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   let query = supabase
     .from('projects')
@@ -35,7 +35,7 @@ export async function getProjects(companyId: string, status?: string, supabaseCl
 }
 
 export async function getProject(id: string, supabaseClient?: SupabaseClient<Database>) {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { data, error } = await supabase
     .from('projects')
@@ -48,7 +48,7 @@ export async function getProject(id: string, supabaseClient?: SupabaseClient<Dat
 }
 
 export async function createProject(project: ProjectInsert) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('projects')
@@ -61,7 +61,7 @@ export async function createProject(project: ProjectInsert) {
 }
 
 export async function updateProject(id: string, updates: ProjectUpdate) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('projects')
@@ -75,7 +75,7 @@ export async function updateProject(id: string, updates: ProjectUpdate) {
 }
 
 export async function deleteProject(id: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { error } = await supabase
     .from('projects')
@@ -89,7 +89,7 @@ export async function deleteProject(id: string) {
  * Archive a project by updating its status
  */
 export async function archiveProject(id: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('projects')
@@ -106,7 +106,7 @@ export async function archiveProject(id: string) {
  * Get project count for a company by status
  */
 export async function getProjectCount(companyId: string, status?: string, supabaseClient?: SupabaseClient<Database>) {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   let query = supabase
     .from('projects')
@@ -127,7 +127,7 @@ export async function getProjectCount(companyId: string, status?: string, supaba
  * Get projects for notes (company-based)
  */
 export async function getProjectsWithNotes(companyId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('projects')
@@ -143,7 +143,7 @@ export async function getProjectsWithNotes(companyId: string) {
  * Get pinned projects for dashboard
  */
 export async function getPinnedProjects(companyId: string, supabaseClient?: SupabaseClient<Database>): Promise<ProjectWithTasks[]> {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   try {
     const { data, error } = await supabase
@@ -173,7 +173,7 @@ export async function getPinnedProjects(companyId: string, supabaseClient?: Supa
  * Toggle pin status for a project
  */
 export async function toggleProjectPin(projectId: string, supabaseClient?: SupabaseClient<Database>) {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   try {
     const { data: project, error: fetchError } = await supabase

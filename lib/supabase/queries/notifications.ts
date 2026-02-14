@@ -11,7 +11,7 @@ export async function getNotifications(
   offset: number = 0,
   supabaseClient?: SupabaseClient<Database>
 ) {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { data, error } = await supabase
     .from('notifications')
@@ -30,7 +30,7 @@ export async function getUnreadCount(
   companyId: string,
   supabaseClient?: SupabaseClient<Database>
 ) {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { count, error } = await supabase
     .from('notifications')
@@ -44,7 +44,7 @@ export async function getUnreadCount(
 }
 
 export async function markAsRead(notificationId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { error } = await supabase
     .from('notifications')
@@ -55,7 +55,7 @@ export async function markAsRead(notificationId: string) {
 }
 
 export async function markAllAsRead(userId: string, companyId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { error } = await supabase
     .from('notifications')
@@ -76,7 +76,7 @@ export async function createNotification(
   metadata?: Record<string, any>,
   supabaseClient?: SupabaseClient<Database>
 ) {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { data, error } = await supabase
     .from('notifications')

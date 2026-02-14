@@ -30,7 +30,7 @@ export async function createCompany(
   ownerId: string,
   supabaseClient?: SupabaseClient<Database>
 ) {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
   const slug = generateSlug(name) + '-' + Date.now().toString(36)
   const joinCode = generateJoinCode()
 
@@ -96,7 +96,7 @@ export async function createCompany(
 }
 
 export async function getCompany(companyId: string, supabaseClient?: SupabaseClient<Database>) {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { data, error } = await supabase
     .from('companies')
@@ -109,7 +109,7 @@ export async function getCompany(companyId: string, supabaseClient?: SupabaseCli
 }
 
 export async function updateCompany(companyId: string, updates: CompanyUpdate) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('companies')
@@ -123,7 +123,7 @@ export async function updateCompany(companyId: string, updates: CompanyUpdate) {
 }
 
 export async function getCompanyMembers(companyId: string, supabaseClient?: SupabaseClient<Database>): Promise<CompanyMemberWithProfile[]> {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { data, error } = await supabase
     .from('company_members')
@@ -139,7 +139,7 @@ export async function getCompanyMembers(companyId: string, supabaseClient?: Supa
 }
 
 export async function updateMemberRole(memberId: string, role: 'admin' | 'member') {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('company_members')
@@ -153,7 +153,7 @@ export async function updateMemberRole(memberId: string, role: 'admin' | 'member
 }
 
 export async function removeMember(companyId: string, userId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   // Remove from all teams in this company
   const { data: teams } = await supabase
@@ -162,7 +162,7 @@ export async function removeMember(companyId: string, userId: string) {
     .eq('company_id', companyId)
 
   if (teams) {
-    const teamIds = teams.map(t => t.id)
+    const teamIds = teams.map((t: { id: string }) => t.id)
     if (teamIds.length > 0) {
       await supabase
         .from('team_members')
@@ -193,7 +193,7 @@ export async function removeMember(companyId: string, userId: string) {
 }
 
 export async function joinByCode(joinCode: string, userId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   // Find company by join code
   const { data: company, error: findError } = await supabase
@@ -256,7 +256,7 @@ export async function joinByCode(joinCode: string, userId: string) {
 }
 
 export async function regenerateJoinCode(companyId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
   const newCode = generateJoinCode()
 
   const { data, error } = await supabase

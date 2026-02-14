@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { createProject, getProjectCount } from '@/lib/supabase/queries/projects'
+import type { Project } from '@/lib/supabase/queries/projects'
 import { logProjectCreated } from '@/lib/supabase/queries/activities'
 import { usePremium } from '@/lib/hooks/usePremium'
 import { Button } from '@/components/ui/button'
@@ -142,14 +143,14 @@ export function CreateProjectForm() {
         }
       }
 
-      const newProject = await createProject({
+      const newProject = (await createProject({
         user_id: user.id,
         company_id: company?.id || null,
         title,
         description: description || null,
         color,
         status,
-      })
+      })) as Project
 
       // Activity log ekle
       await logProjectCreated(user.id, newProject.id, title)

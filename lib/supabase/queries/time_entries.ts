@@ -32,7 +32,7 @@ export type TimeEntryUpdate = {
  * Start a new time entry for a task
  */
 export async function startTimeEntry(taskId: string, userId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
   const startTime = new Date()
 
   const { data, error } = await supabase
@@ -59,7 +59,7 @@ export async function stopTimeEntry(
   durationMinutes: number,
   note?: string
 ) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
   const endTime = new Date()
 
   // Update the time entry
@@ -106,7 +106,7 @@ export async function addManualTimeEntry(
   minutes: number,
   note?: string
 ) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
   const now = new Date()
   const startTime = new Date(now.getTime() - minutes * 60000)
 
@@ -150,7 +150,7 @@ export async function addManualTimeEntry(
  * Get time entries for a specific task
  */
 export async function getTimeEntriesByTask(taskId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('time_entries')
@@ -170,7 +170,7 @@ export async function getTimeEntriesByDateRange(
   startDate?: Date,
   endDate?: Date
 ) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   let query = supabase
     .from('time_entries')
@@ -195,7 +195,7 @@ export async function getTimeEntriesByDateRange(
  * Get active time entry for a user
  */
 export async function getActiveTimeEntry(userId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('time_entries')

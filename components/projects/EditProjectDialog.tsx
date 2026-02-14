@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { updateProject, deleteProject } from '@/lib/supabase/queries/projects'
+import type { Project } from '@/lib/supabase/queries/projects'
 import { logProjectUpdated, logProjectDeleted } from '@/lib/supabase/queries/activities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -79,7 +79,6 @@ export function EditProjectDialog({
   const [error, setError] = useState<string | null>(null)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
   const t = useTranslation()
 
   // Update form when project changes
@@ -99,12 +98,12 @@ export function EditProjectDialog({
     setError(null)
 
     try {
-      const updatedProject = await updateProject(project.id, {
+      const updatedProject = (await updateProject(project.id, {
         title,
         description: description || null,
         color,
         status,
-      })
+      })) as Project
 
       // Activity log ekle
       await logProjectUpdated(

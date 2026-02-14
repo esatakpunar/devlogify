@@ -25,7 +25,7 @@ export async function createShareLink(
   resourceId: string,
   expiresAt?: Date
 ): Promise<SharedLink> {
-  const supabase = await createServerClient()
+  const supabase = (await createServerClient()) as any
   
   const token = generateShareToken()
   
@@ -54,7 +54,7 @@ export async function createShareLink(
  */
 export async function getShareLinkByToken(token: string, supabaseClient?: SupabaseClient<Database>): Promise<SharedLink | null> {
   // Use public client for anonymous access
-  const supabase = supabaseClient || createPublicClient()
+  const supabase = (supabaseClient || createPublicClient()) as any
   
   const { data, error } = await supabase
     .from('shared_links')
@@ -83,7 +83,7 @@ export async function getUserShareLinks(
   userId: string,
   resourceType?: 'project' | 'analytics'
 ): Promise<SharedLink[]> {
-  const supabase = await createServerClient()
+  const supabase = (await createServerClient()) as any
   
   let query = supabase
     .from('shared_links')
@@ -109,7 +109,7 @@ export async function getUserShareLinks(
  */
 export async function incrementShareLinkViews(token: string, supabaseClient?: SupabaseClient<Database>): Promise<void> {
   // Use public client for anonymous access
-  const supabase = supabaseClient || createPublicClient()
+  const supabase = (supabaseClient || createPublicClient()) as any
   
   // Try RPC first, fallback to manual update if it doesn't exist
   try {
@@ -144,7 +144,7 @@ export async function incrementShareLinkViews(token: string, supabaseClient?: Su
  * Deactivate share link
  */
 export async function deactivateShareLink(token: string, userId: string): Promise<void> {
-  const supabase = await createServerClient()
+  const supabase = (await createServerClient()) as any
   
   const { error } = await supabase
     .from('shared_links')
@@ -156,4 +156,3 @@ export async function deactivateShareLink(token: string, userId: string): Promis
     throw new Error(`Failed to deactivate share link: ${error.message}`)
   }
 }
-

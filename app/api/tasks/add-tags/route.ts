@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 import { addTagsToTasks } from '@/lib/supabase/queries/tasks'
+import type { Database } from '@/types/supabase'
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,10 +33,11 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify ownership of tasks
-    const { data: tasks, error: verifyError } = await supabase
+    const { data: tasksData, error: verifyError } = await supabase
       .from('tasks')
       .select('id, user_id')
       .in('id', taskIds)
+    const tasks = (tasksData || []) as Pick<Database['public']['Tables']['tasks']['Row'], 'id' | 'user_id'>[]
 
     if (verifyError) {
       return NextResponse.json(
@@ -81,4 +83,3 @@ export async function POST(request: NextRequest) {
     )
   }
 }
-

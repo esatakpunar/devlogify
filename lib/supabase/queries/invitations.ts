@@ -19,7 +19,7 @@ export async function createInvitation(
   role: 'admin' | 'member',
   invitedBy: string
 ) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
   const token = generateToken()
   const expiresAt = new Date()
   expiresAt.setDate(expiresAt.getDate() + 7) // 7 days expiry
@@ -42,7 +42,7 @@ export async function createInvitation(
 }
 
 export async function getInvitations(companyId: string, supabaseClient?: SupabaseClient<Database>) {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { data, error } = await supabase
     .from('invitations')
@@ -58,7 +58,7 @@ export async function getInvitations(companyId: string, supabaseClient?: Supabas
 }
 
 export async function acceptInvitation(token: string, userId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   // Find invitation by token
   const { data: invitation, error: findError } = await supabase
@@ -125,7 +125,7 @@ export async function acceptInvitation(token: string, userId: string) {
 }
 
 export async function cancelInvitation(invitationId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { error } = await supabase
     .from('invitations')

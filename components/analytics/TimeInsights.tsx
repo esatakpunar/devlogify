@@ -6,6 +6,7 @@ import { Clock, TrendingUp, Calendar, Target } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { createClient } from '@/lib/supabase/client'
 import { format } from 'date-fns'
+import type { Database } from '@/types/supabase'
 
 interface TimeInsightsProps {
   userId: string
@@ -36,7 +37,7 @@ export function TimeInsights({ userId }: TimeInsightsProps) {
       const thirtyDaysAgo = new Date()
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-      const { data: timeEntries } = await supabase
+      const { data: timeEntriesData } = await supabase
         .from('time_entries')
         .select(`
           duration,
@@ -48,6 +49,16 @@ export function TimeInsights({ userId }: TimeInsightsProps) {
         .eq('user_id', userId)
         .gte('started_at', thirtyDaysAgo.toISOString())
         .not('duration', 'is', null)
+      const timeEntries = (timeEntriesData || []) as Array<{
+        duration: Database['public']['Tables']['time_entries']['Row']['duration']
+        started_at: Database['public']['Tables']['time_entries']['Row']['started_at']
+        task?: {
+          project?: {
+            title: string
+            color: string
+          } | null
+        } | null
+      }>
 
       if (!timeEntries) return
 
@@ -86,13 +97,14 @@ export function TimeInsights({ userId }: TimeInsightsProps) {
       })
 
       // Average task duration
-      const { data: tasks } = await supabase
+      const { data: tasksData } = await supabase
         .from('tasks')
         .select('actual_duration')
         .eq('user_id', userId)
         .eq('status', 'done')
         .gt('actual_duration', 0)
         .limit(100)
+      const tasks = (tasksData || []) as Pick<Database['public']['Tables']['tasks']['Row'], 'actual_duration'>[]
 
       const avgDuration = tasks && tasks.length > 0
         ? Math.round(tasks.reduce((sum, t) => sum + t.actual_duration, 0) / tasks.length)
@@ -184,4 +196,3 @@ export function TimeInsights({ userId }: TimeInsightsProps) {
     </Card>
   )
 }
-

@@ -24,7 +24,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Plus, Sparkles, ChevronDown } from 'lucide-react'
+import { Plus, Sparkles, ChevronDown, Filter, X } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { updateTask, updateTaskStatus } from '@/lib/supabase/queries/tasks'
 import { logActivity } from '@/lib/supabase/queries/activities'
@@ -86,6 +86,7 @@ type MultiSelectOption = {
   value: string
   label: string
 }
+type DesktopFilterKey = 'project' | 'status' | 'priority' | 'assignee' | 'responsible'
 
 function sortByUpdatedAtDesc(tasks: TaskItem[]): TaskItem[] {
   return [...tasks].sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
@@ -181,6 +182,14 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
   const [selectedResponsibleIds, setSelectedResponsibleIds] = useState<string[]>([])
   const [sortKey, setSortKey] = useState<SortKey>('title')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
+  const [desktopFiltersOpen, setDesktopFiltersOpen] = useState(false)
+  const [desktopActiveFilter, setDesktopActiveFilter] = useState<DesktopFilterKey>('project')
+  const [desktopFilterSearch, setDesktopFilterSearch] = useState('')
+  const [draftProjectIds, setDraftProjectIds] = useState<string[]>([])
+  const [draftStatuses, setDraftStatuses] = useState<string[]>([])
+  const [draftPriorities, setDraftPriorities] = useState<string[]>([])
+  const [draftAssigneeIds, setDraftAssigneeIds] = useState<string[]>([])
+  const [draftResponsibleIds, setDraftResponsibleIds] = useState<string[]>([])
 
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isAICreateDialogOpen, setIsAICreateDialogOpen] = useState(false)
@@ -518,7 +527,10 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
     setTasks((prev) => prev.map((item) => (item.id === task.id ? optimistic : item)))
 
     try {
-      const updated = await updateTask(task.id, updates)
+      const updated = (await updateTask(task.id, updates)) as Partial<TaskItem> & {
+        assignee_id?: string | null
+        responsible_id?: string | null
+      }
       setTasks((prev) =>
         prev.map((item) =>
           item.id === task.id
@@ -554,6 +566,133 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
     return sortDirection === 'asc' ? '↑' : '↓'
   }
 
+  const activeFilterGroupCount = useMemo(() => {
+    return [
+      selectedProjectIds.length,
+      selectedStatuses.length,
+      selectedPriorities.length,
+      selectedAssigneeIds.length,
+      selectedResponsibleIds.length,
+    ].filter((count) => count > 0).length
+  }, [
+    selectedProjectIds.length,
+    selectedStatuses.length,
+    selectedPriorities.length,
+    selectedAssigneeIds.length,
+    selectedResponsibleIds.length,
+  ])
+
+  const clearAllFilters = () => {
+    setSelectedProjectIds([])
+    setSelectedStatuses([])
+    setSelectedPriorities([])
+    setSelectedAssigneeIds([])
+    setSelectedResponsibleIds([])
+  }
+
+  useEffect(() => {
+    if (!desktopFiltersOpen) return
+    setDesktopActiveFilter('project')
+    setDesktopFilterSearch('')
+    setDraftProjectIds(selectedProjectIds)
+    setDraftStatuses(selectedStatuses)
+    setDraftPriorities(selectedPriorities)
+    setDraftAssigneeIds(selectedAssigneeIds)
+    setDraftResponsibleIds(selectedResponsibleIds)
+  }, [
+    desktopFiltersOpen,
+    selectedProjectIds,
+    selectedStatuses,
+    selectedPriorities,
+    selectedAssigneeIds,
+    selectedResponsibleIds,
+  ])
+
+  const desktopFilterGroups = useMemo(
+    () => [
+      {
+        key: 'project' as DesktopFilterKey,
+        label: t('tasks.project'),
+        options: projectFilterOptions,
+        values: draftProjectIds,
+        onChange: setDraftProjectIds,
+      },
+      {
+        key: 'status' as DesktopFilterKey,
+        label: t('tasks.status'),
+        options: statusFilterOptions,
+        values: draftStatuses,
+        onChange: setDraftStatuses,
+      },
+      {
+        key: 'priority' as DesktopFilterKey,
+        label: t('tasks.priority'),
+        options: priorityFilterOptions,
+        values: draftPriorities,
+        onChange: setDraftPriorities,
+      },
+      {
+        key: 'assignee' as DesktopFilterKey,
+        label: t('tasks.assignee'),
+        options: assigneeFilterOptions,
+        values: draftAssigneeIds,
+        onChange: setDraftAssigneeIds,
+      },
+      {
+        key: 'responsible' as DesktopFilterKey,
+        label: t('tasks.responsible'),
+        options: responsibleFilterOptions,
+        values: draftResponsibleIds,
+        onChange: setDraftResponsibleIds,
+      },
+    ],
+    [
+      t,
+      projectFilterOptions,
+      statusFilterOptions,
+      priorityFilterOptions,
+      assigneeFilterOptions,
+      responsibleFilterOptions,
+      draftProjectIds,
+      draftStatuses,
+      draftPriorities,
+      draftAssigneeIds,
+      draftResponsibleIds,
+    ]
+  )
+
+  const activeDesktopGroup = useMemo(
+    () => desktopFilterGroups.find((group) => group.key === desktopActiveFilter) || desktopFilterGroups[0],
+    [desktopFilterGroups, desktopActiveFilter]
+  )
+
+  const filteredDesktopOptions = useMemo(() => {
+    const searchTerm = desktopFilterSearch.trim().toLowerCase()
+    if (!searchTerm) return activeDesktopGroup?.options || []
+    return (activeDesktopGroup?.options || []).filter((option) =>
+      option.label.toLowerCase().includes(searchTerm)
+    )
+  }, [activeDesktopGroup, desktopFilterSearch])
+
+  const clearAllDraftFilters = () => {
+    setDraftProjectIds([])
+    setDraftStatuses([])
+    setDraftPriorities([])
+    setDraftAssigneeIds([])
+    setDraftResponsibleIds([])
+  }
+
+  const applyDesktopFilters = () => {
+    setSelectedProjectIds(draftProjectIds)
+    setSelectedStatuses(draftStatuses)
+    setSelectedPriorities(draftPriorities)
+    setSelectedAssigneeIds(draftAssigneeIds)
+    setSelectedResponsibleIds(draftResponsibleIds)
+    setDesktopFiltersOpen(false)
+  }
+
+  const desktopDraftGroupCount = desktopFilterGroups.filter((group) => group.values.length > 0).length
+
   return (
     <div className="space-y-4 sm:space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -583,14 +722,150 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-6 gap-3">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
         <Input
           placeholder={t('common.search')}
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          className="lg:col-span-2"
+          className="lg:max-w-md"
         />
+        <div className="hidden lg:flex lg:items-center lg:gap-2">
+          <Popover open={desktopFiltersOpen} onOpenChange={setDesktopFiltersOpen}>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="relative">
+                <Filter className="mr-2 h-4 w-4" />
+                {t('kanban.filters')}
+                {activeFilterGroupCount > 0 && (
+                  <span className="ml-2 rounded bg-primary/10 px-1.5 py-0.5 text-xs text-primary">
+                    {activeFilterGroupCount}
+                  </span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent
+              align="end"
+              className="w-[860px] max-w-[calc(100vw-2rem)] p-0"
+              sideOffset={8}
+            >
+              <div className="grid h-[520px] grid-cols-[220px_1fr]">
+                <div className="border-r bg-muted/20 p-3">
+                  <div className="mb-3 text-sm font-semibold">{t('kanban.filters')}</div>
+                  <div className="space-y-1">
+                    {desktopFilterGroups.map((group) => {
+                      const isActive = group.key === desktopActiveFilter
+                      return (
+                        <button
+                          key={group.key}
+                          type="button"
+                          onClick={() => {
+                            setDesktopActiveFilter(group.key)
+                            setDesktopFilterSearch('')
+                          }}
+                          className={`flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors ${
+                            isActive
+                              ? 'bg-primary/10 text-primary'
+                              : 'text-muted-foreground hover:bg-muted'
+                          }`}
+                        >
+                          <span>{group.label}</span>
+                          {group.values.length > 0 && (
+                            <span className="rounded bg-primary px-1.5 py-0.5 text-xs text-primary-foreground">
+                              {group.values.length}
+                            </span>
+                          )}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  <div className="mt-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full"
+                      onClick={clearAllDraftFilters}
+                      disabled={desktopDraftGroupCount === 0}
+                    >
+                      {t('kanban.clearAll')}
+                    </Button>
+                  </div>
+                  <div className="mt-2">
+                    <Button size="sm" className="w-full" onClick={applyDesktopFilters}>
+                      {t('kanban.apply')}
+                    </Button>
+                  </div>
+                </div>
 
+                <div className="flex h-full flex-col">
+                  <div className="flex items-center justify-between border-b px-4 py-3">
+                    <p className="text-sm font-semibold">{activeDesktopGroup?.label}</p>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => setDesktopFiltersOpen(false)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                  <div className="border-b px-4 py-3">
+                    <Input
+                      value={desktopFilterSearch}
+                      onChange={(event) => setDesktopFilterSearch(event.target.value)}
+                      placeholder={`${t('common.search')}...`}
+                    />
+                  </div>
+                  <div className="flex items-center justify-between border-b px-4 py-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2 text-xs"
+                      onClick={() => activeDesktopGroup?.onChange(activeDesktopGroup.options.map((option) => option.value))}
+                      disabled={!activeDesktopGroup || activeDesktopGroup.options.length === 0}
+                    >
+                      {t('kanban.selectAll')}
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 px-2 text-xs"
+                      onClick={() => activeDesktopGroup?.onChange([])}
+                      disabled={!activeDesktopGroup || activeDesktopGroup.values.length === 0}
+                    >
+                      {t('kanban.deselectAll')}
+                    </Button>
+                  </div>
+                  <div className="flex-1 overflow-y-auto px-4 py-2">
+                    <div className="space-y-1">
+                      {filteredDesktopOptions.map((option) => (
+                        <label key={option.value} className="flex items-center gap-2 rounded px-2 py-1.5 text-sm hover:bg-muted/60">
+                          <Checkbox
+                            checked={activeDesktopGroup?.values.includes(option.value) || false}
+                            onCheckedChange={() => {
+                              if (!activeDesktopGroup) return
+                              const next = activeDesktopGroup.values.includes(option.value)
+                                ? activeDesktopGroup.values.filter((item) => item !== option.value)
+                                : [...activeDesktopGroup.values, option.value]
+                              activeDesktopGroup.onChange(next)
+                            }}
+                          />
+                          <span className="truncate">{option.label}</span>
+                        </label>
+                      ))}
+                      {filteredDesktopOptions.length === 0 && (
+                        <p className="px-2 py-6 text-center text-sm text-muted-foreground">
+                          {t('common.noResults')}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 lg:hidden">
         <MultiSelectFilter
           label={t('tasks.project')}
           options={projectFilterOptions}
@@ -867,6 +1142,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
         onOpenChange={setIsAICreateDialogOpen}
         projects={projects}
         userId={userId}
+        companyId={companyId}
         onTasksCreated={(newTasks) => {
           const enrichedTasks = newTasks.map((task) => ({
             ...task,

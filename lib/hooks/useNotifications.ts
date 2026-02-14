@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { 
+import {
   requestNotificationPermission, 
   showNotification,
   getNotificationPermission,
   isNotificationSupported,
 } from '@/lib/utils/notifications'
 import { createClient } from '@/lib/supabase/client'
+import type { Database } from '@/types/supabase'
 
 interface NotificationPreferences {
   enabled: boolean
@@ -108,13 +109,17 @@ export function useNotifications(userId: string) {
       // Check for tasks in progress for more than 2 hours
       const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000)
       
-      const { data: tasks } = await supabase
+      const { data: tasksData } = await supabase
         .from('tasks')
         .select('id, title, status, updated_at')
         .eq('user_id', userId)
         .eq('status', 'in_progress')
         .lte('updated_at', twoHoursAgo.toISOString())
         .limit(5)
+      const tasks = (tasksData || []) as Pick<
+        Database['public']['Tables']['tasks']['Row'],
+        'id' | 'title' | 'status' | 'updated_at'
+      >[]
 
       if (tasks && tasks.length > 0) {
         sendNotification(
@@ -154,4 +159,3 @@ export function useNotifications(userId: string) {
     sendNotification,
   }
 }
-

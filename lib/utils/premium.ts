@@ -16,11 +16,12 @@ export async function checkIsPremium(
   try {
     const supabase = supabaseClient || await createClient()
     
-    const { data, error } = await supabase
+    const { data: profileData, error } = await supabase
       .from('profiles')
       .select('is_premium')
       .eq('id', userId)
       .maybeSingle()
+    const data = profileData as Pick<Database['public']['Tables']['profiles']['Row'], 'is_premium'> | null
 
     if (error) {
       console.error('Error checking premium status:', error)
@@ -47,11 +48,12 @@ export async function getUserLocale(
   try {
     const supabase = supabaseClient || await createClient()
     
-    const { data, error } = await supabase
+    const { data: profileData, error } = await supabase
       .from('profiles')
       .select('language')
       .eq('id', userId)
       .maybeSingle()
+    const data = profileData as Pick<Database['public']['Tables']['profiles']['Row'], 'language'> | null
 
     if (error) {
       console.error('Error getting user locale:', error)
@@ -70,4 +72,3 @@ export async function getUserLocale(
     return defaultLocale
   }
 }
-

@@ -7,7 +7,7 @@ export type NoteInsert = Database['public']['Tables']['notes']['Insert']
 export type NoteUpdate = Database['public']['Tables']['notes']['Update']
 
 export async function getNotes(companyId: string, supabaseClient?: SupabaseClient<Database>) {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { data, error } = await supabase
     .from('notes')
@@ -24,7 +24,7 @@ export async function getNotes(companyId: string, supabaseClient?: SupabaseClien
 }
 
 export async function getNote(id: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('notes')
@@ -40,7 +40,7 @@ export async function getNote(id: string) {
 }
 
 export async function createNote(note: NoteInsert) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('notes')
@@ -53,7 +53,7 @@ export async function createNote(note: NoteInsert) {
 }
 
 export async function updateNote(id: string, updates: NoteUpdate) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('notes')
@@ -67,7 +67,7 @@ export async function updateNote(id: string, updates: NoteUpdate) {
 }
 
 export async function deleteNote(id: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { error } = await supabase
     .from('notes')
@@ -78,7 +78,7 @@ export async function deleteNote(id: string) {
 }
 
 export async function togglePinNote(id: string, isPinned: boolean) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('notes')

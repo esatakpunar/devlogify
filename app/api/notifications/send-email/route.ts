@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
+import type { Database } from '@/types/supabase'
 
 export async function POST(request: Request) {
   try {
@@ -18,11 +19,15 @@ export async function POST(request: Request) {
     }
 
     // Get recipient's profile to check notification preferences
-    const { data: profile } = await supabase
+    const { data: profileData } = await supabase
       .from('profiles')
       .select('email, notifications_enabled')
       .eq('id', userId)
       .single()
+    const profile = profileData as Pick<
+      Database['public']['Tables']['profiles']['Row'],
+      'email' | 'notifications_enabled'
+    > | null
 
     if (!profile) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
@@ -38,7 +43,7 @@ export async function POST(request: Request) {
 
     // Mark notification as email_sent if notificationId is provided
     if (notificationId) {
-      await supabase
+      await (supabase as any)
         .from('notifications')
         .update({ email_sent: true })
         .eq('id', notificationId)

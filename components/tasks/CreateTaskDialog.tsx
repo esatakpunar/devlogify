@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createTask } from '@/lib/supabase/queries/tasks'
+import type { Task } from '@/lib/supabase/queries/tasks'
 import { logActivity } from '@/lib/supabase/queries/activities'
 import { getTaskTemplates } from '@/lib/supabase/queries/taskTemplates'
 import type { TaskTemplate } from '@/lib/supabase/queries/taskTemplates'
@@ -121,7 +122,7 @@ export function CreateTaskDialog({
         return
       }
 
-      const newTask = await createTask({
+      const newTask = (await createTask({
         project_id: finalProjectId,
         user_id: userId,
         title,
@@ -134,7 +135,7 @@ export function CreateTaskDialog({
         company_id: companyId || profile?.company_id || null,
         assignee_id: assigneeId,
         responsible_id: responsibleId,
-      })
+      })) as Task
   
       // Activity log ekle
       await logActivity(

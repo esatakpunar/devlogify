@@ -2,8 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import { createProject, getProjectCount } from '@/lib/supabase/queries/projects'
+import type { Project } from '@/lib/supabase/queries/projects'
 import { logProjectCreated } from '@/lib/supabase/queries/activities'
 import { usePremium } from '@/lib/hooks/usePremium'
 import { Button } from '@/components/ui/button'
@@ -65,7 +65,6 @@ export function CreateProjectDialog({
   const { company } = useCompanyStore()
   const [showUpgradeDialog, setShowUpgradeDialog] = useState(false)
   const router = useRouter()
-  const supabase = createClient()
   const { isPremium, loading: premiumLoading } = usePremium(userId)
   const t = useTranslation()
 
@@ -86,14 +85,14 @@ export function CreateProjectDialog({
         }
       }
 
-      const newProject = await createProject({
+      const newProject = (await createProject({
         user_id: userId,
         company_id: company?.id || null,
         title,
         description: description || null,
         color,
         status,
-      })
+      })) as Project
 
       // Activity log ekle
       await logProjectCreated(userId, newProject.id, title)
@@ -251,4 +250,3 @@ export function CreateProjectDialog({
     </>
   )
 }
-

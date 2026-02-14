@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getUserCompanyId } from '@/lib/supabase/queries/companyMembership'
 import { redirect } from 'next/navigation'
 import { getProject } from '@/lib/supabase/queries/projects'
+import type { Project } from '@/lib/supabase/queries/projects'
 import { getTasks } from '@/lib/supabase/queries/tasks'
 import { notFound } from 'next/navigation'
 import { ProjectHeader } from '@/components/projects/ProjectHeader'
@@ -30,7 +31,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
 
   // Get project
   try {
-    const project = await getProject(id, supabase)
+    const project = (await getProject(id, supabase)) as Project
 
     // Verify company ownership
     if (project.company_id !== companyId && project.user_id !== user.id) {

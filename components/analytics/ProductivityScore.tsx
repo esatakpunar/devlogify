@@ -6,6 +6,7 @@ import { ProgressBar } from '@/components/ui/progress-bar'
 import { TrendingUp, Target, Clock, CheckCircle2 } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { createClient } from '@/lib/supabase/client'
+import type { Database } from '@/types/supabase'
 
 interface ProductivityScoreProps {
   userId: string
@@ -32,12 +33,16 @@ export function ProductivityScore({ userId }: ProductivityScoreProps) {
       const supabase = createClient()
       
       // Get tasks data
-      const { data: tasks } = await supabase
+      const { data: tasksData } = await supabase
         .from('tasks')
         .select('status, created_at, completed_at, estimated_duration, actual_duration')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
         .limit(100)
+      const tasks = (tasksData || []) as Pick<
+        Database['public']['Tables']['tasks']['Row'],
+        'status' | 'created_at' | 'completed_at' | 'estimated_duration' | 'actual_duration'
+      >[]
 
       // Get time entries for consistency and weekly stats
       const now = new Date()
@@ -48,12 +53,16 @@ export function ProductivityScore({ userId }: ProductivityScoreProps) {
       const lastWeekStart = new Date(weekStart)
       lastWeekStart.setDate(lastWeekStart.getDate() - 7)
 
-      const { data: timeEntries } = await supabase
+      const { data: timeEntriesData } = await supabase
         .from('time_entries')
         .select('started_at, duration')
         .eq('user_id', userId)
         .gte('started_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
         .not('duration', 'is', null)
+      const timeEntries = (timeEntriesData || []) as Pick<
+        Database['public']['Tables']['time_entries']['Row'],
+        'started_at' | 'duration'
+      >[]
 
       // Calculate weekly stats manually
       const currentWeekMinutes = timeEntries?.filter(entry => {
@@ -199,4 +208,3 @@ export function ProductivityScore({ userId }: ProductivityScoreProps) {
     </Card>
   )
 }
-

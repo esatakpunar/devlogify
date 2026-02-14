@@ -9,13 +9,14 @@ export async function getUserCompanyIdFromMembership(
   userId: string,
   supabase: SupabaseClient<Database>
 ): Promise<string | null> {
-  const { data, error } = await supabase
+  const { data: membershipData, error } = await supabase
     .from('company_members')
     .select('company_id')
     .eq('user_id', userId)
     .order('joined_at', { ascending: true })
     .limit(1)
     .maybeSingle()
+  const data = membershipData as Pick<Database['public']['Tables']['company_members']['Row'], 'company_id'> | null
 
   if (error) throw error
   return data?.company_id || null
@@ -30,11 +31,12 @@ export async function syncProfileCompanyId(
   companyId: string | null,
   supabase: SupabaseClient<Database>
 ): Promise<void> {
-  const { data: profile, error: profileError } = await supabase
+  const { data: profileData, error: profileError } = await supabase
     .from('profiles')
     .select('company_id')
     .eq('id', userId)
     .maybeSingle()
+  const profile = profileData as Pick<Database['public']['Tables']['profiles']['Row'], 'company_id'> | null
 
   if (profileError) throw profileError
 
@@ -42,7 +44,7 @@ export async function syncProfileCompanyId(
     return
   }
 
-  const { error: updateError } = await supabase
+  const { error: updateError } = await (supabase as any)
     .from('profiles')
     .update({ company_id: companyId })
     .eq('id', userId)

@@ -7,6 +7,7 @@ import { format, startOfYear, endOfYear, eachDayOfInterval, isSameDay, subDays }
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import type { Database } from '@/types/supabase'
 
 interface HeatmapCalendarProps {
   userId: string
@@ -38,22 +39,27 @@ export function HeatmapCalendar({ userId }: HeatmapCalendarProps) {
       const start = subDays(end, 365)
       
       // Get completed tasks
-      const { data: tasks } = await supabase
+      const { data: tasksData } = await supabase
         .from('tasks')
         .select('completed_at')
         .eq('user_id', userId)
         .eq('status', 'done')
         .gte('completed_at', start.toISOString())
         .lte('completed_at', end.toISOString())
+      const tasks = (tasksData || []) as Pick<Database['public']['Tables']['tasks']['Row'], 'completed_at'>[]
 
       // Get time entries
-      const { data: timeEntries } = await supabase
+      const { data: timeEntriesData } = await supabase
         .from('time_entries')
         .select('started_at, duration')
         .eq('user_id', userId)
         .gte('started_at', start.toISOString())
         .lte('started_at', end.toISOString())
         .not('duration', 'is', null)
+      const timeEntries = (timeEntriesData || []) as Pick<
+        Database['public']['Tables']['time_entries']['Row'],
+        'started_at' | 'duration'
+      >[]
 
       // Create activity map
       const activityMap = new Map<string, number>()
@@ -191,4 +197,3 @@ export function HeatmapCalendar({ userId }: HeatmapCalendarProps) {
     </Card>
   )
 }
-

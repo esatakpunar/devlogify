@@ -7,7 +7,7 @@ export type TaskTemplateInsert = Database['public']['Tables']['task_templates'][
 export type TaskTemplateUpdate = Database['public']['Tables']['task_templates']['Update']
 
 export async function getTaskTemplates(userId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('task_templates')
@@ -20,7 +20,7 @@ export async function getTaskTemplates(userId: string) {
 }
 
 export async function getTaskTemplate(id: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('task_templates')
@@ -33,7 +33,7 @@ export async function getTaskTemplate(id: string) {
 }
 
 export async function createTaskTemplate(template: TaskTemplateInsert) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('task_templates')
@@ -46,7 +46,7 @@ export async function createTaskTemplate(template: TaskTemplateInsert) {
 }
 
 export async function updateTaskTemplate(id: string, updates: TaskTemplateUpdate) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('task_templates')
@@ -60,7 +60,7 @@ export async function updateTaskTemplate(id: string, updates: TaskTemplateUpdate
 }
 
 export async function deleteTaskTemplate(id: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { error } = await supabase
     .from('task_templates')
@@ -69,4 +69,3 @@ export async function deleteTaskTemplate(id: string) {
 
   if (error) throw error
 }
-

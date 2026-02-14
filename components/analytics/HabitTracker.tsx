@@ -7,6 +7,7 @@ import { Flame, Calendar } from 'lucide-react'
 import { format, startOfWeek, eachDayOfInterval, isSameDay } from 'date-fns'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { createClient } from '@/lib/supabase/client'
+import type { Database } from '@/types/supabase'
 
 interface HabitTrackerProps {
   userId: string
@@ -42,21 +43,26 @@ export function HabitTracker({ userId }: HabitTrackerProps) {
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
       // Get completed tasks
-      const { data: tasks } = await supabase
+      const { data: tasksData } = await supabase
         .from('tasks')
         .select('completed_at')
         .eq('user_id', userId)
         .eq('status', 'done')
         .gte('completed_at', thirtyDaysAgo.toISOString())
         .order('completed_at', { ascending: false })
+      const tasks = (tasksData || []) as Pick<Database['public']['Tables']['tasks']['Row'], 'completed_at'>[]
 
       // Get time entries
-      const { data: timeEntries } = await supabase
+      const { data: timeEntriesData } = await supabase
         .from('time_entries')
         .select('started_at, duration')
         .eq('user_id', userId)
         .gte('started_at', thirtyDaysAgo.toISOString())
         .not('duration', 'is', null)
+      const timeEntries = (timeEntriesData || []) as Pick<
+        Database['public']['Tables']['time_entries']['Row'],
+        'started_at' | 'duration'
+      >[]
 
       // Create activity map
       const activityMap = new Map<string, { tasks: number; minutes: number }>()
@@ -202,4 +208,3 @@ export function HabitTracker({ userId }: HabitTrackerProps) {
     </Card>
   )
 }
-

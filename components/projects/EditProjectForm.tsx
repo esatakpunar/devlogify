@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { updateProject, deleteProject } from '@/lib/supabase/queries/projects'
+import type { Project } from '@/lib/supabase/queries/projects'
 import { logProjectUpdated, logProjectDeleted } from '@/lib/supabase/queries/activities'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -65,12 +66,12 @@ export function EditProjectForm({ project }: EditProjectFormProps) {
 
       if (!user) throw new Error('Not authenticated')
 
-      const updatedProject = await updateProject(project.id, {
+      const updatedProject = (await updateProject(project.id, {
         title,
         description: description || null,
         color,
         status,
-      })
+      })) as Project
 
       // Activity log ekle
       await logProjectUpdated(

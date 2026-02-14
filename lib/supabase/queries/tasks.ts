@@ -68,7 +68,7 @@ export type TaskWithDetails = Task & {
 }
 
 export async function getTasks(projectId: string, supabaseClient?: SupabaseClient<Database>) {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { data, error } = await supabase
     .from('tasks')
@@ -88,7 +88,7 @@ export async function getTasks(projectId: string, supabaseClient?: SupabaseClien
  * Get all tasks in a company across all projects (including archived projects)
  */
 export async function getCompanyTasks(companyId: string, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithDetails[]> {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { data, error } = await supabase
     .from('tasks')
@@ -106,7 +106,7 @@ export async function getCompanyTasks(companyId: string, supabaseClient?: Supaba
 }
 
 export async function getTask(id: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('tasks')
@@ -123,7 +123,7 @@ export async function getTask(id: string) {
 }
 
 export async function createTask(task: TaskInsert, supabaseClient?: SupabaseClient<Database>) {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { data, error } = await supabase
     .from('tasks')
@@ -139,7 +139,7 @@ export async function createTask(task: TaskInsert, supabaseClient?: SupabaseClie
  * Create multiple tasks in a single batch operation
  */
 export async function createTasks(tasks: TaskInsert[]) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   if (tasks.length === 0) {
     return []
@@ -155,7 +155,7 @@ export async function createTasks(tasks: TaskInsert[]) {
 }
 
 export async function updateTask(id: string, updates: TaskUpdate) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('tasks')
@@ -169,7 +169,7 @@ export async function updateTask(id: string, updates: TaskUpdate) {
 }
 
 export async function deleteTask(id: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { error } = await supabase
     .from('tasks')
@@ -180,7 +180,7 @@ export async function deleteTask(id: string) {
 }
 
 export async function updateTaskStatus(id: string, status: 'todo' | 'in_progress' | 'done') {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const updates: TaskUpdate = {
     status,
@@ -204,7 +204,7 @@ export async function updateTaskStatus(id: string, status: 'todo' | 'in_progress
 }
 
 export async function updateTaskOrder(taskId: string, newOrder: number) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('tasks')
@@ -218,7 +218,7 @@ export async function updateTaskOrder(taskId: string, newOrder: number) {
 }
 
 export async function updateTaskProgress(id: string, progress: number) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const clampedProgress = Math.max(0, Math.min(100, progress))
 
@@ -234,7 +234,7 @@ export async function updateTaskProgress(id: string, progress: number) {
 }
 
 export async function updateTasksOrder(taskUpdates: { id: string; order_index: number }[]) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   if (taskUpdates.length === 0) {
     return []
@@ -266,7 +266,7 @@ export async function updateTasksOrder(taskUpdates: { id: string; order_index: n
  * Get recent incomplete tasks for dashboard (company-based)
  */
 export async function getRecentIncompleteTasks(companyId: string, limit: number = 5, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithProjectAndAssignees[]> {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { data, error } = await supabase
     .from('tasks')
@@ -289,7 +289,7 @@ export async function getRecentIncompleteTasks(companyId: string, limit: number 
  * Get tasks completed today for dashboard (company-based)
  */
 export async function getTodayCompletedTasks(companyId: string, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithProjectAndAssignees[]> {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const today = new Date()
   today.setHours(0, 0, 0, 0)
@@ -318,7 +318,7 @@ export async function getTodayCompletedTasks(companyId: string, supabaseClient?:
  * Get tasks assigned to a specific user
  */
 export async function getMyTasks(userId: string, companyId: string, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithProjectAndAssignees[]> {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { data, error } = await supabase
     .from('tasks')
@@ -341,7 +341,7 @@ export async function getMyTasks(userId: string, companyId: string, supabaseClie
  * Get tasks waiting for review by a specific responsible user
  */
 export async function getTasksToReview(userId: string, companyId: string, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithProjectAndAssignees[]> {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { data, error } = await supabase
     .from('tasks')
@@ -364,7 +364,7 @@ export async function getTasksToReview(userId: string, companyId: string, supaba
  * Approve a task (by responsible)
  */
 export async function approveTask(taskId: string, userId: string, note?: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('tasks')
@@ -385,7 +385,7 @@ export async function approveTask(taskId: string, userId: string, note?: string)
  * Reject a task (by responsible)
  */
 export async function rejectTask(taskId: string, userId: string, note?: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('tasks')
@@ -406,7 +406,7 @@ export async function rejectTask(taskId: string, userId: string, note?: string) 
  * Request changes on a task (by responsible)
  */
 export async function requestChanges(taskId: string, userId: string, note?: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('tasks')
@@ -428,7 +428,7 @@ export async function requestChanges(taskId: string, userId: string, note?: stri
  * Submit task for review (by assignee, moves to done with pending review)
  */
 export async function submitForReview(taskId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('tasks')
@@ -450,7 +450,7 @@ export async function submitForReview(taskId: string) {
  * Add tags to multiple tasks
  */
 export async function addTagsToTasks(taskIds: string[], tags: string[], supabaseClient?: SupabaseClient<Database>) {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
 
   const { data: existingTasks, error: fetchError } = await supabase
     .from('tasks')
@@ -467,7 +467,7 @@ export async function addTagsToTasks(taskIds: string[], tags: string[], supabase
     throw new Error(`Tasks not found for IDs: ${taskIds.join(', ')}`)
   }
 
-  const updates = existingTasks.map(task => {
+  const updates = existingTasks.map((task: { id: string; tags: string[] | null }) => {
     const existingTags = (task.tags || []) as string[]
     const newTags = [...new Set([...existingTags, ...tags])]
     return {
@@ -476,7 +476,7 @@ export async function addTagsToTasks(taskIds: string[], tags: string[], supabase
     }
   })
 
-  const updatePromises = updates.map(update =>
+  const updatePromises = updates.map((update: { id: string; tags: string[] }) =>
     supabase
       .from('tasks')
       .update({ tags: update.tags })

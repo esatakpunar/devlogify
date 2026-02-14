@@ -31,7 +31,7 @@ export type ProfileUpdate = {
  * Get user profile (client-side)
  */
 export async function getProfile(userId: string): Promise<Profile | null> {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('profiles')
@@ -50,7 +50,7 @@ export async function getProfile(userId: string): Promise<Profile | null> {
  * Update user profile
  */
 export async function updateProfile(userId: string, updates: ProfileUpdate): Promise<Profile> {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('profiles')
@@ -72,7 +72,7 @@ export async function createProfile(
   fullName?: string,
   additionalData?: Partial<ProfileUpdate>
 ): Promise<Profile> {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('profiles')

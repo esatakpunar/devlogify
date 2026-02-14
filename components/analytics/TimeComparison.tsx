@@ -6,6 +6,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { Clock, TrendingUp, TrendingDown } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { createClient } from '@/lib/supabase/client'
+import type { Database } from '@/types/supabase'
 
 interface TimeComparisonProps {
   userId: string
@@ -41,7 +42,7 @@ export function TimeComparison({ userId }: TimeComparisonProps) {
       const supabase = createClient()
       
       // Get completed tasks with estimates and actual durations
-      const { data: tasks } = await supabase
+      const { data: tasksData } = await supabase
         .from('tasks')
         .select('id, title, estimated_duration, actual_duration')
         .eq('user_id', userId)
@@ -50,6 +51,10 @@ export function TimeComparison({ userId }: TimeComparisonProps) {
         .gt('actual_duration', 0)
         .order('completed_at', { ascending: false })
         .limit(20)
+      const tasks = (tasksData || []) as Pick<
+        Database['public']['Tables']['tasks']['Row'],
+        'id' | 'title' | 'estimated_duration' | 'actual_duration'
+      >[]
 
       if (!tasks) return
 
@@ -180,4 +185,3 @@ export function TimeComparison({ userId }: TimeComparisonProps) {
     </Card>
   )
 }
-

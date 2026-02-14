@@ -7,7 +7,7 @@ export type RecurringTaskInsert = Database['public']['Tables']['recurring_tasks'
 export type RecurringTaskUpdate = Database['public']['Tables']['recurring_tasks']['Update']
 
 export async function getRecurringTasks(userId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('recurring_tasks')
@@ -20,7 +20,7 @@ export async function getRecurringTasks(userId: string) {
 }
 
 export async function getActiveRecurringTasks(userId: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('recurring_tasks')
@@ -34,7 +34,7 @@ export async function getActiveRecurringTasks(userId: string) {
 }
 
 export async function getRecurringTask(id: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('recurring_tasks')
@@ -47,7 +47,7 @@ export async function getRecurringTask(id: string) {
 }
 
 export async function createRecurringTask(task: RecurringTaskInsert) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('recurring_tasks')
@@ -60,7 +60,7 @@ export async function createRecurringTask(task: RecurringTaskInsert) {
 }
 
 export async function updateRecurringTask(id: string, updates: RecurringTaskUpdate) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
     .from('recurring_tasks')
@@ -74,7 +74,7 @@ export async function updateRecurringTask(id: string, updates: RecurringTaskUpda
 }
 
 export async function deleteRecurringTask(id: string) {
-  const supabase = createBrowserClient()
+  const supabase = createBrowserClient() as any
 
   const { error } = await supabase
     .from('recurring_tasks')
@@ -89,7 +89,7 @@ export async function deleteRecurringTask(id: string) {
  * @param supabaseClient - Optional Supabase client (use service role for cron jobs)
  */
 export async function getDueRecurringTasks(supabaseClient?: SupabaseClient<Database>) {
-  const supabase = supabaseClient || createBrowserClient()
+  const supabase = (supabaseClient || createBrowserClient()) as any
   const now = new Date().toISOString()
 
   const { data, error } = await supabase
@@ -102,4 +102,3 @@ export async function getDueRecurringTasks(supabaseClient?: SupabaseClient<Datab
   if (error) throw error
   return data || []
 }
-

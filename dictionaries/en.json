@@ -536,7 +536,11 @@
     "allStatuses": "All statuses",
     "allPriorities": "All priorities",
     "allAssignees": "All assignees",
-    "allResponsibles": "All responsibles"
+    "allResponsibles": "All responsibles",
+    "filters": "Filters",
+    "clearFilters": "Clear filters",
+    "clearAll": "Clear All",
+    "apply": "Apply"
   },
   "profile": {
     "profileSettings": "Profile Settings",

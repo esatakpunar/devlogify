@@ -114,8 +114,9 @@ export async function logActivity(
   companyId?: string | null
 ) {
   const supabase = createBrowserClient()
+  const client = supabase as any
 
-  const { error } = await supabase
+  const { error } = await client
     .from('activity_logs')
     .insert({
       user_id: userId,

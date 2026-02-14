@@ -29,6 +29,7 @@ import { createProject } from '@/lib/supabase/queries/projects'
 import { createTasks } from '@/lib/supabase/queries/tasks'
 import { createNote } from '@/lib/supabase/queries/notes'
 import type { ExportData } from '@/lib/utils/export'
+import type { Project } from '@/lib/supabase/queries/projects'
 
 interface DataExportImportProps {
   userId: string
@@ -147,7 +148,7 @@ export function DataExportImport({ userId }: DataExportImportProps) {
 
       for (const project of projects) {
         try {
-          const newProject = await createProject(project)
+          const newProject = (await createProject(project)) as Project
           newProjectIds.push(newProject.id)
           oldProjectIds.push(data.projects.find(p => p.title === project.title)?.id || '')
         } catch (error: any) {
@@ -320,4 +321,3 @@ export function DataExportImport({ userId }: DataExportImportProps) {
     </div>
   )
 }
-
