@@ -1,21 +1,41 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, usePathname } from 'next/navigation'
 import { Sidebar } from '@/components/layout/Sidebar'
 import { Navbar } from '@/components/layout/Navbar'
-import { MobileSidebar } from '@/components/layout/MobileSidebar'
-import { MobileBottomNav } from '@/components/layout/MobileBottomNav'
-import { CommandPalette } from '@/components/layout/CommandPalette'
-import { ShortcutsHelp } from '@/components/ui/ShortcutsHelp'
-import { OfflineIndicator } from '@/components/ui/OfflineIndicator'
-import { GlobalSearch } from '@/components/search/GlobalSearch'
 import { useKeyboardShortcuts } from '@/lib/hooks/useKeyboardShortcuts'
 import { LanguageProvider } from '@/components/providers/LanguageProvider'
 import { LanguageHtml } from '@/components/providers/LanguageHtml'
 import { useUserProfileStore } from '@/lib/store/userProfileStore'
 import { Toaster } from 'sonner'
+
+const MobileSidebar = dynamic(
+  () => import('@/components/layout/MobileSidebar').then((m) => m.MobileSidebar),
+  { ssr: false }
+)
+const MobileBottomNav = dynamic(
+  () => import('@/components/layout/MobileBottomNav').then((m) => m.MobileBottomNav),
+  { ssr: false }
+)
+const CommandPalette = dynamic(
+  () => import('@/components/layout/CommandPalette').then((m) => m.CommandPalette),
+  { ssr: false }
+)
+const ShortcutsHelp = dynamic(
+  () => import('@/components/ui/ShortcutsHelp').then((m) => m.ShortcutsHelp),
+  { ssr: false }
+)
+const OfflineIndicator = dynamic(
+  () => import('@/components/ui/OfflineIndicator').then((m) => m.OfflineIndicator),
+  { ssr: false }
+)
+const GlobalSearch = dynamic(
+  () => import('@/components/search/GlobalSearch').then((m) => m.GlobalSearch),
+  { ssr: false }
+)
 
 export function DashboardLayout({
   children,

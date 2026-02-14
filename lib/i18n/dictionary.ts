@@ -1,30 +1,53 @@
 import type { Locale } from './config'
 
-// Import all dictionaries
-// Note: Turbopack HMR warnings for JSON imports are harmless and can be ignored
+// Keep a lightweight in-bundle fallback dictionary and lazy-load others.
 import en from '@/dictionaries/en.json'
-import tr from '@/dictionaries/tr.json'
-import de from '@/dictionaries/de.json'
-import es from '@/dictionaries/es.json'
 
 export type Dictionary = typeof en
 
-const dictionaries: Record<Locale, Dictionary> = {
-  en,
-  tr,
-  de,
-  es,
+type DictionaryLoader = () => Promise<Dictionary>
+
+const dictionaryLoaders: Record<Locale, DictionaryLoader> = {
+  en: async () => en,
+  tr: async () => (await import('@/dictionaries/tr.json')).default as Dictionary,
+  de: async () => (await import('@/dictionaries/de.json')).default as Dictionary,
+  es: async () => (await import('@/dictionaries/es.json')).default as Dictionary,
 }
 
 /**
- * Get dictionary for a specific locale
+ * In-memory dictionary cache to avoid duplicate dynamic imports.
  */
-export function getDictionary(locale: Locale): Dictionary {
-  const dictionary = dictionaries[locale]
-  if (!dictionary) {
-    throw new Error(`Dictionary not found for locale: ${locale}`)
+const dictionaryCache: Partial<Record<Locale, Dictionary>> = {
+  en,
+}
+
+const dictionaryPromises: Partial<Record<Locale, Promise<Dictionary>>> = {}
+
+export function getFallbackDictionary(): Dictionary {
+  return en
+}
+
+/**
+ * Get dictionary for a specific locale.
+ * Uses dynamic import for non-default locales to reduce initial bundle size.
+ */
+export async function getDictionary(locale: Locale): Promise<Dictionary> {
+  const cached = dictionaryCache[locale]
+  if (cached) return cached
+
+  if (!dictionaryPromises[locale]) {
+    const loader = dictionaryLoaders[locale]
+    if (!loader) {
+      throw new Error(`Dictionary not found for locale: ${locale}`)
+    }
+
+    dictionaryPromises[locale] = loader().then((dict) => {
+      dictionaryCache[locale] = dict
+      return dict
+    })
   }
-  return dictionary
+
+  return dictionaryPromises[locale] as Promise<Dictionary>
 }
 
 /**

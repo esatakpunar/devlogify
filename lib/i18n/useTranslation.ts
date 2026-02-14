@@ -1,8 +1,8 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useLanguage } from '@/components/providers/LanguageProvider'
-import { getDictionary, getNestedValue, type Dictionary } from './dictionary'
+import { getDictionary, getFallbackDictionary, getNestedValue, type Dictionary } from './dictionary'
 
 /**
  * Hook to use translations in client components
@@ -14,9 +14,27 @@ import { getDictionary, getNestedValue, type Dictionary } from './dictionary'
  */
 export function useTranslation() {
   const { locale } = useLanguage()
-  const dictionary = useMemo(() => getDictionary(locale), [locale])
+  const [dictionary, setDictionary] = useState<Dictionary>(getFallbackDictionary())
 
-  const t = (key: string, params?: Record<string, string | number>): string => {
+  useEffect(() => {
+    let isMounted = true
+
+    getDictionary(locale)
+      .then((loadedDictionary) => {
+        if (isMounted) {
+          setDictionary(loadedDictionary)
+        }
+      })
+      .catch((error) => {
+        console.error('[i18n] Failed to load dictionary:', error)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [locale])
+
+  const t = useCallback((key: string, params?: Record<string, string | number>): string => {
     const resolved = getNestedValue(dictionary, key)
     if (!resolved) {
       if (process.env.NODE_ENV !== 'production') {
@@ -38,7 +56,7 @@ export function useTranslation() {
     }
 
     return translation
-  }
+  }, [dictionary, locale])
 
   return t
 }
@@ -48,5 +66,25 @@ export function useTranslation() {
  */
 export function useDictionary(): Dictionary {
   const { locale } = useLanguage()
-  return useMemo(() => getDictionary(locale), [locale])
+  const [dictionary, setDictionary] = useState<Dictionary>(getFallbackDictionary())
+
+  useEffect(() => {
+    let isMounted = true
+
+    getDictionary(locale)
+      .then((loadedDictionary) => {
+        if (isMounted) {
+          setDictionary(loadedDictionary)
+        }
+      })
+      .catch((error) => {
+        console.error('[i18n] Failed to load dictionary:', error)
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [locale])
+
+  return dictionary
 }

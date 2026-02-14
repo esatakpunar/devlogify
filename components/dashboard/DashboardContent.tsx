@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import dynamic from 'next/dynamic'
 import { FolderKanban, Clock, CheckCircle2, TrendingUp, Zap, Calendar, Target } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
@@ -10,16 +11,17 @@ import { RecentTasks } from '@/components/dashboard/RecentTasks'
 import { TodayCompleted } from '@/components/dashboard/TodayCompleted'
 import { PinnedProjects } from '@/components/dashboard/PinnedProjects'
 import { QuickTimerCard } from '@/components/dashboard/QuickTimerCard'
-import { TaskSuggestions } from '@/components/dashboard/TaskSuggestions'
-import { DailyStandup } from '@/components/dashboard/DailyStandup'
-import { PomodoroTimer } from '@/components/timer/PomodoroTimer'
-import { MobileTimer } from '@/components/timer/MobileTimer'
-import { AIFeaturesPromo } from '@/components/dashboard/AIFeaturesPromo'
 import { CreateProjectDialog } from '@/components/projects/CreateProjectDialog'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { cn } from '@/lib/utils'
 import type { ProjectWithTasks } from '@/lib/supabase/queries/projects'
 import type { TaskWithProject } from '@/lib/supabase/queries/tasks'
+
+const PomodoroTimer = dynamic(() => import('@/components/timer/PomodoroTimer').then((m) => m.PomodoroTimer))
+const MobileTimer = dynamic(() => import('@/components/timer/MobileTimer').then((m) => m.MobileTimer))
+const DailyStandup = dynamic(() => import('@/components/dashboard/DailyStandup').then((m) => m.DailyStandup))
+const TaskSuggestions = dynamic(() => import('@/components/dashboard/TaskSuggestions').then((m) => m.TaskSuggestions))
+const AIFeaturesPromo = dynamic(() => import('@/components/dashboard/AIFeaturesPromo').then((m) => m.AIFeaturesPromo))
 
 interface DashboardContentProps {
   user: {
@@ -231,4 +233,3 @@ export function DashboardContent({
     </div>
   )
 }
-
