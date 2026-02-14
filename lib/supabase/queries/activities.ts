@@ -105,6 +105,52 @@ export type ActivityType =
   | 'team_created'
   | 'team_updated'
 
+async function resolveCompanyIdForActivity(
+  supabase: SupabaseClient<Database>,
+  userId: string,
+  projectId?: string | null,
+  taskId?: string | null,
+  companyId?: string | null
+): Promise<string> {
+  if (companyId) return companyId
+
+  if (projectId) {
+    const { data, error } = await supabase
+      .from('projects')
+      .select('company_id')
+      .eq('id', projectId)
+      .maybeSingle()
+    const project = data as Pick<Database['public']['Tables']['projects']['Row'], 'company_id'> | null
+
+    if (error) throw error
+    if (project?.company_id) return project.company_id
+  }
+
+  if (taskId) {
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('company_id')
+      .eq('id', taskId)
+      .maybeSingle()
+    const task = data as Pick<Database['public']['Tables']['tasks']['Row'], 'company_id'> | null
+
+    if (error) throw error
+    if (task?.company_id) return task.company_id
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from('profiles')
+    .select('company_id')
+    .eq('id', userId)
+    .maybeSingle()
+  const profileData = profile as Pick<Database['public']['Tables']['profiles']['Row'], 'company_id'> | null
+
+  if (profileError) throw profileError
+  if (profileData?.company_id) return profileData.company_id
+
+  throw new Error('Cannot log activity without company_id')
+}
+
 export async function logActivity(
   userId: string,
   projectId: string | null,
@@ -115,6 +161,13 @@ export async function logActivity(
 ) {
   const supabase = createBrowserClient()
   const client = supabase as any
+  const resolvedCompanyId = await resolveCompanyIdForActivity(
+    client,
+    userId,
+    projectId,
+    taskId,
+    companyId
+  )
 
   const { error } = await client
     .from('activity_logs')
@@ -124,7 +177,7 @@ export async function logActivity(
       task_id: taskId,
       action_type: actionType,
       metadata: metadata || {},
-      company_id: companyId || null,
+      company_id: resolvedCompanyId,
     })
 
   if (error) {

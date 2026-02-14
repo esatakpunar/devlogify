@@ -59,6 +59,8 @@ export function TimelineContent({ initialActivities, userId }: TimelineContentPr
 
   // Always group activities by date
   const groupedActivities = groupByDate(filteredActivities)
+  const sortedGroupedActivities = Object.entries(groupedActivities)
+    .sort(([a], [b]) => b.localeCompare(a))
 
   return (
     <div className="space-y-4 sm:space-y-6">
@@ -71,16 +73,18 @@ export function TimelineContent({ initialActivities, userId }: TimelineContentPr
 
       {/* Activity Feed - Always grouped by date */}
       <div className="space-y-4 sm:space-y-6">
-        {Object.entries(groupedActivities)
-          .sort(([a], [b]) => b.localeCompare(a))
-          .map(([date, activities]) => (
+        {sortedGroupedActivities.length === 0 ? (
+          <ActivityFeed activities={[]} />
+        ) : (
+          sortedGroupedActivities.map(([date, activities]) => (
             <div key={date}>
               <h3 className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
                 {format(new Date(date), 'EEEE, MMMM dd, yyyy', { locale: localeMap[locale] })}
               </h3>
               <ActivityFeed activities={activities} />
             </div>
-          ))}
+          ))
+        )}
       </div>
     </div>
   )
