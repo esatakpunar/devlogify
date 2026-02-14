@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { KeyRound, Loader2 } from 'lucide-react'
+import { useTranslation } from '@/lib/i18n/useTranslation'
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('')
@@ -19,6 +21,7 @@ export default function ResetPasswordPage() {
   const [hasRecoverySession, setHasRecoverySession] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+  const t = useTranslation()
   
   // Use refs to access latest state values in event handler without causing re-renders
   const passwordResetSuccessRef = useRef(false)
@@ -48,7 +51,7 @@ export default function ResetPasswordPage() {
         // If no session or signed out
         // But don't show error if password was successfully updated
         if (!session && !passwordResetSuccessRef.current && !hasRecoverySessionRef.current) {
-          setError('Invalid or expired link. Please request a new password reset link.')
+          setError(t('auth.invalidOrExpiredLink'))
         }
       }
     })
@@ -56,7 +59,7 @@ export default function ResetPasswordPage() {
     return () => {
       subscription.unsubscribe()
     }
-  }, [supabase.auth])
+  }, [supabase.auth, t])
   
   // Keep refs in sync with state
   useEffect(() => {
@@ -74,12 +77,12 @@ export default function ResetPasswordPage() {
 
     // Password validation
     if (password !== confirmPassword) {
-      setError('Passwords do not match!')
+      setError(t('auth.passwordsDoNotMatch'))
       return
     }
 
     if (password.length < 6) {
-      setError('Password must be at least 6 characters!')
+      setError(t('auth.passwordMinLength'))
       return
     }
 
@@ -92,11 +95,11 @@ export default function ResetPasswordPage() {
     setLoading(false)
 
     if (updateError) {
-      setError('An error occurred while updating password: ' + updateError.message)
+      setError(t('auth.passwordUpdateFailed') + ': ' + updateError.message)
     } else {
       // Set successful update flag
       setPasswordResetSuccess(true)
-      setMessage('Your password has been successfully updated!')
+      setMessage(t('auth.passwordUpdatedSuccess'))
       setError('') // Clear error message
       
       // Clear session after password update and redirect to login
@@ -107,31 +110,34 @@ export default function ResetPasswordPage() {
   }
 
   return (
-    <Card>
+    <Card className="flex flex-col border shadow-sm lg:min-h-[460px]">
       <CardHeader className="space-y-1">
-        <CardTitle className="text-2xl font-bold">Reset Password</CardTitle>
+        <div className="mb-2 inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+          <KeyRound className="h-5 w-5 text-primary" />
+        </div>
+        <CardTitle className="text-2xl font-bold">{t('auth.resetPasswordTitle')}</CardTitle>
         <CardDescription>
-          Enter your new password below
+          {t('auth.enterNewPassword')}
         </CardDescription>
       </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4 pb-6">
+      <form onSubmit={handleSubmit} className="flex h-full flex-1 flex-col">
+        <CardContent className="flex-1 space-y-4 pb-6">
           {error && !passwordResetSuccess && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
+            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
               {error}
             </div>
           )}
           {message && (
-            <div className="bg-green-50 text-green-600 p-3 rounded-md text-sm">
+            <div className="rounded-md border border-green-200 bg-green-50 p-3 text-sm text-green-700">
               {message}
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="password">New Password</Label>
+            <Label htmlFor="password">{t('auth.newPassword')}</Label>
             <Input
               id="password"
               type="password"
-              placeholder="At least 6 characters"
+              placeholder={t('auth.newPasswordPlaceholder')}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -140,11 +146,11 @@ export default function ResetPasswordPage() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirm-password">Confirm Password</Label>
+            <Label htmlFor="confirm-password">{t('auth.confirmPassword')}</Label>
             <Input
               id="confirm-password"
               type="password"
-              placeholder="Confirm your password"
+              placeholder={t('auth.confirmPasswordPlaceholder')}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
@@ -155,11 +161,12 @@ export default function ResetPasswordPage() {
         </CardContent>
         <CardFooter className="flex flex-col space-y-4">
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Updating...' : 'Update Password'}
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {loading ? t('auth.updatingPassword') : t('auth.updatePassword')}
           </Button>
-          <p className="text-sm text-center text-gray-600">
-            <Link href="/login" className="text-blue-600 hover:underline">
-              Back to login
+          <p className="text-center text-sm text-muted-foreground">
+            <Link href="/login" className="text-primary hover:underline">
+              {t('auth.backToLogin')}
             </Link>
           </p>
         </CardFooter>
@@ -167,4 +174,3 @@ export default function ResetPasswordPage() {
     </Card>
   )
 }
-

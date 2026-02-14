@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 const ReactQuill = dynamic(() => import('react-quill-new'), { 
   ssr: false,
   loading: () => (
-    <div className="flex items-center justify-center h-full min-h-[450px] w-full border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900">
+    <div className="flex items-center justify-center h-full min-h-[460px] w-full border border-gray-200 dark:border-gray-800 rounded-lg bg-white dark:bg-gray-900">
       <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400">
         <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
