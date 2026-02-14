@@ -287,7 +287,7 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
                       <div className="space-y-1">
                         {group.tasks.map((task) => (
                           <div key={task.id} className="text-sm text-gray-700 dark:text-gray-300">
-                            • {task.title}
+                            • {task.task_number ? `#${task.task_number} ` : ''}{task.title}
                           </div>
                         ))}
                       </div>
@@ -340,4 +340,3 @@ export function TaskGroupingDialog({ open, onOpenChange, projectId, userId, onTa
     </Dialog>
   )
 }
-

@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Badge } from '@/components/ui/badge'
 import {
   Select,
   SelectContent,
@@ -32,6 +33,7 @@ import { cn } from '@/lib/utils'
 
 type Task = {
   id: string
+  task_number: number
   project_id: string
   title: string
   description: string | null
@@ -153,7 +155,15 @@ export function EditTaskDialog({
         <form onSubmit={handleSubmit} className="flex flex-col flex-1 min-h-0 h-full">
           <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-3 sm:pb-4 flex-shrink-0">
             <DialogHeader>
-              <DialogTitle>{readOnly ? t('tasks.taskDetails') : t('tasks.editTask')}</DialogTitle>
+              <DialogTitle className="flex items-center gap-2">
+                <span>{readOnly ? t('tasks.taskDetails') : t('tasks.editTask')}</span>
+                <Badge
+                  variant="outline"
+                  className="h-6 px-2.5 text-xs font-mono font-semibold tracking-wide bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800"
+                >
+                  #{task.task_number}
+                </Badge>
+              </DialogTitle>
               <DialogDescription className="text-xs sm:text-sm">
                 {readOnly ? t('tasks.viewTaskDetails') : t('tasks.updateTaskDetails')}
               </DialogDescription>

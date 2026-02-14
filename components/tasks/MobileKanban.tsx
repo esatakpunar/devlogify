@@ -15,6 +15,7 @@ import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 
 type Task = {
   id: string
+  task_number: number
   project_id: string
   title: string
   description: string | null
@@ -248,4 +249,3 @@ export function MobileKanban({
     </div>
   )
 }
-

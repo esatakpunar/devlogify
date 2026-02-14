@@ -31,6 +31,7 @@ interface Activity {
   task?: {
     id: string
     title: string
+    task_number?: number
   } | null
 }
 
@@ -68,6 +69,9 @@ export function ActivityItem({ activity }: ActivityItemProps) {
   const { locale } = useLanguage()
   const Icon = activityIcons[activity.action_type as keyof typeof activityIcons] || Clock
   const colorClass = activityColors[activity.action_type as keyof typeof activityColors] || 'bg-gray-50 text-gray-600'
+  const taskLabel = activity.task
+    ? `${activity.task.task_number ? `#${activity.task.task_number} ` : ''}${activity.task.title}`
+    : ''
 
   const getActivityText = () => {
     switch (activity.action_type) {
@@ -75,15 +79,15 @@ export function ActivityItem({ activity }: ActivityItemProps) {
         return (
           <>
             {t('timeline.createdTask')}{' '}
-            {activity.task && activity.project ? (
+            {activity.task ? (
               <Link 
-                href={`/projects/${activity.project.id}`}
+                href={`/kanban?task=${activity.task.id}`}
                 className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
               >
-                {activity.task.title}
+                {taskLabel}
               </Link>
             ) : (
-              <span className="font-medium dark:text-gray-200">{activity.task?.title}</span>
+              <span className="font-medium dark:text-gray-200">{taskLabel}</span>
             )}
           </>
         )
@@ -91,14 +95,32 @@ export function ActivityItem({ activity }: ActivityItemProps) {
         return (
           <>
             {t('timeline.completedTask')}{' '}
-            <span className="font-medium dark:text-gray-200">{activity.task?.title}</span>
+            {activity.task ? (
+              <Link
+                href={`/kanban?task=${activity.task.id}`}
+                className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                {taskLabel}
+              </Link>
+            ) : (
+              <span className="font-medium dark:text-gray-200">{taskLabel}</span>
+            )}
           </>
         )
       case 'task_status_changed':
         return (
           <>
             {t('timeline.moved')}{' '}
-            <span className="font-medium dark:text-gray-200">{activity.task?.title}</span>
+            {activity.task ? (
+              <Link
+                href={`/kanban?task=${activity.task.id}`}
+                className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                {taskLabel}
+              </Link>
+            ) : (
+              <span className="font-medium dark:text-gray-200">{taskLabel}</span>
+            )}
             {' '}{t('timeline.to')}{' '}
             <span className="font-medium dark:text-gray-200">{activity.metadata?.new_status || t('timeline.unknown')}</span>
           </>
@@ -116,7 +138,12 @@ export function ActivityItem({ activity }: ActivityItemProps) {
             {activity.task && (
               <>
                 {' '}{t('timeline.on')}{' '}
-                <span className="font-medium dark:text-gray-200">{activity.task.title}</span>
+                <Link
+                  href={`/kanban?task=${activity.task.id}`}
+                  className="font-medium text-blue-600 dark:text-blue-400 hover:underline"
+                >
+                  {taskLabel}
+                </Link>
               </>
             )}
           </>

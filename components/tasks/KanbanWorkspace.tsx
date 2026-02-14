@@ -20,6 +20,7 @@ import { EditTaskDialog } from '@/components/tasks/EditTaskDialog'
 import { AICreateTasksDialog } from '@/components/tasks/AICreateTasksDialog'
 import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -47,6 +48,7 @@ type MemberOption = {
 
 type TaskItem = {
   id: string
+  task_number: number
   project_id: string
   title: string
   description: string | null
@@ -977,6 +979,14 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
           <DragOverlay>
             {activeTask ? (
               <div className="border rounded-lg p-3 bg-white dark:bg-gray-800 shadow-lg opacity-95 cursor-grabbing max-w-[320px]">
+                <div className="flex items-center gap-2 mb-1">
+                  <Badge
+                    variant="outline"
+                    className="h-5 px-2 text-[10px] font-mono font-semibold tracking-wide bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800"
+                  >
+                    #{activeTask.task_number}
+                  </Badge>
+                </div>
                 <h4 className="font-semibold text-sm dark:text-gray-200">{activeTask.title}</h4>
                 {activeTask.project?.title && (
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{activeTask.project.title}</p>
@@ -1033,10 +1043,18 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
                   <tr key={task.id} className="border-b last:border-b-0">
                     <td className="px-3 py-2 min-w-[220px]">
                       <button
-                        className="text-left hover:text-blue-600 dark:hover:text-blue-400 truncate max-w-[260px]"
+                        className="text-left hover:text-blue-600 dark:hover:text-blue-400 max-w-[260px]"
                         onClick={() => setSelectedTask(task)}
                       >
-                        {task.title}
+                        <span className="inline-flex items-center gap-2 max-w-[260px]">
+                          <Badge
+                            variant="outline"
+                            className="h-5 px-2 text-[10px] font-mono font-semibold tracking-wide bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800"
+                          >
+                            #{task.task_number}
+                          </Badge>
+                          <span className="truncate">{task.title}</span>
+                        </span>
                       </button>
                     </td>
                     <td className="px-3 py-2 min-w-[160px]">

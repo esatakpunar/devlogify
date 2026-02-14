@@ -15,7 +15,7 @@ export async function getActivities(
     .select(`
       *,
       project:projects(id, title, color),
-      task:tasks(id, title),
+      task:tasks(id, title, task_number),
       user:profiles!activity_logs_user_id_fkey(id, full_name, avatar_url, email)
     `)
     .eq('company_id', companyId)
@@ -41,7 +41,7 @@ export async function getActivitiesByDateRange(
     .select(`
       *,
       project:projects(id, title, color),
-      task:tasks(id, title),
+      task:tasks(id, title, task_number),
       user:profiles!activity_logs_user_id_fkey(id, full_name, avatar_url, email)
     `)
     .eq('company_id', companyId)

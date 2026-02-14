@@ -9,6 +9,7 @@ import { EditTaskDialog } from '@/components/tasks/EditTaskDialog'
 
 type Task = {
   id: string
+  task_number: number
   project_id: string
   title: string
   description: string | null
@@ -110,4 +111,3 @@ export function ProjectContent({ projectId, initialTasks, userId, project }: Pro
     </div>
   )
 }
-

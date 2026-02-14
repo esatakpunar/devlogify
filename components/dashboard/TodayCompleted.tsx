@@ -10,6 +10,7 @@ import type { TaskWithProject } from '@/lib/supabase/queries/tasks'
 
 interface Task {
   id: string
+  task_number: number
   title: string
   actual_duration: number
   completed_at: string | null
@@ -73,7 +74,7 @@ export function TodayCompleted({ tasks }: TodayCompletedProps) {
                   href={`/projects/${task.project.id}`}
                   className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 truncate"
                 >
-                  {task.title}
+                  #{task.task_number} {task.title}
                 </Link>
                 <Badge
                   variant="secondary"

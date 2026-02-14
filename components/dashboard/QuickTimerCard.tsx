@@ -12,6 +12,7 @@ import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface Task {
   id: string
+  task_number: number
   title: string
   project: {
     id: string
@@ -151,7 +152,7 @@ export function QuickTimerCard({ userId }: QuickTimerCardProps) {
             >
               <div className="flex-1 min-w-0">
                 <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white truncate">
-                  {task.title}
+                  #{task.task_number} {task.title}
                 </p>
                 <div className="flex items-center gap-1.5 sm:gap-2 mt-1">
                   <div

@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 
 type Task = {
   id: string
+  task_number: number
   project_id: string
   title: string
   description: string | null

@@ -15,6 +15,7 @@ import { formatSupabaseError, isRetryableError } from '@/lib/utils/errorHandler'
 
 interface Task {
   id: string
+  task_number: number
   title: string
   status: 'todo' | 'in_progress' | 'done'
   actual_duration: number
@@ -143,7 +144,7 @@ export function RecentTasks({ tasks, userId }: RecentTasksProps) {
                   href={`/projects/${task.project.id}`}
                   className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400 truncate"
                 >
-                  {task.title}
+                  #{task.task_number} {task.title}
                 </Link>
                 <Badge
                   variant="secondary"

@@ -32,6 +32,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 type Task = {
   id: string
+  task_number: number
   project_id: string
   title: string
   description: string | null
@@ -333,6 +334,14 @@ export function TaskCard({ task, userId, onTaskUpdated, onTaskDeleted, onClick, 
         {/* Header */}
         <div className="flex items-start justify-between mb-2">
           <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <Badge
+                variant="outline"
+                className="h-5 px-2 text-[10px] font-mono font-semibold tracking-wide bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800"
+              >
+                #{localTask.task_number}
+              </Badge>
+            </div>
             <h4 className="font-semibold text-sm line-clamp-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 dark:text-gray-200 transition-colors">
               {localTask.title}
             </h4>

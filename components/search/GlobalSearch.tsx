@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
+import { Badge } from '@/components/ui/badge'
 import { Search, FolderKanban, CheckSquare, FileText, Loader2 } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { saveSearchHistory } from '@/lib/utils/filtering'
@@ -145,6 +146,14 @@ export function GlobalSearch({ open, onOpenChange, userId }: GlobalSearchProps) 
                   </div>
                   <div className="flex-1 min-w-0 w-0 overflow-hidden">
                     <div className="flex items-center gap-2 min-w-0 w-full overflow-hidden">
+                      {result.type === 'task' && result.metadata?.taskNumber ? (
+                        <Badge
+                          variant="outline"
+                          className="h-5 px-2 text-[10px] font-mono font-semibold tracking-wide bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800 shrink-0"
+                        >
+                          #{result.metadata.taskNumber}
+                        </Badge>
+                      ) : null}
                       <p className="text-sm font-medium min-w-0 flex-1 truncate">{result.title}</p>
                       <span className="text-xs text-gray-500 px-1.5 py-0.5 bg-gray-100 dark:bg-gray-800 rounded shrink-0">
                         {getTypeLabel(result.type)}

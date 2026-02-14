@@ -281,6 +281,7 @@ export type Database = {
           estimated_duration: number | null
           actual_duration: number
           progress: number
+          task_number: number
           order_index: number
           tags: string[] | null
           completed_at: string | null
@@ -303,6 +304,7 @@ export type Database = {
           estimated_duration?: number | null
           actual_duration?: number
           progress?: number
+          task_number?: number
           order_index?: number
           tags?: string[] | null
           completed_at?: string | null
@@ -325,6 +327,7 @@ export type Database = {
           estimated_duration?: number | null
           actual_duration?: number
           progress?: number
+          task_number?: number
           order_index?: number
           tags?: string[] | null
           completed_at?: string | null

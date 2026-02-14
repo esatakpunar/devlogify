@@ -89,7 +89,9 @@ export function useGlobalSearch(userId: string) {
 
       // Search tasks
       tasks?.forEach((task: TaskWithProject) => {
+        const taskNumberText = task.task_number ? `#${task.task_number}` : ''
         if (
+          taskNumberText.toLowerCase().includes(searchLower) ||
           task.title.toLowerCase().includes(searchLower) ||
           task.description?.toLowerCase().includes(searchLower) ||
           task.tags?.some(tag => tag.toLowerCase().includes(searchLower))
@@ -101,6 +103,7 @@ export function useGlobalSearch(userId: string) {
             subtitle: task.project?.title || task.description || undefined,
             url: `/kanban?task=${task.id}`,
             metadata: {
+              taskNumber: task.task_number,
               status: task.status,
               priority: task.priority,
               projectColor: task.project?.color,

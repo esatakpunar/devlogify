@@ -30,6 +30,7 @@ import { useTranslation } from '@/lib/i18n/useTranslation'
 
 type Task = {
   id: string
+  task_number: number
   project_id: string
   title: string
   description: string | null
@@ -417,7 +418,7 @@ export function KanbanBoard({
         {activeTask ? (
           <div className="border rounded-lg p-3 bg-white dark:bg-gray-800 shadow-lg opacity-95 cursor-grabbing">
             <div className="flex items-start justify-between mb-2">
-              <h4 className="font-semibold text-sm dark:text-gray-200">{activeTask.title}</h4>
+              <h4 className="font-semibold text-sm dark:text-gray-200">#{activeTask.task_number} {activeTask.title}</h4>
             </div>
             {activeTask.description && (
               <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-1 mb-2">

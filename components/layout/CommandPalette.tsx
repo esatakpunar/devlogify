@@ -255,7 +255,7 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
                   onSelect={handleSelect}
                 >
                   <CheckSquare className="mr-2 h-4 w-4" />
-                  <span>{task.title}</span>
+                  <span>#{task.task_number} {task.title}</span>
                   {task.project && (
                     <span className="ml-2 text-xs text-gray-500">
                       {task.project.title}

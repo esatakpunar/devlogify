@@ -30,6 +30,7 @@ interface Project {
 
 type Task = {
   id: string
+  task_number: number
   project_id: string
   title: string
   description: string | null
@@ -325,4 +326,3 @@ export function SharedProjectView({ project, tasks, shareLink }: SharedProjectVi
     </div>
   )
 }
-

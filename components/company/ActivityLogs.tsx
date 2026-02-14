@@ -36,7 +36,7 @@ interface ActivityLog {
   company_id: string | null
   created_at: string
   project: { id: string; title: string; color: string } | null
-  task: { id: string; title: string } | null
+  task: { id: string; title: string; task_number: number } | null
   user: { id: string; full_name: string | null; avatar_url: string | null; email: string } | null
 }
 
@@ -133,41 +133,44 @@ export function ActivityLogs({ companyId }: ActivityLogsProps) {
   const getActionDescription = (activity: ActivityLog) => {
     const userName = activity.user?.full_name || activity.user?.email || t('company.unknownUser')
     const metadata = activity.metadata || {}
+    const formattedTask =
+      metadata.task_title ||
+      (activity.task ? `#${activity.task.task_number} ${activity.task.title}` : '')
 
     switch (activity.action_type) {
       case 'task_created':
         return t('company.activity_taskCreated', {
           user: userName,
-          task: metadata.task_title || activity.task?.title || '',
+          task: formattedTask,
         })
       case 'task_completed':
         return t('company.activity_taskCompleted', {
           user: userName,
-          task: metadata.task_title || activity.task?.title || '',
+          task: formattedTask,
         })
       case 'task_status_changed':
         return t('company.activity_taskStatusChanged', {
           user: userName,
-          task: metadata.task_title || activity.task?.title || '',
+          task: formattedTask,
           status: metadata.new_status || '',
         })
       case 'task_progress_updated':
         return t('company.activity_taskProgressUpdated', {
           user: userName,
-          task: metadata.task_title || activity.task?.title || '',
+          task: formattedTask,
           progress: metadata.new_progress || 0,
         })
       case 'task_progress_milestone':
         return t('company.activity_taskProgressMilestone', {
           user: userName,
-          task: metadata.task_title || activity.task?.title || '',
+          task: formattedTask,
           progress: metadata.new_progress || 0,
         })
       case 'time_logged':
         return t('company.activity_timeLogged', {
           user: userName,
           duration: metadata.duration || 0,
-          task: metadata.task_title || activity.task?.title || '',
+          task: formattedTask,
         })
       case 'project_created':
         return t('company.activity_projectCreated', {
@@ -203,27 +206,27 @@ export function ActivityLogs({ companyId }: ActivityLogsProps) {
       case 'task_assigned':
         return t('company.activity_taskAssigned', {
           user: userName,
-          task: metadata.task_title || activity.task?.title || '',
+          task: formattedTask,
         })
       case 'task_review_requested':
         return t('company.activity_taskReviewRequested', {
           user: userName,
-          task: metadata.task_title || activity.task?.title || '',
+          task: formattedTask,
         })
       case 'task_approved':
         return t('company.activity_taskApproved', {
           user: userName,
-          task: metadata.task_title || activity.task?.title || '',
+          task: formattedTask,
         })
       case 'task_rejected':
         return t('company.activity_taskRejected', {
           user: userName,
-          task: metadata.task_title || activity.task?.title || '',
+          task: formattedTask,
         })
       case 'task_changes_requested':
         return t('company.activity_taskChangesRequested', {
           user: userName,
-          task: metadata.task_title || activity.task?.title || '',
+          task: formattedTask,
         })
       default:
         return t('company.activity_generic', {
