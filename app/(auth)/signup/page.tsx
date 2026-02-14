@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -11,13 +11,15 @@ import { PasswordInput } from '@/components/auth/PasswordInput'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { UserPlus } from 'lucide-react'
 
-export default function SignupPage() {
+function SignupForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirectTo = searchParams.get('redirect')
   const supabase = createClient()
   const t = useTranslation()
 
@@ -30,7 +32,7 @@ export default function SignupPage() {
       email,
       password,
       options: {
-        emailRedirectTo: `${location.origin}/auth/callback`,
+        emailRedirectTo: `${location.origin}/auth/callback${redirectTo ? `?next=${encodeURIComponent(redirectTo)}` : ''}`,
       },
     })
 
@@ -105,5 +107,13 @@ export default function SignupPage() {
         disabled={loading}
       />
     </AuthCard>
+  )
+}
+
+export default function SignupPage() {
+  return (
+    <Suspense>
+      <SignupForm />
+    </Suspense>
   )
 }

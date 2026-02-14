@@ -23,6 +23,8 @@ import {
 } from '@dnd-kit/core'
 import { updateTaskStatus, updateTasksOrder } from '@/lib/supabase/queries/tasks'
 import { logActivity } from '@/lib/supabase/queries/activities'
+import { notifyTaskStatusChanged } from '@/lib/notifications/triggers'
+import { useUserProfileStore } from '@/lib/store/userProfileStore'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 
@@ -39,6 +41,9 @@ type Task = {
   order_index: number
   created_at: string
   tags?: string[] | null
+  company_id?: string | null
+  assignee_id?: string | null
+  responsible_id?: string | null
 }
 
 interface Project {
@@ -72,6 +77,7 @@ export function KanbanBoard({
 }: KanbanBoardProps) {
   const router = useRouter()
   const { isPremium } = usePremium(userId)
+  const { profile } = useUserProfileStore()
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isAICreateDialogOpen, setIsAICreateDialogOpen] = useState(false)
@@ -164,6 +170,27 @@ export function KanbanBoard({
     }
   }
 
+  const sendStatusNotification = async (task: Task, oldStatus: string, newStatus: string) => {
+    const companyId = task.company_id || profile?.company_id
+    if (!companyId || (!task.assignee_id && !task.responsible_id)) return
+
+    try {
+      await notifyTaskStatusChanged({
+        taskId: task.id,
+        taskTitle: task.title,
+        projectId: task.project_id,
+        companyId,
+        actorId: userId,
+        assigneeId: task.assignee_id || null,
+        responsibleId: task.responsible_id || null,
+        oldStatus,
+        newStatus,
+      })
+    } catch (err) {
+      console.error('Failed to send status change notification:', err)
+    }
+  }
+
   const handleDragEnd = async (event: DragEndEvent) => {
     const { active, over } = event
     setActiveTask(null)
@@ -194,23 +221,23 @@ export function KanbanBoard({
 
         // Update in database
         await updateTaskStatus(activeId, newStatus)
-        
+
         // Log activity
         await logActivity(
           userId,
           activeTask.project_id,
           activeTask.id,
           newStatus === 'done' ? 'task_completed' : 'task_status_changed',
-          { 
+          {
             old_status: activeTask.status,
             new_status: newStatus,
             task_title: activeTask.title
           }
         )
 
-        const statusText = newStatus === 'todo' ? t('kanban.todo') : 
-                          newStatus === 'in_progress' ? t('kanban.inProgress') : 
-                          t('kanban.done')
+        // Send notifications
+        sendStatusNotification(activeTask, activeTask.status, newStatus)
+
         toast.success(t('tasks.taskMarkedAsComplete'))
       } catch (error) {
         console.error('Failed to update task status:', error)
@@ -243,12 +270,15 @@ export function KanbanBoard({
             activeTask.project_id,
             activeTask.id,
             newStatus === 'done' ? 'task_completed' : 'task_status_changed',
-            { 
+            {
               old_status: activeTask.status,
               new_status: newStatus,
               task_title: activeTask.title
             }
           )
+
+          // Send notifications
+          sendStatusNotification(activeTask, activeTask.status, newStatus)
 
           toast.success(t('tasks.taskMarkedAsComplete'))
         } catch (error) {

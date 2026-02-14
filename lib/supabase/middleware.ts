@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { getUserCompanyId } from '@/lib/supabase/queries/companyMembership'
 
 // Routes that don't require company membership
-const PUBLIC_ROUTES = ['/login', '/signup', '/reset-password', '/forgot-password', '/onboarding', '/auth', '/share']
+const PUBLIC_ROUTES = ['/login', '/signup', '/reset-password', '/forgot-password', '/onboarding', '/auth', '/share', '/invite']
 const AUTH_ROUTES = ['/login', '/signup', '/reset-password', '/forgot-password']
 
 export async function updateSession(request: NextRequest) {

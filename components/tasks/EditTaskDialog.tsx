@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { updateTask } from '@/lib/supabase/queries/tasks'
+import { notifyTaskAssigned } from '@/lib/notifications/triggers'
 import {
   Dialog,
   DialogContent,
@@ -120,6 +121,20 @@ export function EditTaskDialog({
         assignee_id: assigneeId || null,
         responsible_id: responsibleId || null,
       })
+
+      // If assignee changed, notify the new assignee
+      const newAssigneeId = assigneeId || null
+      const oldAssigneeId = task.assignee_id || null
+      if (newAssigneeId && newAssigneeId !== oldAssigneeId && userId && companyId) {
+        notifyTaskAssigned({
+          taskId: task.id,
+          taskTitle: title,
+          projectId: task.project_id,
+          companyId,
+          actorId: userId,
+          assigneeId: newAssigneeId,
+        }).catch(err => console.error('Failed to send assignment notification:', err))
+      }
 
       onTaskUpdated(updatedTask)
       toast.success(t('tasks.taskUpdatedSuccessfully'))

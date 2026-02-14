@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { ProjectProgressStats } from './ProjectProgressStats'
 import { KanbanBoard } from '@/components/tasks/KanbanBoard'
 import { MobileKanban } from '@/components/tasks/MobileKanban'
+import { EditTaskDialog } from '@/components/tasks/EditTaskDialog'
 
 type Task = {
   id: string
@@ -35,6 +37,12 @@ interface ProjectContentProps {
 
 export function ProjectContent({ projectId, initialTasks, userId, project }: ProjectContentProps) {
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
+  const searchParams = useSearchParams()
+  const router = useRouter()
+  const openTaskId = searchParams.get('task')
+
+  // Find the task to open from query param
+  const openTask = openTaskId ? tasks.find(t => t.id === openTaskId) : undefined
 
   const handleTaskCreated = (newTask: Task) => {
     setTasks(prev => [...prev, newTask])
@@ -84,6 +92,21 @@ export function ProjectContent({ projectId, initialTasks, userId, project }: Pro
           onTaskDeleted={handleTaskDeleted}
         />
       </div>
+
+      {/* Auto-open task from notification link */}
+      {openTask && (
+        <EditTaskDialog
+          open={true}
+          onOpenChange={(isOpen) => {
+            if (!isOpen) {
+              // Remove ?task= param when dialog closes
+              router.replace(`/projects/${projectId}`, { scroll: false })
+            }
+          }}
+          task={openTask}
+          onTaskUpdated={handleTaskUpdated}
+        />
+      )}
     </div>
   )
 }

@@ -537,6 +537,8 @@ export type Database = {
         }
       }
     }
+    Views: Record<string, never>
+    Functions: Record<string, never>
   }
 }
 

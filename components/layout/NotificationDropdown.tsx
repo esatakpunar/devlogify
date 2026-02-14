@@ -1,7 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Bell, Check, CheckCheck } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Bell, CheckCheck, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -27,12 +28,37 @@ const notificationIcons: Record<string, string> = {
   member_joined: '🎉',
 }
 
+// Notification types that link to a task/project
+const taskRelatedTypes = [
+  'task_assigned',
+  'task_status_changed',
+  'task_review_requested',
+  'task_approved',
+  'task_rejected',
+  'task_changes_requested',
+]
+
+function getNotificationLink(notification: Notification): string | null {
+  const metadata = notification.metadata as Record<string, any> | null
+  if (!metadata) return null
+
+  if (taskRelatedTypes.includes(notification.type) && metadata.project_id) {
+    // Navigate to the project page where the task lives
+    // The task_id can be used to auto-open the task via query param
+    const base = `/projects/${metadata.project_id}`
+    return metadata.task_id ? `${base}?task=${metadata.task_id}` : base
+  }
+
+  return null
+}
+
 export function NotificationDropdown() {
   const [notifications, setNotifications] = useState<Notification[]>([])
   const [unreadCount, setUnreadCount] = useState(0)
   const [open, setOpen] = useState(false)
   const { profile } = useUserProfileStore()
   const t = useTranslation()
+  const router = useRouter()
 
   const companyId = profile?.company_id
 
@@ -52,7 +78,6 @@ export function NotificationDropdown() {
 
   useEffect(() => {
     fetchData()
-    // Poll every 30 seconds
     const interval = setInterval(fetchData, 30000)
     return () => clearInterval(interval)
   }, [fetchData])
@@ -61,15 +86,25 @@ export function NotificationDropdown() {
     if (open) fetchData()
   }, [open, fetchData])
 
-  const handleMarkAsRead = async (notificationId: string) => {
-    try {
-      await markAsRead(notificationId)
-      setNotifications(prev =>
-        prev.map(n => n.id === notificationId ? { ...n, is_read: true } : n)
-      )
-      setUnreadCount(prev => Math.max(0, prev - 1))
-    } catch (error) {
-      console.error('Failed to mark notification as read:', error)
+  const handleNotificationClick = async (notification: Notification) => {
+    // Mark as read
+    if (!notification.is_read) {
+      try {
+        await markAsRead(notification.id)
+        setNotifications(prev =>
+          prev.map(n => n.id === notification.id ? { ...n, is_read: true } : n)
+        )
+        setUnreadCount(prev => Math.max(0, prev - 1))
+      } catch (error) {
+        console.error('Failed to mark notification as read:', error)
+      }
+    }
+
+    // Navigate if there's a link
+    const link = getNotificationLink(notification)
+    if (link) {
+      setOpen(false)
+      router.push(link)
     }
   }
 
@@ -120,35 +155,43 @@ export function NotificationDropdown() {
               {t('notifications.noNotifications')}
             </div>
           ) : (
-            notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className={`flex items-start gap-3 px-4 py-3 hover:bg-muted/50 cursor-pointer border-b last:border-0 transition-colors ${
-                  !notification.is_read ? 'bg-blue-50/50 dark:bg-blue-950/20' : ''
-                }`}
-                onClick={() => !notification.is_read && handleMarkAsRead(notification.id)}
-              >
-                <span className="text-base mt-0.5">
-                  {notificationIcons[notification.type] || '📌'}
-                </span>
-                <div className="flex-1 min-w-0">
-                  <p className={`text-sm ${!notification.is_read ? 'font-medium' : ''}`}>
-                    {notification.title}
-                  </p>
-                  {notification.message && (
-                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
-                      {notification.message}
+            notifications.map((notification) => {
+              const link = getNotificationLink(notification)
+              return (
+                <div
+                  key={notification.id}
+                  className={`flex items-start gap-3 px-4 py-3 hover:bg-muted/50 cursor-pointer border-b last:border-0 transition-colors ${
+                    !notification.is_read ? 'bg-blue-50/50 dark:bg-blue-950/20' : ''
+                  }`}
+                  onClick={() => handleNotificationClick(notification)}
+                >
+                  <span className="text-base mt-0.5">
+                    {notificationIcons[notification.type] || '📌'}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className={`text-sm ${!notification.is_read ? 'font-medium' : ''}`}>
+                      {notification.title}
                     </p>
-                  )}
-                  <p className="text-xs text-muted-foreground mt-1">
-                    {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
-                  </p>
+                    {notification.message && (
+                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">
+                        {notification.message}
+                      </p>
+                    )}
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {formatDistanceToNow(new Date(notification.created_at), { addSuffix: true })}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0 mt-1">
+                    {link && (
+                      <ExternalLink className="h-3.5 w-3.5 text-muted-foreground" />
+                    )}
+                    {!notification.is_read && (
+                      <div className="w-2 h-2 rounded-full bg-blue-500" />
+                    )}
+                  </div>
                 </div>
-                {!notification.is_read && (
-                  <div className="w-2 h-2 rounded-full bg-blue-500 mt-2 shrink-0" />
-                )}
-              </div>
-            ))
+              )
+            })
           )}
         </div>
       </DropdownMenuContent>

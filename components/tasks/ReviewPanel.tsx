@@ -6,7 +6,33 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { approveTask, rejectTask, requestChanges } from '@/lib/supabase/queries/tasks'
-import { createNotification } from '@/lib/supabase/queries/notifications'
+
+async function createNotificationAndEmail(
+  userId: string,
+  companyId: string,
+  type: string,
+  title: string,
+  message: string,
+  metadata?: Record<string, any>
+) {
+  // Create notification via API route (server-side, bypasses RLS)
+  const res = await fetch('/api/notifications/create', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, companyId, type, title, message, metadata }),
+  })
+  const data = await res.json()
+  const notificationId = data.notification?.id
+
+  // Trigger email in background
+  fetch('/api/notifications/send-email', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, subject: title, message, type, notificationId }),
+  }).catch(err => console.error('Failed to trigger email:', err))
+
+  return data.notification
+}
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 
@@ -49,7 +75,7 @@ export function ReviewPanel({
     try {
       await approveTask(taskId, userId, note || undefined)
       if (assigneeId) {
-        await createNotification(
+        await createNotificationAndEmail(
           assigneeId,
           companyId,
           'task_approved',
@@ -73,7 +99,7 @@ export function ReviewPanel({
     try {
       await rejectTask(taskId, userId, note || undefined)
       if (assigneeId) {
-        await createNotification(
+        await createNotificationAndEmail(
           assigneeId,
           companyId,
           'task_rejected',
@@ -101,7 +127,7 @@ export function ReviewPanel({
     try {
       await requestChanges(taskId, userId, note)
       if (assigneeId) {
-        await createNotification(
+        await createNotificationAndEmail(
           assigneeId,
           companyId,
           'task_changes_requested',

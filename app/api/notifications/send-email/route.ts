@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import type { Database } from '@/types/supabase'
+import { sendEmail } from '@/lib/email/resend'
+import { notificationEmailTemplate } from '@/lib/email/templates'
 
 export async function POST(request: Request) {
   try {
@@ -12,44 +13,57 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { userId, subject, message, notificationId } = body
+    const { userId, subject, message, notificationId, type } = body
 
     if (!userId || !subject || !message) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Get recipient's profile to check notification preferences
-    const { data: profileData } = await supabase
-      .from('profiles')
-      .select('email, notifications_enabled')
-      .eq('id', userId)
-      .single()
-    const profile = profileData as Pick<
-      Database['public']['Tables']['profiles']['Row'],
-      'email' | 'notifications_enabled'
-    > | null
+    // Use SECURITY DEFINER RPC to get other user's email prefs
+    const { data: prefs, error: prefsError } = await (supabase as any).rpc('get_member_email_prefs', {
+      p_user_id: userId,
+    })
 
-    if (!profile) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    if (prefsError) {
+      console.error('[Email] Failed to get email prefs:', prefsError)
+      return NextResponse.json({ error: 'Failed to get user preferences' }, { status: 500 })
     }
 
-    if (!profile.notifications_enabled) {
+    if (prefs?.error) {
+      return NextResponse.json({ error: prefs.error }, { status: 404 })
+    }
+
+    if (!prefs?.notifications_enabled) {
       return NextResponse.json({ message: 'Email notifications disabled for this user' })
     }
 
-    // In production, integrate with Resend, SendGrid, or Supabase Edge Functions
-    // For now, we log and mark the notification as email_sent
-    console.log(`[Email] To: ${profile.email}, Subject: ${subject}, Message: ${message}`)
+    // Send email via Resend
+    const template = notificationEmailTemplate({
+      title: subject,
+      message,
+      type: type || 'general',
+    })
+
+    const result = await sendEmail({
+      to: prefs.email,
+      subject: template.subject,
+      html: template.html,
+    })
 
     // Mark notification as email_sent if notificationId is provided
-    if (notificationId) {
+    if (notificationId && result.success) {
       await (supabase as any)
         .from('notifications')
         .update({ email_sent: true })
         .eq('id', notificationId)
     }
 
-    return NextResponse.json({ success: true })
+    if (!result.success) {
+      console.error('[Email] Send failed:', result.error)
+      return NextResponse.json({ error: result.error }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true, emailId: result.id })
   } catch (error: any) {
     console.error('Failed to send email notification:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })

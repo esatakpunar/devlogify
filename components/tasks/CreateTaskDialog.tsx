@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { createTask } from '@/lib/supabase/queries/tasks'
 import type { Task } from '@/lib/supabase/queries/tasks'
 import { logActivity } from '@/lib/supabase/queries/activities'
+import { notifyTaskAssigned, notifyReviewRequested } from '@/lib/notifications/triggers'
 import { getTaskTemplates } from '@/lib/supabase/queries/taskTemplates'
 import type { TaskTemplate } from '@/lib/supabase/queries/taskTemplates'
 import {
@@ -145,7 +146,33 @@ export function CreateTaskDialog({
         'task_created',
         { task_title: title }
       )
-  
+
+      const taskCompanyId = companyId || profile?.company_id
+
+      // Send notification to assignee (includes email)
+      if (assigneeId && taskCompanyId) {
+        notifyTaskAssigned({
+          taskId: newTask.id,
+          taskTitle: title,
+          projectId: finalProjectId,
+          companyId: taskCompanyId,
+          actorId: userId,
+          assigneeId,
+        }).catch(err => console.error('Failed to create assignment notification:', err))
+      }
+
+      // Send notification to responsible (includes email)
+      if (responsibleId && responsibleId !== assigneeId && taskCompanyId) {
+        notifyReviewRequested({
+          taskId: newTask.id,
+          taskTitle: title,
+          projectId: finalProjectId,
+          companyId: taskCompanyId,
+          actorId: userId,
+          responsibleId,
+        }).catch(err => console.error('Failed to create responsible notification:', err))
+      }
+
       onTaskCreated(newTask)
       
       // Reset form

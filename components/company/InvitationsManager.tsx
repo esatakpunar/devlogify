@@ -98,7 +98,26 @@ export function InvitationsManager({ companyId, userId, isAdmin }: InvitationsMa
 
     setIsSending(true)
     try {
-      await createInvitation(companyId, email.trim(), role, userId)
+      const invitation = await createInvitation(companyId, email.trim(), role, userId)
+
+      // Send invitation email
+      try {
+        await fetch('/api/invitations/send', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email.trim(),
+            companyId,
+            token: invitation.token,
+            role,
+            expiresAt: invitation.expires_at,
+          }),
+        })
+      } catch (emailError) {
+        console.error('Failed to send invitation email:', emailError)
+        // Don't block invitation creation if email fails
+      }
+
       await loadInvitations()
       setEmail('')
       setRole('member')

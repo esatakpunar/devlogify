@@ -91,6 +91,9 @@ export async function createNotification(
     .select()
     .single()
 
-  if (error) throw error
+  if (error) {
+    console.error('[createNotification] Error:', JSON.stringify(error), 'Code:', error.code, 'Message:', error.message, 'Details:', error.details, 'Hint:', error.hint)
+    throw error
+  }
   return data
 }
