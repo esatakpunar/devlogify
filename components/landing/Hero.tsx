@@ -9,7 +9,7 @@ import { useTranslation } from '@/lib/i18n/useTranslation'
 export function Hero() {
   const t = useTranslation()
   return (
-    <section className="relative pt-32 pb-20 px-4 overflow-hidden">
+    <section className="relative overflow-hidden px-4 pb-16 pt-28 sm:pb-20 sm:pt-32">
       {/* Background gradient */}
       <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/5 via-background to-background" />
 
@@ -36,7 +36,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight"
+            className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl"
           >
             {t('landing.buildBetterProducts')}
             <br />
@@ -48,7 +48,7 @@ export function Hero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            className="text-xl md:text-2xl text-muted-foreground max-w-3xl mx-auto"
+            className="mx-auto max-w-3xl text-base text-muted-foreground sm:text-xl md:text-2xl"
           >
             {t('landing.heroDescription')}
           </motion.p>
@@ -78,18 +78,18 @@ export function Hero() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.6 }}
-            className="pt-12 grid grid-cols-3 gap-8 max-w-2xl mx-auto"
+            className="mx-auto grid max-w-3xl grid-cols-1 gap-3 pt-10 sm:grid-cols-3 sm:gap-4 sm:pt-12"
           >
-            <div>
-              <div className="text-3xl font-bold">10K+</div>
+            <div className="rounded-xl border bg-card/60 px-4 py-3 sm:bg-transparent sm:border-0 sm:p-0">
+              <div className="text-2xl font-bold sm:text-3xl">10K+</div>
               <div className="text-sm text-muted-foreground">{t('landing.activeUsers')}</div>
             </div>
-            <div>
-              <div className="text-3xl font-bold">50K+</div>
+            <div className="rounded-xl border bg-card/60 px-4 py-3 sm:bg-transparent sm:border-0 sm:p-0">
+              <div className="text-2xl font-bold sm:text-3xl">50K+</div>
               <div className="text-sm text-muted-foreground">{t('landing.projectsTracked')}</div>
             </div>
-            <div>
-              <div className="text-3xl font-bold">99.9%</div>
+            <div className="rounded-xl border bg-card/60 px-4 py-3 sm:bg-transparent sm:border-0 sm:p-0">
+              <div className="text-2xl font-bold sm:text-3xl">99.9%</div>
               <div className="text-sm text-muted-foreground">{t('landing.uptime')}</div>
             </div>
           </motion.div>

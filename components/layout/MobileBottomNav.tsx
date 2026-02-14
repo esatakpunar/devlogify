@@ -39,7 +39,10 @@ export function MobileBottomNav() {
   )
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 md:hidden">
+    <nav
+      className="fixed bottom-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 md:hidden"
+      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
       <div className="grid grid-cols-5 h-16">
         {primaryNavItems.map((item) => {
           const Icon = item.icon
@@ -49,6 +52,8 @@ export function MobileBottomNav() {
             <button
               key={item.path}
               onClick={() => handleNavigate(item.path)}
+              aria-current={isActive ? 'page' : undefined}
+              aria-label={item.label}
               className={cn(
                 'flex flex-col items-center justify-center gap-1 transition-colors min-w-0',
                 isActive
@@ -65,6 +70,8 @@ export function MobileBottomNav() {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <button
+              type="button"
+              aria-label={t('nav.more')}
               className={cn(
                 'flex flex-col items-center justify-center gap-1 transition-colors min-w-0',
                 isMoreActive

@@ -22,11 +22,11 @@ export function LandingNav() {
           <span className="font-bold text-xl">Devlogify</span>
         </Link>
 
-        <div className="flex items-center space-x-4">
-          <Button variant="ghost" asChild>
+        <div className="flex items-center gap-2 sm:gap-4">
+          <Button variant="ghost" asChild className="text-sm sm:text-base">
             <Link href="/login">{t('auth.login')}</Link>
           </Button>
-          <Button asChild>
+          <Button asChild size="sm" className="sm:h-10 sm:px-4">
             <Link href="/signup">{t('auth.signUp')}</Link>
           </Button>
         </div>
