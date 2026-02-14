@@ -474,7 +474,14 @@
     "startCapturingIdeas": "Beginnen Sie, Ihre Ideen zu erfassen",
     "pinned": "Angeheftet",
     "allNotes": "Alle Notizen",
-    "tasksCreatedSuccessfully": "Aufgaben erfolgreich erstellt!"
+    "tasksCreatedSuccessfully": "Aufgaben erfolgreich erstellt!",
+    "emptyStateTips": {
+      "captureIdeas": "Erfassen Sie Ideen, Besprechungsnotizen und Gedanken",
+      "useTags": "Verwenden Sie Tags, um Ihre Notizen zu organisieren",
+      "pinImportant": "Heften Sie wichtige Notizen fur schnellen Zugriff an",
+      "linkToProjects": "Verknupfen Sie Notizen mit Projekten fur bessere Organisation"
+    },
+    "quickTipsTitle": "Schnelle Tipps:"
   },
   "noteCard": {
     "createTasksFromNote": "Aufgaben aus Notiz erstellen",

@@ -11,6 +11,7 @@ interface EmptyStateProps {
   actionHref?: string
   onAction?: () => void
   tips?: string[]
+  tipsTitle?: string
   examples?: ReactNode
   variant?: 'default' | 'minimal' | 'featured'
 }
@@ -23,6 +24,7 @@ export function EmptyState({
   actionHref,
   onAction,
   tips,
+  tipsTitle,
   examples,
   variant = 'default'
 }: EmptyStateProps) {
@@ -80,7 +82,7 @@ export function EmptyState({
 
       {tips && tips.length > 0 && (
         <div className="w-full max-w-md mb-6 bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
-          <p className="text-xs font-semibold text-blue-900 dark:text-blue-300 mb-2">💡 Quick Tips:</p>
+          <p className="text-xs font-semibold text-blue-900 dark:text-blue-300 mb-2">💡 {tipsTitle || 'Quick Tips:'}</p>
           <ul className="space-y-1.5 text-xs text-blue-800 dark:text-blue-400">
             {tips.map((tip, index) => (
               <li key={index} className="flex items-start gap-2">

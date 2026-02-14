@@ -474,7 +474,14 @@
     "startCapturingIdeas": "Start capturing your ideas",
     "pinned": "Pinned",
     "allNotes": "All Notes",
-    "tasksCreatedSuccessfully": "Tasks created successfully!"
+    "tasksCreatedSuccessfully": "Tasks created successfully!",
+    "emptyStateTips": {
+      "captureIdeas": "Capture ideas, meeting notes, and thoughts",
+      "useTags": "Use tags to organize your notes",
+      "pinImportant": "Pin important notes for quick access",
+      "linkToProjects": "Link notes to projects for better organization"
+    },
+    "quickTipsTitle": "Quick Tips:"
   },
   "noteCard": {
     "createTasksFromNote": "Create Tasks from Note",

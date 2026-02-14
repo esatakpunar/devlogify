@@ -474,7 +474,14 @@
     "startCapturingIdeas": "Fikirlerinizi yakalamaya başlayın",
     "pinned": "Sabitlenen",
     "allNotes": "Tüm Notlar",
-    "tasksCreatedSuccessfully": "Görevler başarıyla oluşturuldu!"
+    "tasksCreatedSuccessfully": "Görevler başarıyla oluşturuldu!",
+    "emptyStateTips": {
+      "captureIdeas": "Fikirleri, toplanti notlarini ve dusuncelerini kaydet",
+      "useTags": "Notlarini duzenlemek icin etiketler kullan",
+      "pinImportant": "Onemli notlari hizli erisim icin sabitle",
+      "linkToProjects": "Daha iyi organizasyon icin notlari projelere bagla"
+    },
+    "quickTipsTitle": "Hizli Ipuclari:"
   },
   "noteCard": {
     "createTasksFromNote": "Nottan Görev Oluştur",

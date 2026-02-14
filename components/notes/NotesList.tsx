@@ -94,11 +94,12 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
           description={searchQuery ? t('notesList.tryDifferentSearch') : t('notesList.startCapturingIdeas')}
           actionLabel={!searchQuery ? t('notes.createNote') : undefined}
           onAction={!searchQuery ? () => setIsCreateDialogOpen(true) : undefined}
+          tipsTitle={!searchQuery ? t('notesList.quickTipsTitle') : undefined}
           tips={!searchQuery ? [
-            'Capture ideas, meeting notes, and thoughts',
-            'Use tags to organize your notes',
-            'Pin important notes for quick access',
-            'Link notes to projects for better organization'
+            t('notesList.emptyStateTips.captureIdeas'),
+            t('notesList.emptyStateTips.useTags'),
+            t('notesList.emptyStateTips.pinImportant'),
+            t('notesList.emptyStateTips.linkToProjects')
           ] : undefined}
           variant={searchQuery ? 'minimal' : 'default'}
         />
