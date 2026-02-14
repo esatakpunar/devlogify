@@ -132,6 +132,7 @@ export function EditProjectDialog({
     } catch (err: any) {
       setError(err.message)
       toast.error(t('projects.failedToUpdateProject'))
+    } finally {
       setLoading(false)
     }
   }
@@ -161,6 +162,7 @@ export function EditProjectDialog({
     } catch (err: any) {
       setError(err.message)
       toast.error(t('projects.failedToDeleteProject'))
+    } finally {
       setLoading(false)
     }
   }
@@ -173,6 +175,7 @@ export function EditProjectDialog({
       setColor(project.color)
       setStatus(project.status)
       setError(null)
+      setLoading(false)
     }
     onOpenChange(newOpen)
   }
@@ -330,4 +333,3 @@ export function EditProjectDialog({
     </>
   )
 }
-

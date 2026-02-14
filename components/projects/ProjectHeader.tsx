@@ -21,6 +21,7 @@ import { useTranslation } from '@/lib/i18n/useTranslation'
 import { usePremium } from '@/lib/hooks/usePremium'
 import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 import { useConfirmModal } from '@/lib/hooks/useConfirmModal'
+import { getPlainTextFromHTML } from '@/components/ui/HTMLContent'
 
 interface ProjectHeaderProps {
   project: {
@@ -168,7 +169,7 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
             <h1 className="text-2xl sm:text-3xl font-bold break-words dark:text-white">{project.title}</h1>
             {project.description && (
               <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1 sm:mt-2 break-words overflow-wrap-anywhere">
-                {project.description}
+                {getPlainTextFromHTML(project.description)}
               </p>
             )}
           </div>

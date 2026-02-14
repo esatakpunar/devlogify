@@ -22,7 +22,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Plus, Sparkles } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Plus, Sparkles, ChevronDown } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { updateTask, updateTaskStatus } from '@/lib/supabase/queries/tasks'
 import { logActivity } from '@/lib/supabase/queries/activities'
@@ -80,9 +82,88 @@ interface KanbanWorkspaceProps {
 type ViewMode = 'kanban' | 'list'
 type SortDirection = 'asc' | 'desc'
 type SortKey = 'title' | 'project' | 'status' | 'priority' | 'assignee' | 'responsible' | 'estimated_duration'
+type MultiSelectOption = {
+  value: string
+  label: string
+}
 
 function sortByUpdatedAtDesc(tasks: TaskItem[]): TaskItem[] {
   return [...tasks].sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+}
+
+interface MultiSelectFilterProps {
+  label: string
+  options: MultiSelectOption[]
+  selectedValues: string[]
+  onChange: (values: string[]) => void
+  selectAllLabel: string
+  clearLabel: string
+}
+
+function MultiSelectFilter({
+  label,
+  options,
+  selectedValues,
+  onChange,
+  selectAllLabel,
+  clearLabel,
+}: MultiSelectFilterProps) {
+  const allSelected = options.length > 0 && selectedValues.length === options.length
+
+  const toggleValue = (value: string) => {
+    if (selectedValues.includes(value)) {
+      onChange(selectedValues.filter((item) => item !== value))
+      return
+    }
+    onChange([...selectedValues, value])
+  }
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline" className="w-full justify-between">
+          <span className="truncate">
+            {label}
+            {selectedValues.length > 0 ? ` (${selectedValues.length})` : ''}
+          </span>
+          <ChevronDown className="w-4 h-4 opacity-60" />
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-[280px] p-2" align="start">
+        <div className="flex items-center justify-between px-1 pb-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={() => onChange(options.map((option) => option.value))}
+            disabled={options.length === 0 || allSelected}
+          >
+            {selectAllLabel}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs"
+            onClick={() => onChange([])}
+            disabled={selectedValues.length === 0}
+          >
+            {clearLabel}
+          </Button>
+        </div>
+        <div className="max-h-60 overflow-y-auto space-y-1 px-1">
+          {options.map((option) => (
+            <label key={option.value} className="flex items-center gap-2 text-sm py-1 cursor-pointer">
+              <Checkbox
+                checked={selectedValues.includes(option.value)}
+                onCheckedChange={() => toggleValue(option.value)}
+              />
+              <span className="truncate">{option.label}</span>
+            </label>
+          ))}
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
 }
 
 export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: KanbanWorkspaceProps) {
@@ -93,11 +174,11 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
   const [tasks, setTasks] = useState<TaskItem[]>(sortByUpdatedAtDesc(initialTasks))
   const [viewMode, setViewMode] = useState<ViewMode>('kanban')
   const [search, setSearch] = useState('')
-  const [projectFilter, setProjectFilter] = useState('all')
-  const [statusFilter, setStatusFilter] = useState('all')
-  const [priorityFilter, setPriorityFilter] = useState('all')
-  const [assigneeFilter, setAssigneeFilter] = useState('all')
-  const [responsibleFilter, setResponsibleFilter] = useState('all')
+  const [selectedProjectIds, setSelectedProjectIds] = useState<string[]>([])
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([])
+  const [selectedPriorities, setSelectedPriorities] = useState<string[]>([])
+  const [selectedAssigneeIds, setSelectedAssigneeIds] = useState<string[]>([userId])
+  const [selectedResponsibleIds, setSelectedResponsibleIds] = useState<string[]>([])
   const [sortKey, setSortKey] = useState<SortKey>('title')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
 
@@ -128,11 +209,15 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
     const searchLower = search.trim().toLowerCase()
 
     return tasks.filter((task) => {
-      if (projectFilter !== 'all' && task.project_id !== projectFilter) return false
-      if (statusFilter !== 'all' && task.status !== statusFilter) return false
-      if (priorityFilter !== 'all' && task.priority !== priorityFilter) return false
-      if (assigneeFilter !== 'all' && (task.assignee_id || 'none') !== assigneeFilter) return false
-      if (responsibleFilter !== 'all' && (task.responsible_id || 'none') !== responsibleFilter) return false
+      if (selectedProjectIds.length > 0 && !selectedProjectIds.includes(task.project_id)) return false
+      if (selectedStatuses.length > 0 && !selectedStatuses.includes(task.status)) return false
+      if (selectedPriorities.length > 0 && !selectedPriorities.includes(task.priority)) return false
+
+      const assigneeValue = task.assignee_id || '__none__'
+      if (selectedAssigneeIds.length > 0 && !selectedAssigneeIds.includes(assigneeValue)) return false
+
+      const responsibleValue = task.responsible_id || '__none__'
+      if (selectedResponsibleIds.length > 0 && !selectedResponsibleIds.includes(responsibleValue)) return false
 
       if (!searchLower) return true
 
@@ -148,7 +233,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
 
       return searchable.includes(searchLower)
     })
-  }, [tasks, search, projectFilter, statusFilter, priorityFilter, assigneeFilter, responsibleFilter])
+  }, [tasks, search, selectedProjectIds, selectedStatuses, selectedPriorities, selectedAssigneeIds, selectedResponsibleIds])
 
   const todoTasks = useMemo(() => filteredTasks.filter((task) => task.status === 'todo'), [filteredTasks])
   const inProgressTasks = useMemo(() => filteredTasks.filter((task) => task.status === 'in_progress'), [filteredTasks])
@@ -206,6 +291,51 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
       avatar_url: member.profile.avatar_url,
     }))
   }, [members])
+
+  const projectFilterOptions = useMemo<MultiSelectOption[]>(
+    () => projects.map((project) => ({ value: project.id, label: project.title })),
+    [projects]
+  )
+
+  const statusFilterOptions = useMemo<MultiSelectOption[]>(
+    () => [
+      { value: 'todo', label: t('kanban.todo') },
+      { value: 'in_progress', label: t('kanban.inProgress') },
+      { value: 'done', label: t('kanban.done') },
+    ],
+    [t]
+  )
+
+  const priorityFilterOptions = useMemo<MultiSelectOption[]>(
+    () => [
+      { value: 'low', label: t('common.low') },
+      { value: 'medium', label: t('common.medium') },
+      { value: 'high', label: t('common.high') },
+    ],
+    [t]
+  )
+
+  const assigneeFilterOptions = useMemo<MultiSelectOption[]>(
+    () => [
+      { value: '__none__', label: t('common.none') },
+      ...memberOptions.map((member) => ({
+        value: member.id,
+        label: member.full_name || member.email,
+      })),
+    ],
+    [memberOptions, t]
+  )
+
+  const responsibleFilterOptions = useMemo<MultiSelectOption[]>(
+    () => [
+      { value: '__none__', label: t('common.none') },
+      ...memberOptions.map((member) => ({
+        value: member.id,
+        label: member.full_name || member.email,
+      })),
+    ],
+    [memberOptions, t]
+  )
 
   const getMemberById = (memberId: string | null | undefined): MemberOption | null => {
     if (!memberId) return null
@@ -461,73 +591,50 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
           className="lg:col-span-2"
         />
 
-        <Select value={projectFilter} onValueChange={setProjectFilter}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder={t('tasks.project')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t('kanban.allProjects')}</SelectItem>
-            {projects.map((project) => (
-              <SelectItem key={project.id} value={project.id}>
-                {project.title}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <MultiSelectFilter
+          label={t('tasks.project')}
+          options={projectFilterOptions}
+          selectedValues={selectedProjectIds}
+          onChange={setSelectedProjectIds}
+          selectAllLabel={t('kanban.selectAll')}
+          clearLabel={t('kanban.deselectAll')}
+        />
 
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder={t('tasks.status')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t('kanban.allStatuses')}</SelectItem>
-            <SelectItem value="todo">{t('kanban.todo')}</SelectItem>
-            <SelectItem value="in_progress">{t('kanban.inProgress')}</SelectItem>
-            <SelectItem value="done">{t('kanban.done')}</SelectItem>
-          </SelectContent>
-        </Select>
+        <MultiSelectFilter
+          label={t('tasks.status')}
+          options={statusFilterOptions}
+          selectedValues={selectedStatuses}
+          onChange={setSelectedStatuses}
+          selectAllLabel={t('kanban.selectAll')}
+          clearLabel={t('kanban.deselectAll')}
+        />
 
-        <Select value={priorityFilter} onValueChange={setPriorityFilter}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder={t('tasks.priority')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t('kanban.allPriorities')}</SelectItem>
-            <SelectItem value="low">{t('common.low')}</SelectItem>
-            <SelectItem value="medium">{t('common.medium')}</SelectItem>
-            <SelectItem value="high">{t('common.high')}</SelectItem>
-          </SelectContent>
-        </Select>
+        <MultiSelectFilter
+          label={t('tasks.priority')}
+          options={priorityFilterOptions}
+          selectedValues={selectedPriorities}
+          onChange={setSelectedPriorities}
+          selectAllLabel={t('kanban.selectAll')}
+          clearLabel={t('kanban.deselectAll')}
+        />
 
-        <Select value={assigneeFilter} onValueChange={setAssigneeFilter}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder={t('tasks.assignee')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t('kanban.allAssignees')}</SelectItem>
-            <SelectItem value="none">{t('common.none')}</SelectItem>
-            {memberOptions.map((member) => (
-              <SelectItem key={member.id} value={member.id}>
-                {member.full_name || member.email}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <MultiSelectFilter
+          label={t('tasks.assignee')}
+          options={assigneeFilterOptions}
+          selectedValues={selectedAssigneeIds}
+          onChange={setSelectedAssigneeIds}
+          selectAllLabel={t('kanban.selectAll')}
+          clearLabel={t('kanban.deselectAll')}
+        />
 
-        <Select value={responsibleFilter} onValueChange={setResponsibleFilter}>
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder={t('tasks.responsible')} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">{t('kanban.allResponsibles')}</SelectItem>
-            <SelectItem value="none">{t('common.none')}</SelectItem>
-            {memberOptions.map((member) => (
-              <SelectItem key={member.id} value={member.id}>
-                {member.full_name || member.email}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <MultiSelectFilter
+          label={t('tasks.responsible')}
+          options={responsibleFilterOptions}
+          selectedValues={selectedResponsibleIds}
+          onChange={setSelectedResponsibleIds}
+          selectAllLabel={t('kanban.selectAll')}
+          clearLabel={t('kanban.deselectAll')}
+        />
       </div>
 
       <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as ViewMode)}>
