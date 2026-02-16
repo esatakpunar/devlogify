@@ -13,16 +13,9 @@ interface HTMLContentProps {
  * Strips HTML tags for preview or renders full HTML
  */
 export function HTMLContent({ content, className, maxLines }: HTMLContentProps) {
-  // Strip HTML tags for plain text preview
-  const stripHtml = (html: string) => {
-    const tmp = document.createElement('div')
-    tmp.innerHTML = html
-    return tmp.textContent || tmp.innerText || ''
-  }
-
   // If maxLines is specified, show plain text preview
   if (maxLines) {
-    const plainText = stripHtml(content)
+    const plainText = getPlainTextFromHTML(content)
     return (
       <p className={cn('whitespace-pre-wrap break-words', `line-clamp-${maxLines}`, className)}>
         {plainText}
@@ -43,13 +36,37 @@ export function HTMLContent({ content, className, maxLines }: HTMLContentProps) 
  * Safe plain text extraction from HTML content
  */
 export function getPlainTextFromHTML(html: string): string {
-  if (typeof window === 'undefined') {
-    // Server-side: simple regex strip
-    return html.replace(/<[^>]*>/g, '').trim()
+  const withoutTags = html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/p>/gi, '\n')
+    .replace(/<[^>]*>/g, '')
+
+  return decodeHtmlEntities(withoutTags)
+    .replace(/\u00a0/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+function decodeHtmlEntities(input: string): string {
+  const namedEntities: Record<string, string> = {
+    nbsp: ' ',
+    amp: '&',
+    lt: '<',
+    gt: '>',
+    quot: '"',
+    apos: "'",
   }
-  
-  // Client-side: proper DOM parsing
-  const tmp = document.createElement('div')
-  tmp.innerHTML = html
-  return tmp.textContent || tmp.innerText || ''
+
+  return input.replace(/&(#x?[0-9a-fA-F]+|[a-zA-Z]+);/g, (match, entity) => {
+    if (entity[0] === '#') {
+      const isHex = entity[1]?.toLowerCase() === 'x'
+      const value = parseInt(entity.slice(isHex ? 2 : 1), isHex ? 16 : 10)
+      if (Number.isFinite(value)) {
+        return String.fromCodePoint(value)
+      }
+      return match
+    }
+
+    return namedEntities[entity] ?? match
+  })
 }

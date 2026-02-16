@@ -18,6 +18,7 @@ import { useSwipeGesture } from '@/lib/hooks/useSwipeGesture'
 import type { SharedLink } from '@/lib/supabase/queries/sharing'
 import { exportToJSON, exportToCSV, downloadFile, prepareExportData } from '@/lib/utils/export'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { getPlainTextFromHTML } from '@/components/ui/HTMLContent'
 
 interface Project {
   id: string
@@ -182,7 +183,7 @@ export function SharedProjectView({ project, tasks, shareLink }: SharedProjectVi
               </div>
               {project.description && (
                 <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-2 break-words">
-                  {project.description}
+                  {getPlainTextFromHTML(project.description)}
                 </p>
               )}
             </div>
