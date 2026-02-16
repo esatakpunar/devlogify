@@ -83,7 +83,8 @@ export function EditTaskDialog({
   const t = useTranslation()
 
   const isResponsible = userId && task.responsible_id === userId
-  const { members } = useCompanyStore()
+  const { members, fetchMembers, company } = useCompanyStore()
+  const resolvedCompanyId = companyId || (task as Task & { company_id?: string | null }).company_id || null
 
   // Update state when task prop changes
   useEffect(() => {
@@ -97,6 +98,14 @@ export function EditTaskDialog({
     setAssigneeId(task.assignee_id || '')
     setResponsibleId(task.responsible_id || '')
   }, [task])
+
+  useEffect(() => {
+    if (!open || !resolvedCompanyId) return
+    if (company?.id === resolvedCompanyId && members.length > 0) return
+    fetchMembers(resolvedCompanyId).catch((error) => {
+      console.error('Failed to fetch company members for edit dialog:', error)
+    })
+  }, [open, resolvedCompanyId, company?.id, members.length, fetchMembers])
 
   const handleProgressUpdate = (newProgress: number) => {
     // Clamp between 0 and 100

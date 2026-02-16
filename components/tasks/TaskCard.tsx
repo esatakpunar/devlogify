@@ -107,6 +107,7 @@ export function TaskCard({ task, userId, companyId, onTaskUpdated, onTaskDeleted
   })
 
   const isTimerActive = isRunning && taskId === task.id
+  const resolvedCompanyId = companyId || localTask.company_id || ''
 
   const handleStatusChange = async (newStatus: 'todo' | 'in_progress' | 'done') => {
     if (readOnly || !onTaskUpdated) return
@@ -538,7 +539,7 @@ export function TaskCard({ task, userId, companyId, onTaskUpdated, onTaskDeleted
         onTaskUpdated={handleTaskUpdated}
         readOnly={readOnly}
         userId={userId}
-        companyId={companyId}
+        companyId={resolvedCompanyId}
       />
 
       {/* Add Manual Time Dialog - Only show if not read-only */}

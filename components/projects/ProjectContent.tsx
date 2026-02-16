@@ -20,6 +20,7 @@ type Task = {
   progress: number
   order_index: number
   created_at: string
+  company_id?: string | null
   tags?: string[] | null
 }
 
@@ -106,6 +107,8 @@ export function ProjectContent({ projectId, initialTasks, userId, project }: Pro
           }}
           task={openTask}
           onTaskUpdated={handleTaskUpdated}
+          userId={userId}
+          companyId={openTask.company_id || undefined}
         />
       )}
     </div>
