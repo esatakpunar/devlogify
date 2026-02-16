@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { archiveProject, deleteProject } from '@/lib/supabase/queries/projects'
+import { getTasks } from '@/lib/supabase/queries/tasks'
 import { logProjectDeleted } from '@/lib/supabase/queries/activities'
 import { Button } from '@/components/ui/button'
 import {
@@ -54,9 +55,22 @@ export function ProjectHeader({ project, userId }: ProjectHeaderProps) {
   }
 
   const handleArchive = async () => {
+    let taskImpactText = ''
+    try {
+      const projectTasks = await getTasks(project.id)
+      const openCount = projectTasks.filter((task) => task.status === 'todo').length
+      const inProgressCount = projectTasks.filter((task) => task.status === 'in_progress').length
+      const doneCount = projectTasks.filter((task) => task.status === 'done').length
+      const total = projectTasks.length
+
+      taskImpactText = `\n${total} tasks total (${openCount} todo, ${inProgressCount} in progress, ${doneCount} done).`
+    } catch (error) {
+      console.warn('Failed to load task impact before archive:', error)
+    }
+
     const confirmed = await confirm({
       title: t('projects.areYouSureArchiveProject'),
-      description: t('projects.archiveProjectDescription') || undefined,
+      description: `${t('projects.archiveProjectDescription') || ''}${taskImpactText}`,
       confirmText: t('projects.archive'),
       cancelText: t('common.cancel'),
       variant: 'default',

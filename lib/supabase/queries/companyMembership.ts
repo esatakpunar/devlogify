@@ -61,7 +61,7 @@ export async function getUserCompanyId(
 ): Promise<string | null> {
   const companyId = await getUserCompanyIdFromMembership(userId, supabase)
 
-  if (options?.syncProfile !== false) {
+  if (options?.syncProfile === true) {
     await syncProfileCompanyId(userId, companyId, supabase)
   }
 

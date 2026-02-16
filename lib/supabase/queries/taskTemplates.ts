@@ -6,14 +6,20 @@ export type TaskTemplate = Database['public']['Tables']['task_templates']['Row']
 export type TaskTemplateInsert = Database['public']['Tables']['task_templates']['Insert']
 export type TaskTemplateUpdate = Database['public']['Tables']['task_templates']['Update']
 
-export async function getTaskTemplates(userId: string) {
+export async function getTaskTemplates(userId: string, companyId?: string | null) {
   const supabase = createBrowserClient() as any
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('task_templates')
     .select('*')
     .eq('user_id', userId)
     .order('created_at', { ascending: false })
+
+  if (companyId) {
+    query = query.eq('company_id', companyId)
+  }
+
+  const { data, error } = await query
 
   if (error) throw error
   return data

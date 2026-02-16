@@ -5,7 +5,7 @@ import { CheckCircle2, XCircle, MessageSquare, Loader2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { approveTask, rejectTask, requestChanges } from '@/lib/supabase/queries/tasks'
+import { approveTask, rejectTask, requestChanges, updateTask } from '@/lib/supabase/queries/tasks'
 
 async function createNotificationAndEmail(
   userId: string,
@@ -45,7 +45,7 @@ interface ReviewPanelProps {
   reviewStatus: string | null
   reviewNote: string | null
   isResponsible: boolean
-  onReviewUpdated: (updates: { review_status: string; review_note: string | null }) => void
+  onReviewUpdated: (updates: { review_status: string | null; review_note: string | null }) => void
 }
 
 const reviewStatusColors: Record<string, string> = {
@@ -69,6 +69,44 @@ export function ReviewPanel({
   const [note, setNote] = useState('')
   const [loading, setLoading] = useState(false)
   const t = useTranslation()
+
+  const handleReopenReview = async () => {
+    setLoading(true)
+    try {
+      await updateTask(taskId, {
+        status: 'in_progress',
+        review_status: 'pending',
+        completed_at: null,
+        progress: 50,
+      })
+
+      onReviewUpdated({ review_status: 'pending', review_note: reviewNote || null })
+      toast.success(t('tasks.taskUpdatedSuccessfully'))
+    } catch (error: any) {
+      toast.error(error.message || t('tasks.failedToUpdateTask'))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleFixAndResubmit = async () => {
+    setLoading(true)
+    try {
+      await updateTask(taskId, {
+        status: 'in_progress',
+        review_status: null,
+        review_note: null,
+        completed_at: null,
+        progress: 50,
+      })
+      onReviewUpdated({ review_status: null, review_note: null })
+      toast.success(t('tasks.taskUpdatedSuccessfully'))
+    } catch (error: any) {
+      toast.error(error.message || t('tasks.failedToUpdateTask'))
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleApprove = async () => {
     setLoading(true)
@@ -205,6 +243,30 @@ export function ReviewPanel({
             </Button>
           </div>
         </>
+      )}
+
+      {isResponsible && reviewStatus === 'approved' && (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={handleReopenReview}
+          disabled={loading}
+        >
+          {loading ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
+          Re-open review
+        </Button>
+      )}
+
+      {!isResponsible && (reviewStatus === 'rejected' || reviewStatus === 'changes_requested') && assigneeId === userId && (
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={handleFixAndResubmit}
+          disabled={loading}
+        >
+          {loading ? <Loader2 className="h-3 w-3 animate-spin mr-1" /> : null}
+          Fix and resubmit
+        </Button>
       )}
     </div>
   )

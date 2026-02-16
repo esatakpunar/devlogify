@@ -63,6 +63,7 @@ type TaskItem = {
   updated_at: string
   company_id?: string | null
   tags?: string[] | null
+  completed_at?: string | null
   assignee_id?: string | null
   responsible_id?: string | null
   review_status?: 'pending' | 'approved' | 'rejected' | 'changes_requested' | null
@@ -187,7 +188,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
   const [selectedProjectIds, setSelectedProjectIds] = useState<string[]>([])
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([])
   const [selectedPriorities, setSelectedPriorities] = useState<string[]>([])
-  const [selectedAssigneeIds, setSelectedAssigneeIds] = useState<string[]>([userId])
+  const [selectedAssigneeIds, setSelectedAssigneeIds] = useState<string[]>([])
   const [selectedResponsibleIds, setSelectedResponsibleIds] = useState<string[]>([])
   const [sortKey, setSortKey] = useState<SortKey>('title')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
@@ -452,7 +453,10 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
             ? {
                 ...item,
                 status: overItem.status,
-                progress: overItem.status === 'done' ? 100 : item.progress,
+                progress: overItem.status === 'done' ? 100 : overItem.status === 'in_progress' ? 50 : 0,
+                completed_at: overItem.status === 'done' ? new Date().toISOString() : null,
+                review_status: overItem.status === 'done' ? item.review_status : null,
+                review_note: overItem.status === 'done' ? item.review_note : null,
               }
             : item
         )
@@ -481,7 +485,10 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
     const optimisticTask: TaskItem = {
       ...currentTask,
       status: targetStatus,
-      progress: targetStatus === 'done' ? 100 : currentTask.progress,
+      progress: targetStatus === 'done' ? 100 : targetStatus === 'in_progress' ? 50 : 0,
+      completed_at: targetStatus === 'done' ? new Date().toISOString() : null,
+      review_status: targetStatus === 'done' ? currentTask.review_status : null,
+      review_note: targetStatus === 'done' ? currentTask.review_note : null,
     }
 
     setTasks((prev) => prev.map((item) => (item.id === activeId ? optimisticTask : item)))
@@ -553,7 +560,10 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
     const optimistic = {
       ...task,
       status,
-      progress: status === 'done' ? 100 : task.progress,
+      progress: status === 'done' ? 100 : status === 'in_progress' ? 50 : 0,
+      completed_at: status === 'done' ? new Date().toISOString() : null,
+      review_status: status === 'done' ? task.review_status : null,
+      review_note: status === 'done' ? task.review_note : null,
     }
 
     setTasks((prev) => prev.map((item) => (item.id === task.id ? optimistic : item)))

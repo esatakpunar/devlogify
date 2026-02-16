@@ -110,21 +110,62 @@ export function EditTaskDialog({
     setLoading(true)
 
     try {
+      const parsedDuration = estimatedDuration ? parseInt(estimatedDuration, 10) : null
+      if (parsedDuration !== null && (!Number.isInteger(parsedDuration) || parsedDuration < 1 || parsedDuration > 9999)) {
+        toast.error('Estimated duration must be between 1 and 9999 minutes')
+        setLoading(false)
+        return
+      }
+
       const tagsArray = tags
         .split(',')
         .map(t => t.trim())
         .filter(t => t.length > 0)
+      const normalizedTags = Array.from(new Set(tagsArray))
+      if (normalizedTags.length > 20) {
+        toast.error('You can add at most 20 tags')
+        setLoading(false)
+        return
+      }
+      if (normalizedTags.some((tag) => tag.length > 32)) {
+        toast.error('Each tag can be at most 32 characters')
+        setLoading(false)
+        return
+      }
+
+      const statusChanged = task.status !== status
+      const movingToDone = statusChanged && status === 'done'
+      const movingFromDone = statusChanged && task.status === 'done' && status !== 'done'
 
       const updatedTask = await updateTask(task.id, {
         title,
         description: description || null,
         status,
         priority,
-        estimated_duration: estimatedDuration ? parseInt(estimatedDuration) : null,
-        progress,
-        tags: tagsArray.length > 0 ? tagsArray : null,
+        estimated_duration: parsedDuration,
+        tags: normalizedTags.length > 0 ? normalizedTags : null,
         assignee_id: assigneeId || null,
         responsible_id: responsibleId || null,
+        ...(movingToDone
+          ? {
+              completed_at: new Date().toISOString(),
+              progress: 100,
+              review_status: responsibleId && responsibleId !== userId ? 'pending' : null,
+              review_note: null,
+            }
+          : movingFromDone
+          ? {
+              completed_at: null,
+              progress: status === 'in_progress' ? 50 : 0,
+              review_status: null,
+              review_note: null,
+            }
+          : statusChanged
+          ? {
+              review_status: status === 'done' ? task.review_status : null,
+              review_note: status === 'done' ? task.review_note : null,
+            }
+          : { progress }),
       })
 
       // If assignee changed, notify the new assignee
@@ -301,6 +342,8 @@ export function EditTaskDialog({
                     <Input
                       id="edit-task-duration"
                       type="number"
+                      min={1}
+                      max={9999}
                       placeholder="60"
                       value={estimatedDuration}
                       onChange={(e) => setEstimatedDuration(e.target.value)}
@@ -319,6 +362,7 @@ export function EditTaskDialog({
                       placeholder={t('tasks.tagsPlaceholder')}
                       value={tags}
                       onChange={(e) => setTags(e.target.value)}
+                      maxLength={500}
                       disabled={loading || readOnly}
                       readOnly={readOnly}
                       className="text-sm sm:text-base"

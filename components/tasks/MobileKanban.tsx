@@ -27,6 +27,7 @@ type Task = {
   order_index: number
   created_at: string
   tags?: string[] | null
+  company_id?: string | null
 }
 
 interface Project {
@@ -39,6 +40,7 @@ interface MobileKanbanProps {
   projectId: string
   tasks: Task[]
   userId: string
+  companyId?: string
   project?: Project
   onTaskCreated?: (task: Task) => void
   onTasksCreated?: (tasks: Task[]) => void
@@ -50,6 +52,7 @@ export function MobileKanban({
   projectId,
   tasks,
   userId,
+  companyId,
   project,
   onTaskCreated,
   onTasksCreated,
@@ -210,6 +213,7 @@ export function MobileKanban({
                 key={task.id}
                 task={task}
                 userId={userId}
+                companyId={companyId || task.company_id || ''}
                 onTaskUpdated={onTaskUpdated}
                 onTaskDeleted={onTaskDeleted}
                 readOnly={false}
@@ -225,6 +229,7 @@ export function MobileKanban({
         onOpenChange={setIsCreateDialogOpen}
         projectId={projectId}
         userId={userId}
+        companyId={companyId || tasks[0]?.company_id || undefined}
         onTaskCreated={(task) => {
           onTaskCreated?.(task)
           setIsCreateDialogOpen(false)

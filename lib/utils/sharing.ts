@@ -2,11 +2,13 @@
  * Sharing utilities for collaboration features
  */
 
+import { generateSecureToken } from '@/lib/utils/crypto'
+
 /**
  * Generate a unique share token
  */
 export function generateShareToken(): string {
-  return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+  return generateSecureToken(20)
 }
 
 /**
@@ -31,4 +33,3 @@ export async function copyToClipboard(text: string): Promise<boolean> {
     return false
   }
 }
-

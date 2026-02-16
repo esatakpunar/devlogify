@@ -68,6 +68,7 @@ export function CreateTaskDialog({
   const t = useTranslation()
   const { members } = useCompanyStore()
   const { profile } = useUserProfileStore()
+  const taskCompanyId = companyId || profile?.company_id || null
 
   // Load templates when dialog opens
   useEffect(() => {
@@ -75,11 +76,11 @@ export function CreateTaskDialog({
       loadTemplates()
       setSelectedProjectId(projectId || projects?.[0]?.id || '')
     }
-  }, [open, userId, projectId, projects])
+  }, [open, userId, projectId, projects, taskCompanyId])
 
   const loadTemplates = async () => {
     try {
-      const data = await getTaskTemplates(userId)
+      const data = await getTaskTemplates(userId, taskCompanyId)
       setTemplates(data || [])
     } catch (error) {
       console.error('Error loading templates:', error)
@@ -111,10 +112,28 @@ export function CreateTaskDialog({
     setError(null)
   
     try {
+      const parsedDuration = estimatedDuration ? parseInt(estimatedDuration, 10) : null
+      if (parsedDuration !== null && (!Number.isInteger(parsedDuration) || parsedDuration < 1 || parsedDuration > 9999)) {
+        setError('Estimated duration must be between 1 and 9999 minutes')
+        setLoading(false)
+        return
+      }
+
       const tagsArray = tags
         .split(',')
         .map(t => t.trim())
         .filter(t => t.length > 0)
+      const normalizedTags = Array.from(new Set(tagsArray))
+      if (normalizedTags.length > 20) {
+        setError('You can add at most 20 tags')
+        setLoading(false)
+        return
+      }
+      if (normalizedTags.some((tag) => tag.length > 32)) {
+        setError('Each tag can be at most 32 characters')
+        setLoading(false)
+        return
+      }
 
       const finalProjectId = projectId || selectedProjectId
       if (!finalProjectId) {
@@ -129,11 +148,10 @@ export function CreateTaskDialog({
         title,
         description: description || null,
         priority,
-        estimated_duration: estimatedDuration ? parseInt(estimatedDuration) : null,
+        estimated_duration: parsedDuration,
         status: 'todo',
-        order_index: 0,
-        tags: tagsArray.length > 0 ? tagsArray : null,
-        company_id: companyId || profile?.company_id || null,
+        tags: normalizedTags.length > 0 ? normalizedTags : null,
+        company_id: taskCompanyId,
         assignee_id: assigneeId,
         responsible_id: responsibleId,
       })) as Task
@@ -145,10 +163,8 @@ export function CreateTaskDialog({
         newTask.id,
         'task_created',
         { task_title: title },
-        companyId || profile?.company_id || null
+        taskCompanyId
       )
-
-      const taskCompanyId = companyId || profile?.company_id
 
       // Send notification to assignee (includes email)
       if (assigneeId && taskCompanyId) {
@@ -370,6 +386,8 @@ export function CreateTaskDialog({
               <Input
                 id="task-duration"
                 type="number"
+                min={1}
+                max={9999}
                 placeholder="60"
                 value={estimatedDuration}
                 onChange={(e) => setEstimatedDuration(e.target.value)}
@@ -385,6 +403,7 @@ export function CreateTaskDialog({
                 placeholder={t('tasks.tagsPlaceholder')}
                 value={tags}
                 onChange={(e) => setTags(e.target.value)}
+                maxLength={500}
                 disabled={loading}
                 className="text-sm sm:text-base"
               />

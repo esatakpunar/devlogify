@@ -79,6 +79,7 @@ export function KanbanBoard({
   const router = useRouter()
   const { isPremium } = usePremium(userId)
   const { profile } = useUserProfileStore()
+  const companyId = profile?.company_id || ''
   const [tasks, setTasks] = useState<Task[]>(initialTasks)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isAICreateDialogOpen, setIsAICreateDialogOpen] = useState(false)
@@ -368,6 +369,7 @@ export function KanbanBoard({
             tasks={todoTasks}
             count={todoTasks.length}
             userId={userId}
+            companyId={companyId}
             onTaskUpdated={handleTaskUpdated}
             onTaskDeleted={handleTaskDeleted}
           />
@@ -377,6 +379,7 @@ export function KanbanBoard({
             tasks={inProgressTasks}
             count={inProgressTasks.length}
             userId={userId}
+            companyId={companyId}
             onTaskUpdated={handleTaskUpdated}
             onTaskDeleted={handleTaskDeleted}
           />
@@ -386,6 +389,7 @@ export function KanbanBoard({
             tasks={doneTasks}
             count={doneTasks.length}
             userId={userId}
+            companyId={companyId}
             onTaskUpdated={handleTaskUpdated}
             onTaskDeleted={handleTaskDeleted}
           />
@@ -396,6 +400,7 @@ export function KanbanBoard({
           onOpenChange={setIsCreateDialogOpen}
           projectId={projectId}
           userId={userId}
+          companyId={companyId}
           onTaskCreated={handleTaskCreated}
         />
 

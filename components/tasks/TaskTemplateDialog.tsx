@@ -28,6 +28,7 @@ import { useTranslation } from '@/lib/i18n/useTranslation'
 
 interface TaskTemplateDialogProps {
   userId: string
+  companyId?: string | null
   onTemplateCreated?: () => void
   initialTask?: {
     title: string
@@ -37,7 +38,7 @@ interface TaskTemplateDialogProps {
   }
 }
 
-export function TaskTemplateDialog({ userId, onTemplateCreated, initialTask }: TaskTemplateDialogProps) {
+export function TaskTemplateDialog({ userId, companyId, onTemplateCreated, initialTask }: TaskTemplateDialogProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
   const t = useTranslation()
@@ -67,6 +68,7 @@ export function TaskTemplateDialog({ userId, onTemplateCreated, initialTask }: T
     try {
       await createTaskTemplate({
         user_id: userId,
+        company_id: companyId || null,
         title: formData.title,
         description: formData.description || null,
         priority: formData.priority,
@@ -177,4 +179,3 @@ export function TaskTemplateDialog({ userId, onTemplateCreated, initialTask }: T
     </Dialog>
   )
 }
-

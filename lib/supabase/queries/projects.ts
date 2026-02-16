@@ -123,6 +123,17 @@ export async function updateProject(id: string, updates: ProjectUpdate) {
 export async function deleteProject(id: string) {
   const supabase = createBrowserClient() as any
 
+  // Remove project share links first to avoid dangling public links.
+  const { error: shareDeleteError } = await supabase
+    .from('shared_links')
+    .delete()
+    .eq('resource_type', 'project')
+    .eq('resource_id', id)
+
+  if (shareDeleteError) {
+    throw shareDeleteError
+  }
+
   const { error } = await supabase
     .from('projects')
     .delete()
@@ -179,6 +190,7 @@ export async function getProjectsWithNotes(companyId: string) {
     .from('projects')
     .select('*')
     .eq('company_id', companyId)
+    .eq('status', 'active')
     .order('created_at', { ascending: false })
 
   if (error) throw error

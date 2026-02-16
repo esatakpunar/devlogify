@@ -16,6 +16,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Token is required' }, { status: 400 })
     }
 
+    const { data: invitation, error: invitationError } = await (supabase as any)
+      .from('invitations')
+      .select('id, email, status, expires_at')
+      .eq('token', token)
+      .maybeSingle()
+
+    if (invitationError || !invitation) {
+      return NextResponse.json({ error: 'Invalid invitation token' }, { status: 404 })
+    }
+
+    if (invitation.status !== 'pending') {
+      return NextResponse.json({ error: 'Invitation is not active' }, { status: 400 })
+    }
+
+    if (new Date(invitation.expires_at) < new Date()) {
+      return NextResponse.json({ error: 'Invitation has expired' }, { status: 400 })
+    }
+
+    if (!user.email || invitation.email.toLowerCase() !== user.email.toLowerCase()) {
+      return NextResponse.json(
+        { error: 'This invitation is for a different email address' },
+        { status: 403 }
+      )
+    }
+
     // Use SECURITY DEFINER RPC - handles full invitation acceptance flow
     const { data, error } = await (supabase as any).rpc('accept_company_invitation', {
       p_token: token,

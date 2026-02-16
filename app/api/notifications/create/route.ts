@@ -44,7 +44,7 @@ export async function POST(request: Request) {
     const adminClient = createSupabaseClient<Database>(supabaseUrl, supabaseServiceKey)
 
     // Insert notification directly (bypasses RLS with service_role)
-    const { data: notification, error } = await adminClient
+    const { data: notification, error } = await (adminClient as any)
       .from('notifications')
       .insert({
         user_id: userId,

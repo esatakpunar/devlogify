@@ -33,8 +33,8 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
   try {
     const project = (await getProject(id, supabase)) as Project
 
-    // Verify company ownership
-    if (project.company_id !== companyId && project.user_id !== user.id) {
+    // Strict company boundary: project must belong to active company context.
+    if (project.company_id !== companyId) {
       notFound()
     }
 

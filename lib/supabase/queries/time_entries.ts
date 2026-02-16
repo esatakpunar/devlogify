@@ -35,6 +35,11 @@ export async function startTimeEntry(taskId: string, userId: string) {
   const supabase = createBrowserClient() as any
   const startTime = new Date()
 
+  const activeEntry = await getActiveTimeEntry(userId)
+  if (activeEntry) {
+    throw new Error('You already have an active timer running. Stop it before starting another one.')
+  }
+
   const { data, error } = await supabase
     .from('time_entries')
     .insert({
@@ -62,21 +67,39 @@ export async function stopTimeEntry(
   const supabase = createBrowserClient() as any
   const endTime = new Date()
 
-  // Update the time entry
-  const { error: timeEntryError } = await supabase
+  // Find active time entry.
+  const { data: activeEntry, error: activeEntryError } = await supabase
+    .from('time_entries')
+    .select('id')
+    .eq('task_id', taskId)
+    .eq('user_id', userId)
+    .is('ended_at', null)
+    .maybeSingle()
+
+  if (activeEntryError) throw activeEntryError
+  if (!activeEntry) {
+    throw new Error('No active timer found for this task')
+  }
+
+  // Stop exactly one active entry; protect against duplicate stop requests.
+  const { data: stoppedEntry, error: timeEntryError } = await supabase
     .from('time_entries')
     .update({
       ended_at: endTime.toISOString(),
       duration: durationMinutes,
       note: note || null,
     })
-    .eq('task_id', taskId)
-    .eq('user_id', userId)
+    .eq('id', activeEntry.id)
     .is('ended_at', null)
+    .select('id')
+    .maybeSingle()
 
   if (timeEntryError) throw timeEntryError
+  if (!stoppedEntry) {
+    throw new Error('Active timer was already stopped')
+  }
 
-  // Get task info and update actual duration
+  // Read metadata for logging/use-site and atomically increment tracked duration.
   const { data: task, error: taskError } = await supabase
     .from('tasks')
     .select('actual_duration, project_id, company_id')
@@ -85,12 +108,10 @@ export async function stopTimeEntry(
 
   if (taskError) throw taskError
 
-  const { error: updateError } = await supabase
-    .from('tasks')
-    .update({
-      actual_duration: task.actual_duration + durationMinutes
-    })
-    .eq('id', taskId)
+  const { error: updateError } = await supabase.rpc('increment_task_duration', {
+    task_id: taskId,
+    minutes: durationMinutes,
+  })
 
   if (updateError) throw updateError
 
@@ -125,7 +146,7 @@ export async function addManualTimeEntry(
 
   if (timeEntryError) throw timeEntryError
 
-  // Get task info and update actual duration
+  // Get task info and update actual duration atomically
   const { data: task, error: taskError } = await supabase
     .from('tasks')
     .select('actual_duration, project_id, company_id')
@@ -134,12 +155,10 @@ export async function addManualTimeEntry(
 
   if (taskError) throw taskError
 
-  const { error: updateError } = await supabase
-    .from('tasks')
-    .update({
-      actual_duration: task.actual_duration + minutes
-    })
-    .eq('id', taskId)
+  const { error: updateError } = await supabase.rpc('increment_task_duration', {
+    task_id: taskId,
+    minutes,
+  })
 
   if (updateError) throw updateError
 
@@ -202,15 +221,9 @@ export async function getActiveTimeEntry(userId: string) {
     .select('*')
     .eq('user_id', userId)
     .is('ended_at', null)
-    .single()
+    .maybeSingle()
 
-  if (error) {
-    if (error.code === 'PGRST116') {
-      // No active timer found
-      return null
-    }
-    throw error
-  }
+  if (error) throw error
 
-  return data as TimeEntry
+  return (data as TimeEntry) || null
 }

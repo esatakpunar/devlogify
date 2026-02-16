@@ -23,7 +23,7 @@ export default async function KanbanPage() {
 
   const [projects, tasks] = await Promise.all([
     getProjectOptions(companyId, 'active', supabase),
-    getCompanyTasks(companyId, supabase),
+    getCompanyTasks(companyId, { limit: 300, offset: 0 }, supabase),
   ])
 
   return (

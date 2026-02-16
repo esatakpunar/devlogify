@@ -67,6 +67,68 @@ export type TaskWithDetails = Task & {
   } | null
 }
 
+export type TaskStatus = 'todo' | 'in_progress' | 'done'
+
+export interface TaskQueryOptions {
+  limit?: number
+  offset?: number
+  statusFilter?: TaskStatus[]
+  projectIds?: string[]
+}
+
+const MAX_ESTIMATED_DURATION = 9999
+const MAX_TAGS_PER_TASK = 20
+const MAX_TAG_LENGTH = 32
+
+function validateEstimatedDuration(value: number | null | undefined) {
+  if (value === null || value === undefined) return
+  if (!Number.isInteger(value) || value < 1 || value > MAX_ESTIMATED_DURATION) {
+    throw new Error(`Estimated duration must be an integer between 1 and ${MAX_ESTIMATED_DURATION}`)
+  }
+}
+
+function normalizeTags(tags: string[] | null | undefined): string[] | null {
+  if (!tags || tags.length === 0) return null
+
+  const normalized = Array.from(
+    new Set(
+      tags
+        .map((tag) => tag.trim())
+        .filter((tag) => tag.length > 0)
+    )
+  )
+
+  if (normalized.length > MAX_TAGS_PER_TASK) {
+    throw new Error(`A task can have at most ${MAX_TAGS_PER_TASK} tags`)
+  }
+
+  for (const tag of normalized) {
+    if (tag.length > MAX_TAG_LENGTH) {
+      throw new Error(`Each tag can be at most ${MAX_TAG_LENGTH} characters`)
+    }
+  }
+
+  return normalized
+}
+
+function getStatusTransitionUpdates(status: TaskStatus): TaskUpdate {
+  if (status === 'done') {
+    return {
+      status,
+      completed_at: new Date().toISOString(),
+      progress: 100,
+    }
+  }
+
+  return {
+    status,
+    completed_at: null,
+    progress: status === 'in_progress' ? 50 : 0,
+    review_status: null,
+    review_note: null,
+  }
+}
+
 export async function getTasks(projectId: string, supabaseClient?: SupabaseClient<Database>) {
   const supabase = (supabaseClient || createBrowserClient()) as any
 
@@ -85,12 +147,16 @@ export async function getTasks(projectId: string, supabaseClient?: SupabaseClien
 }
 
 /**
- * Get all tasks in a company across all projects (only active projects)
+ * Get company tasks with bounded pagination for free-plan friendly reads.
  */
-export async function getCompanyTasks(companyId: string, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithDetails[]> {
+export async function getCompanyTasks(
+  companyId: string,
+  options: TaskQueryOptions = {},
+  supabaseClient?: SupabaseClient<Database>
+): Promise<TaskWithDetails[]> {
   const supabase = (supabaseClient || createBrowserClient()) as any
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('tasks')
     .select(`
       id,
@@ -120,7 +186,23 @@ export async function getCompanyTasks(companyId: string, supabaseClient?: Supaba
     `)
     .eq('company_id', companyId)
     .eq('project.status', 'active')
+
+  if (options.statusFilter && options.statusFilter.length > 0) {
+    query = query.in('status', options.statusFilter)
+  }
+
+  if (options.projectIds && options.projectIds.length > 0) {
+    query = query.in('project_id', options.projectIds)
+  }
+
+  const limit = Math.min(Math.max(options.limit || 200, 1), 500)
+  const offset = Math.max(options.offset || 0, 0)
+
+  query = query
     .order('updated_at', { ascending: false })
+    .range(offset, offset + limit - 1)
+
+  const { data, error } = await query
 
   if (error) throw error
   return data as TaskWithDetails[]
@@ -145,10 +227,32 @@ export async function getTask(id: string) {
 
 export async function createTask(task: TaskInsert, supabaseClient?: SupabaseClient<Database>) {
   const supabase = (supabaseClient || createBrowserClient()) as any
+  validateEstimatedDuration(task.estimated_duration)
+
+  const normalizedTags = normalizeTags(task.tags || null)
+  const taskStatus = task.status || 'todo'
+  const nextTask: TaskInsert = {
+    ...task,
+    tags: normalizedTags,
+  }
+
+  if (nextTask.order_index === undefined || nextTask.order_index === null) {
+    const { data: lastTask, error: orderError } = await supabase
+      .from('tasks')
+      .select('order_index')
+      .eq('project_id', task.project_id)
+      .eq('status', taskStatus)
+      .order('order_index', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (orderError) throw orderError
+    nextTask.order_index = (lastTask?.order_index ?? -1) + 1
+  }
 
   const { data, error } = await supabase
     .from('tasks')
-    .insert(task)
+    .insert(nextTask)
     .select()
     .single()
 
@@ -177,10 +281,19 @@ export async function createTasks(tasks: TaskInsert[]) {
 
 export async function updateTask(id: string, updates: TaskUpdate) {
   const supabase = createBrowserClient() as any
+  validateEstimatedDuration(updates.estimated_duration)
+
+  const nextUpdates: TaskUpdate = {
+    ...updates,
+  }
+
+  if (updates.tags !== undefined) {
+    nextUpdates.tags = normalizeTags(updates.tags)
+  }
 
   const { data, error } = await supabase
     .from('tasks')
-    .update(updates)
+    .update(nextUpdates)
     .eq('id', id)
     .select()
     .single()
@@ -200,18 +313,10 @@ export async function deleteTask(id: string) {
   if (error) throw error
 }
 
-export async function updateTaskStatus(id: string, status: 'todo' | 'in_progress' | 'done') {
+export async function updateTaskStatus(id: string, status: TaskStatus) {
   const supabase = createBrowserClient() as any
 
-  const updates: TaskUpdate = {
-    status,
-    ...(status === 'done'
-      ? {
-          completed_at: new Date().toISOString(),
-          progress: 100
-        }
-      : { completed_at: null })
-  }
+  const updates = getStatusTransitionUpdates(status)
 
   const { data, error } = await supabase
     .from('tasks')
@@ -504,7 +609,7 @@ export async function requestChanges(taskId: string, userId: string, note?: stri
 /**
  * Submit task for review (by assignee, moves to done with pending review)
  */
-export async function submitForReview(taskId: string) {
+export async function submitForReview(taskId: string, userId: string) {
   const supabase = createBrowserClient() as any
 
   const { data, error } = await supabase
@@ -516,6 +621,7 @@ export async function submitForReview(taskId: string) {
       progress: 100,
     })
     .eq('id', taskId)
+    .eq('assignee_id', userId)
     .select()
     .single()
 
@@ -528,6 +634,20 @@ export async function submitForReview(taskId: string) {
  */
 export async function addTagsToTasks(taskIds: string[], tags: string[], supabaseClient?: SupabaseClient<Database>) {
   const supabase = (supabaseClient || createBrowserClient()) as any
+  const normalizedTags = normalizeTags(tags) || []
+  if (taskIds.length === 0 || normalizedTags.length === 0) {
+    return []
+  }
+
+  // Prefer a single SQL statement to avoid N+1 update overhead.
+  const { data: rpcData, error: rpcError } = await supabase.rpc('append_tags_to_tasks', {
+    task_ids: taskIds,
+    tags_to_add: normalizedTags,
+  })
+
+  if (!rpcError) {
+    return rpcData || []
+  }
 
   const { data: existingTasks, error: fetchError } = await supabase
     .from('tasks')
@@ -546,7 +666,7 @@ export async function addTagsToTasks(taskIds: string[], tags: string[], supabase
 
   const updates = existingTasks.map((task: { id: string; tags: string[] | null }) => {
     const existingTags = (task.tags || []) as string[]
-    const newTags = [...new Set([...existingTags, ...tags])]
+    const newTags = normalizeTags([...existingTags, ...normalizedTags]) || []
     return {
       id: task.id,
       tags: newTags

@@ -14,22 +14,23 @@ import type { TaskTemplate } from '@/lib/supabase/queries/taskTemplates'
 
 interface TemplateSelectorProps {
   userId: string
+  companyId?: string | null
   onSelect: (template: TaskTemplate) => void
   placeholder?: string
 }
 
-export function TemplateSelector({ userId, onSelect, placeholder = 'Select template...' }: TemplateSelectorProps) {
+export function TemplateSelector({ userId, companyId, onSelect, placeholder = 'Select template...' }: TemplateSelectorProps) {
   const [templates, setTemplates] = useState<TaskTemplate[]>([])
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     loadTemplates()
-  }, [userId])
+  }, [userId, companyId])
 
   const loadTemplates = async () => {
     setLoading(true)
     try {
-      const data = await getTaskTemplates(userId)
+      const data = await getTaskTemplates(userId, companyId)
       setTemplates(data || [])
     } catch (error) {
       console.error('Error loading templates:', error)
@@ -84,4 +85,3 @@ export function TemplateSelector({ userId, onSelect, placeholder = 'Select templ
     </Select>
   )
 }
-

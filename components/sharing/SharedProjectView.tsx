@@ -227,6 +227,7 @@ export function SharedProjectView({ project, tasks, shareLink }: SharedProjectVi
             count={todoTasks.length}
             projectId={project.id}
             userId=""
+            companyId=""
             onTaskClick={handleTaskClick}
             readOnly
           />
@@ -237,6 +238,7 @@ export function SharedProjectView({ project, tasks, shareLink }: SharedProjectVi
             count={inProgressTasks.length}
             projectId={project.id}
             userId=""
+            companyId=""
             onTaskClick={handleTaskClick}
             readOnly
           />
@@ -247,6 +249,7 @@ export function SharedProjectView({ project, tasks, shareLink }: SharedProjectVi
             count={doneTasks.length}
             projectId={project.id}
             userId=""
+            companyId=""
             onTaskClick={handleTaskClick}
             readOnly
           />
@@ -298,6 +301,7 @@ export function SharedProjectView({ project, tasks, shareLink }: SharedProjectVi
                     key={task.id}
                     task={task}
                     userId=""
+                    companyId=""
                     readOnly={true}
                     onClick={() => handleTaskClick(task)}
                   />

@@ -1,17 +1,9 @@
 import { createClient as createBrowserClient } from '@/lib/supabase/client'
 import type { Database } from '@/types/supabase'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { generateSecureToken } from '@/lib/utils/crypto'
 
 export type Invitation = Database['public']['Tables']['invitations']['Row']
-
-function generateToken(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  let token = ''
-  for (let i = 0; i < 32; i++) {
-    token += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
-  return token
-}
 
 export async function createInvitation(
   companyId: string,
@@ -20,7 +12,7 @@ export async function createInvitation(
   invitedBy: string
 ) {
   const supabase = createBrowserClient() as any
-  const token = generateToken()
+  const token = generateSecureToken(32)
   const expiresAt = new Date()
   expiresAt.setDate(expiresAt.getDate() + 7) // 7 days expiry
 

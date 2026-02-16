@@ -1,6 +1,7 @@
 import { createClient as createBrowserClient } from '@/lib/supabase/client'
 import type { Database, CompanyMemberWithProfile } from '@/types/supabase'
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { generateSecureCode } from '@/lib/utils/crypto'
 
 export type Company = Database['public']['Tables']['companies']['Row']
 export type CompanyInsert = Database['public']['Tables']['companies']['Insert']
@@ -8,12 +9,7 @@ export type CompanyUpdate = Database['public']['Tables']['companies']['Update']
 export type CompanyMember = Database['public']['Tables']['company_members']['Row']
 
 function generateJoinCode(): string {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
-  let code = ''
-  for (let i = 0; i < 8; i++) {
-    code += chars.charAt(Math.floor(Math.random() * chars.length))
-  }
-  return code
+  return generateSecureCode(8)
 }
 
 function generateSlug(name: string): string {
@@ -155,6 +151,31 @@ export async function updateMemberRole(memberId: string, role: 'admin' | 'member
 export async function removeMember(companyId: string, userId: string) {
   const supabase = createBrowserClient() as any
 
+  // Unassign user from task roles in this company to avoid orphaned assignments.
+  await supabase
+    .from('tasks')
+    .update({ assignee_id: null })
+    .eq('company_id', companyId)
+    .eq('assignee_id', userId)
+
+  await supabase
+    .from('tasks')
+    .update({ responsible_id: null, review_status: null })
+    .eq('company_id', companyId)
+    .eq('responsible_id', userId)
+
+  // Stop/remove any active timers for this company membership.
+  await supabase
+    .from('time_entries')
+    .delete()
+    .eq('company_id', companyId)
+    .eq('user_id', userId)
+
+  await supabase
+    .from('recurring_tasks')
+    .delete()
+    .eq('user_id', userId)
+
   // Remove from all teams in this company
   const { data: teams } = await supabase
     .from('teams')
@@ -181,10 +202,18 @@ export async function removeMember(companyId: string, userId: string) {
 
   if (error) throw error
 
-  // Clear company_id from profile
+  // Keep profile.company_id aligned with latest membership.
+  const { data: latestMembership } = await supabase
+    .from('company_members')
+    .select('company_id')
+    .eq('user_id', userId)
+    .order('joined_at', { ascending: false })
+    .limit(1)
+    .maybeSingle()
+
   const { error: clearProfileError } = await supabase
     .from('profiles')
-    .update({ company_id: null })
+    .update({ company_id: latestMembership?.company_id || null })
     .eq('id', userId)
 
   if (clearProfileError) {
@@ -194,12 +223,17 @@ export async function removeMember(companyId: string, userId: string) {
 
 export async function joinByCode(joinCode: string, userId: string) {
   const supabase = createBrowserClient() as any
+  const normalizedCode = joinCode.trim().toUpperCase()
+
+  if (!normalizedCode) {
+    throw new Error('Join code is required')
+  }
 
   // Find company by join code
   const { data: company, error: findError } = await supabase
     .from('companies')
     .select('id')
-    .eq('join_code', joinCode.toUpperCase())
+    .eq('join_code', normalizedCode)
     .single()
 
   if (findError || !company) {
@@ -216,6 +250,20 @@ export async function joinByCode(joinCode: string, userId: string) {
 
   if (existing) {
     throw new Error('Already a member of this company')
+  }
+
+  // The app currently operates with one active company context per user.
+  const { data: otherMembership, error: membershipError } = await supabase
+    .from('company_members')
+    .select('company_id')
+    .eq('user_id', userId)
+    .neq('company_id', company.id)
+    .limit(1)
+    .maybeSingle()
+
+  if (membershipError) throw membershipError
+  if (otherMembership) {
+    throw new Error('You are already a member of another company')
   }
 
   // Add as member

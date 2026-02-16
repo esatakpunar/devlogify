@@ -382,6 +382,7 @@ export type Database = {
         Row: {
           id: string
           user_id: string
+          company_id: string | null
           title: string
           description: string | null
           priority: 'low' | 'medium' | 'high'
@@ -393,6 +394,7 @@ export type Database = {
         Insert: {
           id?: string
           user_id: string
+          company_id?: string | null
           title: string
           description?: string | null
           priority?: 'low' | 'medium' | 'high'
@@ -404,6 +406,7 @@ export type Database = {
         Update: {
           id?: string
           user_id?: string
+          company_id?: string | null
           title?: string
           description?: string | null
           priority?: 'low' | 'medium' | 'high'
