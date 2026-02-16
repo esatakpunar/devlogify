@@ -188,7 +188,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
   const [selectedProjectIds, setSelectedProjectIds] = useState<string[]>([])
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([])
   const [selectedPriorities, setSelectedPriorities] = useState<string[]>([])
-  const [selectedAssigneeIds, setSelectedAssigneeIds] = useState<string[]>([])
+  const [selectedAssigneeIds, setSelectedAssigneeIds] = useState<string[]>([userId])
   const [selectedResponsibleIds, setSelectedResponsibleIds] = useState<string[]>([])
   const [sortKey, setSortKey] = useState<SortKey>('title')
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc')
@@ -198,7 +198,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
   const [draftProjectIds, setDraftProjectIds] = useState<string[]>([])
   const [draftStatuses, setDraftStatuses] = useState<string[]>([])
   const [draftPriorities, setDraftPriorities] = useState<string[]>([])
-  const [draftAssigneeIds, setDraftAssigneeIds] = useState<string[]>([])
+  const [draftAssigneeIds, setDraftAssigneeIds] = useState<string[]>([userId])
   const [draftResponsibleIds, setDraftResponsibleIds] = useState<string[]>([])
   const [listRenderCount, setListRenderCount] = useState(LIST_PAGE_SIZE)
 
