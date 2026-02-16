@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { updateTask } from '@/lib/supabase/queries/tasks'
-import { notifyTaskAssigned } from '@/lib/notifications/triggers'
+import { notifyTaskAssigned, notifyTaskStatusChanged, notifyReviewRequested } from '@/lib/notifications/triggers'
 import {
   Dialog,
   DialogContent,
@@ -72,6 +72,7 @@ export function EditTaskDialog({
 }: EditTaskDialogProps) {
   const [title, setTitle] = useState(task.title)
   const [description, setDescription] = useState(task.description || '')
+  const [status, setStatus] = useState<'todo' | 'in_progress' | 'done'>(task.status)
   const [priority, setPriority] = useState<'low' | 'medium' | 'high'>(task.priority)
   const [estimatedDuration, setEstimatedDuration] = useState(task.estimated_duration?.toString() || '')
   const [progress, setProgress] = useState(task.progress)
@@ -88,6 +89,7 @@ export function EditTaskDialog({
   useEffect(() => {
     setTitle(task.title)
     setDescription(task.description || '')
+    setStatus(task.status)
     setPriority(task.priority)
     setEstimatedDuration(task.estimated_duration?.toString() || '')
     setProgress(task.progress)
@@ -116,6 +118,7 @@ export function EditTaskDialog({
       const updatedTask = await updateTask(task.id, {
         title,
         description: description || null,
+        status,
         priority,
         estimated_duration: estimatedDuration ? parseInt(estimatedDuration) : null,
         progress,
@@ -127,6 +130,7 @@ export function EditTaskDialog({
       // If assignee changed, notify the new assignee
       const newAssigneeId = assigneeId || null
       const oldAssigneeId = task.assignee_id || null
+
       if (newAssigneeId && newAssigneeId !== oldAssigneeId && userId && companyId) {
         notifyTaskAssigned({
           taskId: task.id,
@@ -135,7 +139,52 @@ export function EditTaskDialog({
           companyId,
           actorId: userId,
           assigneeId: newAssigneeId,
-        }).catch(err => console.error('Failed to send assignment notification:', err))
+        }).catch(err => {
+          console.error('[Notification] Failed to send assignment notification:', err)
+          toast.error(t('tasks.failedToSendNotification') || 'Failed to send notification')
+        })
+      }
+
+      // If status changed, notify assignee and responsible
+      const oldStatus = task.status
+      const newStatus = status
+
+      if (oldStatus !== newStatus && userId && companyId) {
+        // Notify about status change
+        if (assigneeId || responsibleId) {
+          notifyTaskStatusChanged({
+            taskId: task.id,
+            taskTitle: title,
+            projectId: task.project_id,
+            companyId,
+            actorId: userId,
+            assigneeId: assigneeId || null,
+            responsibleId: responsibleId || null,
+            oldStatus,
+            newStatus,
+          }).catch(err => {
+            console.error('[Notification] Failed to send status change notification:', err)
+          })
+        }
+
+        // Auto-request review when marked as done
+        if (
+          newStatus === 'done' &&
+          responsibleId &&
+          responsibleId !== userId &&
+          !task.review_status
+        ) {
+          notifyReviewRequested({
+            taskId: task.id,
+            taskTitle: title,
+            projectId: task.project_id,
+            companyId,
+            actorId: userId,
+            responsibleId: responsibleId,
+          }).catch(err => {
+            console.error('[Notification] Failed to send review request notification:', err)
+          })
+        }
       }
 
       onTaskUpdated(updatedTask)
@@ -205,6 +254,26 @@ export function EditTaskDialog({
 
               <div className="lg:col-span-1 space-y-3 sm:space-y-4 lg:pl-2">
                 <div className="space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-task-status" className="text-xs sm:text-sm">
+                      {t('tasks.status')}
+                    </Label>
+                    <Select
+                      value={status}
+                      onValueChange={(value: 'todo' | 'in_progress' | 'done') => setStatus(value)}
+                      disabled={loading || readOnly}
+                    >
+                      <SelectTrigger id="edit-task-status" className="w-full text-sm sm:text-base">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todo">{t('kanban.todo')}</SelectItem>
+                        <SelectItem value="in_progress">{t('kanban.inProgress')}</SelectItem>
+                        <SelectItem value="done">{t('kanban.done')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="edit-task-priority" className="text-xs sm:text-sm">
                       {t('tasks.priority')}

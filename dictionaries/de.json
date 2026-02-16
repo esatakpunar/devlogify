@@ -306,6 +306,7 @@
     "updateTaskDetails": "Aktualisieren Sie Ihre Aufgabendetails",
     "taskUpdatedSuccessfully": "Aufgabe erfolgreich aktualisiert",
     "failedToUpdateTask": "Aufgabe konnte nicht aktualisiert werden",
+    "failedToSendNotification": "Benachrichtigung konnte nicht gesendet werden",
     "progress": "Fortschritt",
     "clickProgressBarToSet": "Klicken Sie auf die Fortschrittsleiste, um den Fortschritt festzulegen",
     "timeStatus": "Zeitstatus",

@@ -10,7 +10,6 @@ async function createNotificationWithEmail(
   message: string,
   metadata?: Record<string, any>
 ) {
-  // Create notification via API route (server-side, no RLS issues)
   const res = await fetch('/api/notifications/create', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -20,11 +19,9 @@ async function createNotificationWithEmail(
   const data = await res.json()
 
   if (!res.ok) {
-    console.error('[createNotificationWithEmail] API error:', data.error)
+    console.error('[Notification] Failed to create:', data.error)
     throw new Error(data.error || 'Failed to create notification')
   }
-
-  const notification = data.notification
 
   // TODO: Email sending disabled - enable when domain is configured
   // fetch('/api/notifications/send-email', {
@@ -35,11 +32,11 @@ async function createNotificationWithEmail(
   //     subject: title,
   //     message,
   //     type,
-  //     notificationId: notification?.id,
+  //     notificationId: data.notification?.id,
   //   }),
-  // }).catch(err => console.error('Failed to trigger email:', err))
+  // }).catch(err => console.error('[Notification] Email send failed:', err))
 
-  return notification
+  return data.notification
 }
 
 /**
@@ -108,20 +105,17 @@ export async function notifyTaskAssigned(params: {
 }) {
   const { taskId, taskTitle, companyId, actorId, assigneeId, projectId } = params
 
+  // Don't notify if user assigns task to themselves
   if (assigneeId === actorId) return
 
-  try {
-    await createNotificationWithEmail(
-      assigneeId,
-      companyId,
-      'task_assigned',
-      'Task assigned to you',
-      `You have been assigned to "${taskTitle}"`,
-      { task_id: taskId, project_id: projectId }
-    )
-  } catch (err) {
-    console.error('Failed to notify about task assignment:', err)
-  }
+  await createNotificationWithEmail(
+    assigneeId,
+    companyId,
+    'task_assigned',
+    'Task assigned to you',
+    `You have been assigned to "${taskTitle}"`,
+    { task_id: taskId, project_id: projectId }
+  )
 }
 
 /**
@@ -139,16 +133,13 @@ export async function notifyReviewRequested(params: {
 
   if (responsibleId === actorId) return
 
-  try {
-    await createNotificationWithEmail(
-      responsibleId,
-      companyId,
-      'task_review_requested',
-      'Review requested',
-      `"${taskTitle}" is ready for your review`,
-      { task_id: taskId, project_id: projectId }
-    )
-  } catch (err) {
-    console.error('Failed to notify about review request:', err)
-  }
+  // Let errors propagate to calling code for proper error handling
+  await createNotificationWithEmail(
+    responsibleId,
+    companyId,
+    'task_review_requested',
+    'Review requested',
+    `"${taskTitle}" is ready for your review`,
+    { task_id: taskId, project_id: projectId }
+  )
 }

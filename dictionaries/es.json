@@ -306,6 +306,7 @@
     "updateTaskDetails": "Actualiza los detalles de tu tarea",
     "taskUpdatedSuccessfully": "Tarea actualizada exitosamente",
     "failedToUpdateTask": "Error al actualizar tarea",
+    "failedToSendNotification": "Error al enviar la notificación",
     "progress": "Progreso",
     "clickProgressBarToSet": "Haz clic en la barra de progreso para establecer el progreso",
     "timeStatus": "Estado del Tiempo",

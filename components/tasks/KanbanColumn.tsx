@@ -31,6 +31,7 @@ interface KanbanColumnProps {
   count?: number
   projectId?: string
   userId: string
+  companyId: string
   onTaskUpdated?: (task: Task) => void
   onTaskDeleted?: (taskId: string) => void
   onTaskClick?: (task: Task) => void
@@ -49,14 +50,15 @@ const statusColors = {
   done: 'text-green-500 bg-green-50 dark:text-green-400 dark:bg-green-900/20'
 }
 
-export function KanbanColumn({ 
-  title, 
-  status, 
-  tasks, 
-  count, 
+export function KanbanColumn({
+  title,
+  status,
+  tasks,
+  count,
   projectId,
-  userId, 
-  onTaskUpdated, 
+  userId,
+  companyId,
+  onTaskUpdated,
   onTaskDeleted,
   onTaskClick,
   readOnly = false
@@ -238,9 +240,10 @@ export function KanbanColumn({
                 }}
                 className="relative"
               >
-                <TaskCard 
+                <TaskCard
                   task={task}
                   userId={userId}
+                  companyId={companyId}
                   onTaskUpdated={onTaskUpdated}
                   onTaskDeleted={onTaskDeleted}
                   onClick={onTaskClick ? () => onTaskClick(task) : undefined}

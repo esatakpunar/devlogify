@@ -287,6 +287,7 @@
     "done": "Done",
     "taskUpdatedSuccessfully": "Task updated successfully",
     "failedToUpdateTask": "Failed to update task",
+    "failedToSendNotification": "Failed to send notification",
     "quickStartFromTemplate": "Quick Start from Template",
     "browseTemplates": "Browse Templates",
     "selectATemplate": "Select a template",

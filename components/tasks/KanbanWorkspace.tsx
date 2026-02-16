@@ -32,6 +32,7 @@ import { updateTask, updateTaskStatus } from '@/lib/supabase/queries/tasks'
 import { logActivity } from '@/lib/supabase/queries/activities'
 import { usePremium } from '@/lib/hooks/usePremium'
 import { useCompanyStore } from '@/lib/store/companyStore'
+import { notifyTaskAssigned, notifyTaskStatusChanged, notifyReviewRequested } from '@/lib/notifications/triggers'
 
 type ProjectOption = {
   id: string
@@ -499,6 +500,44 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
         },
         companyId
       )
+
+      // Notify assignee and responsible about status change
+      if (currentTask.assignee_id || currentTask.responsible_id) {
+        notifyTaskStatusChanged({
+          taskId: currentTask.id,
+          taskTitle: currentTask.title,
+          projectId: currentTask.project_id,
+          companyId,
+          actorId: userId,
+          assigneeId: currentTask.assignee_id || null,
+          responsibleId: currentTask.responsible_id || null,
+          oldStatus: currentTask.status,
+          newStatus: targetStatus,
+        }).catch(err => {
+          console.error('[Notification] Failed to send status change notification:', err)
+        })
+      }
+
+      // Auto-request review when task is marked as done
+      // Only if: task has responsible, actor is not responsible, not already in review
+      if (
+        targetStatus === 'done' &&
+        currentTask.responsible_id &&
+        currentTask.responsible_id !== userId &&
+        !currentTask.review_status
+      ) {
+        notifyReviewRequested({
+          taskId: currentTask.id,
+          taskTitle: currentTask.title,
+          projectId: currentTask.project_id,
+          companyId,
+          actorId: userId,
+          responsibleId: currentTask.responsible_id,
+        }).catch(err => {
+          console.error('[Notification] Failed to send review request notification:', err)
+        })
+      }
+
       toast.success(t('tasks.taskMarkedAsComplete'))
     } catch (error) {
       console.error('Failed to update task status:', error)
@@ -533,6 +572,44 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
         },
         companyId
       )
+
+      // Notify assignee and responsible about status change
+      if (task.assignee_id || task.responsible_id) {
+        notifyTaskStatusChanged({
+          taskId: task.id,
+          taskTitle: task.title,
+          projectId: task.project_id,
+          companyId,
+          actorId: userId,
+          assigneeId: task.assignee_id || null,
+          responsibleId: task.responsible_id || null,
+          oldStatus: previous.status,
+          newStatus: status,
+        }).catch(err => {
+          console.error('[Notification] Failed to send status change notification:', err)
+        })
+      }
+
+      // Auto-request review when task is marked as done
+      // Only if: task has responsible, actor is not responsible, not already in review
+      if (
+        status === 'done' &&
+        task.responsible_id &&
+        task.responsible_id !== userId &&
+        !task.review_status
+      ) {
+        notifyReviewRequested({
+          taskId: task.id,
+          taskTitle: task.title,
+          projectId: task.project_id,
+          companyId,
+          actorId: userId,
+          responsibleId: task.responsible_id,
+        }).catch(err => {
+          console.error('[Notification] Failed to send review request notification:', err)
+        })
+      }
+
       toast.success(t('tasks.taskUpdatedSuccessfully'))
     } catch (error) {
       console.error('Failed to update task status:', error)
@@ -573,6 +650,27 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
             : item
         )
       )
+
+      // If assignee changed, notify the new assignee
+      if (updates.assignee_id !== undefined) {
+        const newAssigneeId = updates.assignee_id
+        const oldAssigneeId = task.assignee_id || null
+
+        if (newAssigneeId && newAssigneeId !== oldAssigneeId && userId && companyId) {
+          notifyTaskAssigned({
+            taskId: task.id,
+            taskTitle: task.title,
+            projectId: task.project_id,
+            companyId,
+            actorId: userId,
+            assigneeId: newAssigneeId,
+          }).catch(err => {
+            console.error('[Notification] Failed to send inline assignment notification:', err)
+            toast.error(t('tasks.failedToSendNotification') || 'Failed to send notification')
+          })
+        }
+      }
+
       toast.success(t('tasks.taskUpdatedSuccessfully'))
     } catch (error) {
       console.error('Failed to update task:', error)
@@ -964,6 +1062,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
               tasks={todoTasks}
               count={todoTasks.length}
               userId={userId}
+              companyId={companyId}
               onTaskUpdated={handleTaskUpdated}
               onTaskDeleted={handleTaskDeleted}
             />
@@ -973,6 +1072,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
               tasks={inProgressTasks}
               count={inProgressTasks.length}
               userId={userId}
+              companyId={companyId}
               onTaskUpdated={handleTaskUpdated}
               onTaskDeleted={handleTaskDeleted}
             />
@@ -982,6 +1082,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
               tasks={doneTasks}
               count={doneTasks.length}
               userId={userId}
+              companyId={companyId}
               onTaskUpdated={handleTaskUpdated}
               onTaskDeleted={handleTaskDeleted}
             />

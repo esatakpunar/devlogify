@@ -306,6 +306,7 @@
     "updateTaskDetails": "Görev detaylarınızı güncelleyin",
     "taskUpdatedSuccessfully": "Görev başarıyla güncellendi",
     "failedToUpdateTask": "Görev güncellenemedi",
+    "failedToSendNotification": "Bildirim gönderilemedi",
     "progress": "İlerleme",
     "clickProgressBarToSet": "İlerlemeyi ayarlamak için ilerleme çubuğuna tıklayın",
     "timeStatus": "Zaman Durumu",
