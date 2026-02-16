@@ -85,7 +85,7 @@ export async function getTasks(projectId: string, supabaseClient?: SupabaseClien
 }
 
 /**
- * Get all tasks in a company across all projects (including archived projects)
+ * Get all tasks in a company across all projects (only active projects)
  */
 export async function getCompanyTasks(companyId: string, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithDetails[]> {
   const supabase = (supabaseClient || createBrowserClient()) as any
@@ -114,11 +114,12 @@ export async function getCompanyTasks(companyId: string, supabaseClient?: Supaba
       review_note,
       created_at,
       updated_at,
-      project:projects(id, title, color),
+      project:projects!inner(id, title, color, status),
       assignee:profiles!tasks_assignee_id_fkey(id, full_name, avatar_url, email),
       responsible:profiles!tasks_responsible_id_fkey(id, full_name, avatar_url, email)
     `)
     .eq('company_id', companyId)
+    .eq('project.status', 'active')
     .order('updated_at', { ascending: false })
 
   if (error) throw error
@@ -299,7 +300,7 @@ export async function updateTasksOrder(taskUpdates: { id: string; order_index: n
 }
 
 /**
- * Get recent incomplete tasks for dashboard (company-based)
+ * Get recent incomplete tasks for dashboard (company-based, only active projects)
  */
 export async function getRecentIncompleteTasks(companyId: string, limit: number = 5, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithProjectAndAssignees[]> {
   const supabase = (supabaseClient || createBrowserClient()) as any
@@ -328,9 +329,10 @@ export async function getRecentIncompleteTasks(companyId: string, limit: number 
       review_note,
       created_at,
       updated_at,
-      project:projects!inner(id, title, color)
+      project:projects!inner(id, title, color, status)
     `)
     .eq('company_id', companyId)
+    .eq('project.status', 'active')
     .neq('status', 'done')
     .order('updated_at', { ascending: false })
     .limit(limit)
@@ -340,7 +342,7 @@ export async function getRecentIncompleteTasks(companyId: string, limit: number 
 }
 
 /**
- * Get tasks completed today for dashboard (company-based)
+ * Get tasks completed today for dashboard (company-based, only active projects)
  */
 export async function getTodayCompletedTasks(companyId: string, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithProjectAndAssignees[]> {
   const supabase = (supabaseClient || createBrowserClient()) as any
@@ -374,9 +376,10 @@ export async function getTodayCompletedTasks(companyId: string, supabaseClient?:
       review_note,
       created_at,
       updated_at,
-      project:projects!inner(id, title, color)
+      project:projects!inner(id, title, color, status)
     `)
     .eq('company_id', companyId)
+    .eq('project.status', 'active')
     .eq('status', 'done')
     .gte('completed_at', today.toISOString())
     .lt('completed_at', tomorrow.toISOString())
@@ -387,7 +390,7 @@ export async function getTodayCompletedTasks(companyId: string, supabaseClient?:
 }
 
 /**
- * Get tasks assigned to a specific user
+ * Get tasks assigned to a specific user (only from active projects)
  */
 export async function getMyTasks(userId: string, companyId: string, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithProjectAndAssignees[]> {
   const supabase = (supabaseClient || createBrowserClient()) as any
@@ -396,11 +399,12 @@ export async function getMyTasks(userId: string, companyId: string, supabaseClie
     .from('tasks')
     .select(`
       *,
-      project:projects!inner(id, title, color),
+      project:projects!inner(id, title, color, status),
       assignee:profiles!tasks_assignee_id_fkey(id, full_name, avatar_url, email),
       responsible:profiles!tasks_responsible_id_fkey(id, full_name, avatar_url, email)
     `)
     .eq('company_id', companyId)
+    .eq('project.status', 'active')
     .eq('assignee_id', userId)
     .neq('status', 'done')
     .order('updated_at', { ascending: false })
@@ -410,7 +414,7 @@ export async function getMyTasks(userId: string, companyId: string, supabaseClie
 }
 
 /**
- * Get tasks waiting for review by a specific responsible user
+ * Get tasks waiting for review by a specific responsible user (only from active projects)
  */
 export async function getTasksToReview(userId: string, companyId: string, supabaseClient?: SupabaseClient<Database>): Promise<TaskWithProjectAndAssignees[]> {
   const supabase = (supabaseClient || createBrowserClient()) as any
@@ -419,11 +423,12 @@ export async function getTasksToReview(userId: string, companyId: string, supaba
     .from('tasks')
     .select(`
       *,
-      project:projects!inner(id, title, color),
+      project:projects!inner(id, title, color, status),
       assignee:profiles!tasks_assignee_id_fkey(id, full_name, avatar_url, email),
       responsible:profiles!tasks_responsible_id_fkey(id, full_name, avatar_url, email)
     `)
     .eq('company_id', companyId)
+    .eq('project.status', 'active')
     .eq('responsible_id', userId)
     .eq('review_status', 'pending')
     .order('updated_at', { ascending: false })
