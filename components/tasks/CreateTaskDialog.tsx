@@ -38,6 +38,7 @@ interface CreateTaskDialogProps {
   onOpenChange: (open: boolean) => void
   projectId?: string
   projects?: { id: string; title: string; color: string }[]
+  sprints?: { id: string; name: string }[]
   userId: string
   companyId?: string
   onTaskCreated: (task: any) => void
@@ -48,6 +49,7 @@ export function CreateTaskDialog({
   onOpenChange,
   projectId,
   projects,
+  sprints = [],
   userId,
   companyId,
   onTaskCreated
@@ -65,6 +67,7 @@ export function CreateTaskDialog({
   const [selectedTemplate, setSelectedTemplate] = useState<TaskTemplate | null>(null)
   const [showTemplates, setShowTemplates] = useState(false)
   const [selectedProjectId, setSelectedProjectId] = useState(projectId || '')
+  const [selectedSprintId, setSelectedSprintId] = useState<string>('none')
   const t = useTranslation()
   const { members } = useCompanyStore()
   const { profile } = useUserProfileStore()
@@ -75,6 +78,7 @@ export function CreateTaskDialog({
     if (open) {
       loadTemplates()
       setSelectedProjectId(projectId || projects?.[0]?.id || '')
+      setSelectedSprintId('none')
     }
   }, [open, userId, projectId, projects, taskCompanyId])
 
@@ -152,6 +156,7 @@ export function CreateTaskDialog({
         status: 'todo',
         tags: normalizedTags.length > 0 ? normalizedTags : null,
         company_id: taskCompanyId,
+        sprint_id: selectedSprintId === 'none' ? null : selectedSprintId,
         assignee_id: assigneeId,
         responsible_id: responsibleId,
       })) as Task
@@ -165,6 +170,17 @@ export function CreateTaskDialog({
         { task_title: title },
         taskCompanyId
       )
+
+      if (selectedSprintId !== 'none') {
+        await logActivity(
+          userId,
+          finalProjectId,
+          newTask.id,
+          'task_added_to_sprint',
+          { task_title: title, sprint_id: selectedSprintId },
+          taskCompanyId
+        )
+      }
 
       // Send notification to assignee (includes email)
       if (assigneeId && taskCompanyId) {
@@ -202,6 +218,7 @@ export function CreateTaskDialog({
       setResponsibleId(userId)
       setSelectedTemplate(null)
       setSelectedProjectId(projectId || projects?.[0]?.id || '')
+      setSelectedSprintId('none')
       onOpenChange(false)
     } catch (err: any) {
       setError(err.message)
@@ -250,6 +267,25 @@ export function CreateTaskDialog({
               </Select>
             </div>
           )}
+
+          <div className="space-y-2">
+            <Label htmlFor="task-sprint" className="text-xs sm:text-sm">
+              {t('kanban.sprint')}
+            </Label>
+            <Select value={selectedSprintId} onValueChange={setSelectedSprintId} disabled={loading}>
+              <SelectTrigger id="task-sprint" className="text-sm sm:text-base">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">{t('kanban.noSprint')}</SelectItem>
+                {sprints.map((sprint) => (
+                  <SelectItem key={sprint.id} value={sprint.id}>
+                    {sprint.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
           {/* Template Selection */}
           {templates.length > 0 && (

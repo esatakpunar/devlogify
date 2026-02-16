@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { getProjectCount, getPinnedProjects } from '@/lib/supabase/queries/projects'
 import { getTodayStats, getWeeklyStats } from '@/lib/supabase/queries/analytics'
 import { getRecentIncompleteTasks, getTodayCompletedTasks } from '@/lib/supabase/queries/tasks'
+import { getActiveSprint, getSprintMetrics } from '@/lib/supabase/queries/sprints'
 import { DashboardContent } from '@/components/dashboard/DashboardContent'
 
 export default async function DashboardPage() {
@@ -25,15 +26,21 @@ export default async function DashboardPage() {
     weeklyStats,
     recentTasks,
     todayCompletedTasks,
-    pinnedProjects
+    pinnedProjects,
+    activeSprint,
   ] = await Promise.all([
     getProjectCount(companyId, 'active', supabase),
     getTodayStats(companyId, user.id),
     getWeeklyStats(companyId, user.id),
     getRecentIncompleteTasks(companyId, 5, supabase),
     getTodayCompletedTasks(companyId, supabase),
-    getPinnedProjects(companyId, supabase)
+    getPinnedProjects(companyId, supabase),
+    getActiveSprint(companyId, supabase),
   ])
+
+  const activeSprintMetrics = activeSprint
+    ? await getSprintMetrics(companyId, activeSprint.id, activeSprint.end_date, supabase)
+    : null
 
   return (
     <DashboardContent
@@ -45,6 +52,8 @@ export default async function DashboardPage() {
       recentTasks={recentTasks || []}
       todayCompletedTasks={todayCompletedTasks || []}
       pinnedProjects={pinnedProjects || []}
+      activeSprint={activeSprint}
+      activeSprintMetrics={activeSprintMetrics}
     />
   )
 }

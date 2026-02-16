@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { updateTask } from '@/lib/supabase/queries/tasks'
 import { notifyTaskAssigned, notifyTaskStatusChanged, notifyReviewRequested } from '@/lib/notifications/triggers'
+import { logActivity } from '@/lib/supabase/queries/activities'
 import {
   Dialog,
   DialogContent,
@@ -45,6 +46,7 @@ type Task = {
   order_index: number
   created_at: string
   tags?: string[] | null
+  sprint_id?: string | null
   assignee_id?: string | null
   responsible_id?: string | null
   review_status?: 'pending' | 'approved' | 'rejected' | 'changes_requested' | null
@@ -66,6 +68,7 @@ interface EditTaskDialogProps {
   companyId?: string
   userId?: string
   projects?: ProjectOption[]
+  sprints?: { id: string; name: string }[]
 }
 
 export function EditTaskDialog({
@@ -77,6 +80,7 @@ export function EditTaskDialog({
   companyId,
   userId,
   projects = [],
+  sprints = [],
 }: EditTaskDialogProps) {
   const [title, setTitle] = useState(task.title)
   const [description, setDescription] = useState(task.description || '')
@@ -88,6 +92,7 @@ export function EditTaskDialog({
   const [assigneeId, setAssigneeId] = useState(task.assignee_id || '')
   const [responsibleId, setResponsibleId] = useState(task.responsible_id || '')
   const [projectId, setProjectId] = useState(task.project_id)
+  const [sprintId, setSprintId] = useState(task.sprint_id || 'none')
   const [loading, setLoading] = useState(false)
   const t = useTranslation()
 
@@ -107,6 +112,7 @@ export function EditTaskDialog({
     setAssigneeId(task.assignee_id || '')
     setResponsibleId(task.responsible_id || '')
     setProjectId(task.project_id)
+    setSprintId(task.sprint_id || 'none')
   }, [task])
 
   useEffect(() => {
@@ -159,6 +165,7 @@ export function EditTaskDialog({
       const updatedTask = await updateTask(task.id, {
         title,
         project_id: projectId,
+        sprint_id: sprintId === 'none' ? null : sprintId,
         description: description || null,
         status,
         priority,
@@ -246,6 +253,20 @@ export function EditTaskDialog({
             console.error('[Notification] Failed to send review request notification:', err)
           })
         }
+      }
+
+      if (userId && resolvedCompanyId && task.sprint_id !== (sprintId === 'none' ? null : sprintId)) {
+        await logActivity(
+          userId,
+          projectId,
+          task.id,
+          'task_added_to_sprint',
+          {
+            task_title: title,
+            sprint_id: sprintId === 'none' ? null : sprintId,
+          },
+          resolvedCompanyId
+        )
       }
 
       onTaskUpdated(updatedTask)
@@ -353,6 +374,29 @@ export function EditTaskDialog({
                         <SelectItem value="todo">{t('kanban.todo')}</SelectItem>
                         <SelectItem value="in_progress">{t('kanban.inProgress')}</SelectItem>
                         <SelectItem value="done">{t('kanban.done')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-task-sprint" className="text-xs sm:text-sm">
+                      {t('kanban.sprint')}
+                    </Label>
+                    <Select
+                      value={sprintId}
+                      onValueChange={setSprintId}
+                      disabled={loading || readOnly}
+                    >
+                      <SelectTrigger id="edit-task-sprint" className="w-full text-sm sm:text-base">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none">{t('kanban.noSprint')}</SelectItem>
+                        {sprints.map((sprint) => (
+                          <SelectItem key={sprint.id} value={sprint.id}>
+                            {sprint.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>

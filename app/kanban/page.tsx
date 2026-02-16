@@ -4,6 +4,7 @@ import { getUserCompanyId } from '@/lib/supabase/queries/companyMembership'
 import { getProjectOptions } from '@/lib/supabase/queries/projects'
 import { getCompanyTasks } from '@/lib/supabase/queries/tasks'
 import { getTeamsWithMembers } from '@/lib/supabase/queries/teams'
+import { getSprints } from '@/lib/supabase/queries/sprints'
 import { KanbanWorkspace } from '@/components/tasks/KanbanWorkspace'
 
 export default async function KanbanPage() {
@@ -22,10 +23,11 @@ export default async function KanbanPage() {
     redirect('/onboarding')
   }
 
-  const [projects, tasks, teams] = await Promise.all([
+  const [projects, tasks, teams, sprints] = await Promise.all([
     getProjectOptions(companyId, 'active', supabase),
     getCompanyTasks(companyId, { limit: 300, offset: 0 }, supabase),
     getTeamsWithMembers(companyId, supabase),
+    getSprints(companyId, {}, supabase),
   ])
 
   return (
@@ -44,6 +46,7 @@ export default async function KanbanPage() {
         color: team.color,
         memberUserIds: (team.team_members || []).map((member) => member.user_id),
       }))}
+      sprints={sprints || []}
     />
   )
 }

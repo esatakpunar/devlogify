@@ -74,6 +74,7 @@ export interface TaskQueryOptions {
   offset?: number
   statusFilter?: TaskStatus[]
   projectIds?: string[]
+  sprintId?: string | null
 }
 
 const MAX_ESTIMATED_DURATION = 9999
@@ -174,6 +175,7 @@ export async function getCompanyTasks(
       tags,
       completed_at,
       company_id,
+      sprint_id,
       assignee_id,
       responsible_id,
       review_status,
@@ -193,6 +195,14 @@ export async function getCompanyTasks(
 
   if (options.projectIds && options.projectIds.length > 0) {
     query = query.in('project_id', options.projectIds)
+  }
+
+  if (options.sprintId !== undefined) {
+    if (options.sprintId === null) {
+      query = query.is('sprint_id', null)
+    } else {
+      query = query.eq('sprint_id', options.sprintId)
+    }
   }
 
   const limit = Math.min(Math.max(options.limit || 200, 1), 500)
@@ -428,6 +438,7 @@ export async function getRecentIncompleteTasks(companyId: string, limit: number 
       tags,
       completed_at,
       company_id,
+      sprint_id,
       assignee_id,
       responsible_id,
       review_status,
@@ -475,6 +486,7 @@ export async function getTodayCompletedTasks(companyId: string, supabaseClient?:
       tags,
       completed_at,
       company_id,
+      sprint_id,
       assignee_id,
       responsible_id,
       review_status,

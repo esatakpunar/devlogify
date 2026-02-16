@@ -21,6 +21,7 @@ type Task = {
   order_index: number
   created_at: string
   company_id?: string | null
+  sprint_id?: string | null
 }
 
 interface KanbanColumnProps {
@@ -32,6 +33,7 @@ interface KanbanColumnProps {
   userId: string
   companyId: string
   projectOptions?: { id: string; title: string; color: string }[]
+  sprintOptions?: { id: string; name: string }[]
   onTaskUpdated?: (task: Task) => void
   onTaskDeleted?: (taskId: string) => void
   onTaskClick?: (task: Task) => void
@@ -59,6 +61,7 @@ export function KanbanColumn({
   userId,
   companyId,
   projectOptions,
+  sprintOptions,
   onTaskUpdated,
   onTaskDeleted,
   onTaskClick,
@@ -126,6 +129,7 @@ export function KanbanColumn({
                   userId={userId}
                   companyId={companyId}
                   projectOptions={projectOptions}
+                  sprintOptions={sprintOptions}
                   onTaskUpdated={onTaskUpdated}
                   onTaskDeleted={onTaskDeleted}
                   onClick={onTaskClick ? () => onTaskClick(task) : undefined}

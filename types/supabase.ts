@@ -286,6 +286,7 @@ export type Database = {
           tags: string[] | null
           completed_at: string | null
           company_id: string | null
+          sprint_id: string | null
           assignee_id: string | null
           responsible_id: string | null
           review_status: 'pending' | 'approved' | 'rejected' | 'changes_requested' | null
@@ -309,6 +310,7 @@ export type Database = {
           tags?: string[] | null
           completed_at?: string | null
           company_id?: string | null
+          sprint_id?: string | null
           assignee_id?: string | null
           responsible_id?: string | null
           review_status?: 'pending' | 'approved' | 'rejected' | 'changes_requested' | null
@@ -332,10 +334,49 @@ export type Database = {
           tags?: string[] | null
           completed_at?: string | null
           company_id?: string | null
+          sprint_id?: string | null
           assignee_id?: string | null
           responsible_id?: string | null
           review_status?: 'pending' | 'approved' | 'rejected' | 'changes_requested' | null
           review_note?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      sprints: {
+        Row: {
+          id: string
+          company_id: string
+          name: string
+          start_date: string
+          end_date: string
+          status: 'planned' | 'active' | 'closed'
+          created_by: string
+          closed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          company_id: string
+          name: string
+          start_date: string
+          end_date: string
+          status?: 'planned' | 'active' | 'closed'
+          created_by: string
+          closed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          company_id?: string
+          name?: string
+          start_date?: string
+          end_date?: string
+          status?: 'planned' | 'active' | 'closed'
+          created_by?: string
+          closed_at?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -560,6 +601,10 @@ export type CompanyMemberUpdate = Database['public']['Tables']['company_members'
 export type Team = Database['public']['Tables']['teams']['Row']
 export type TeamInsert = Database['public']['Tables']['teams']['Insert']
 export type TeamUpdate = Database['public']['Tables']['teams']['Update']
+
+export type Sprint = Database['public']['Tables']['sprints']['Row']
+export type SprintInsert = Database['public']['Tables']['sprints']['Insert']
+export type SprintUpdate = Database['public']['Tables']['sprints']['Update']
 
 export type TeamMember = Database['public']['Tables']['team_members']['Row']
 export type TeamMemberInsert = Database['public']['Tables']['team_members']['Insert']

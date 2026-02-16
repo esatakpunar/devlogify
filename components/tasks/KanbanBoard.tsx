@@ -43,6 +43,7 @@ type Task = {
   created_at: string
   tags?: string[] | null
   company_id?: string | null
+  sprint_id?: string | null
   assignee_id?: string | null
   responsible_id?: string | null
 }

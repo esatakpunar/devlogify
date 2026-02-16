@@ -17,6 +17,7 @@ import { useTranslation } from '@/lib/i18n/useTranslation'
 import { cn } from '@/lib/utils'
 import type { ProjectWithTasks } from '@/lib/supabase/queries/projects'
 import type { TaskWithProject } from '@/lib/supabase/queries/tasks'
+import type { Sprint, SprintMetrics } from '@/lib/supabase/queries/sprints'
 
 const PomodoroTimer = dynamic(() => import('@/components/timer/PomodoroTimer').then((m) => m.PomodoroTimer))
 const MobileTimer = dynamic(() => import('@/components/timer/MobileTimer').then((m) => m.MobileTimer))
@@ -43,6 +44,8 @@ interface DashboardContentProps {
   recentTasks: TaskWithProject[]
   todayCompletedTasks: TaskWithProject[]
   pinnedProjects: ProjectWithTasks[]
+  activeSprint: Sprint | null
+  activeSprintMetrics: SprintMetrics | null
 }
 
 export function DashboardContent({
@@ -54,6 +57,8 @@ export function DashboardContent({
   recentTasks,
   todayCompletedTasks,
   pinnedProjects,
+  activeSprint,
+  activeSprintMetrics,
 }: DashboardContentProps) {
   const t = useTranslation()
   const router = useRouter()
@@ -160,6 +165,36 @@ export function DashboardContent({
           </AnimatedCard>
         ))}
       </div>
+
+      {activeSprint && activeSprintMetrics && (
+        <Card>
+          <CardHeader className="pb-3">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <Target className="w-5 h-5 text-indigo-500" />
+              {t('kanban.activeSprint')}: {activeSprint.name}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="rounded-lg border bg-card p-3">
+                <p className="text-xs text-muted-foreground">{t('kanban.completionRatio')}</p>
+                <p className="text-xl font-semibold">{activeSprintMetrics.completionRatio}%</p>
+                <p className="text-xs text-muted-foreground">
+                  {activeSprintMetrics.completedTasks}/{activeSprintMetrics.totalTasks}
+                </p>
+              </div>
+              <div className="rounded-lg border bg-card p-3">
+                <p className="text-xs text-muted-foreground">{t('kanban.completedMinutes')}</p>
+                <p className="text-xl font-semibold">{activeSprintMetrics.completedMinutes}</p>
+              </div>
+              <div className="rounded-lg border bg-card p-3">
+                <p className="text-xs text-muted-foreground">{t('kanban.carryOverCount')}</p>
+                <p className="text-xl font-semibold">{activeSprintMetrics.carryOverCount}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Quick Access Section */}
       <Card className="border-2">

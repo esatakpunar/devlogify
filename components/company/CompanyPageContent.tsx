@@ -7,12 +7,14 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { CompanySettings } from './CompanySettings'
 import { MembersManager } from './MembersManager'
 import { TeamsManager } from './TeamsManager'
+import { SprintsManager } from './SprintsManager'
 import { InvitationsManager } from './InvitationsManager'
 import { ActivityLogs } from './ActivityLogs'
 import {
   Settings,
   Users,
   FolderKanban,
+  CalendarRange,
   Mail,
   Activity,
 } from 'lucide-react'
@@ -23,7 +25,7 @@ interface CompanyPageContentProps {
   companyId: string
 }
 
-type CompanyTab = 'general' | 'members' | 'teams' | 'invitations' | 'activity'
+type CompanyTab = 'general' | 'members' | 'teams' | 'sprints' | 'invitations' | 'activity'
 
 export function CompanyPageContent({ userId, companyId }: CompanyPageContentProps) {
   const t = useTranslation()
@@ -43,6 +45,7 @@ export function CompanyPageContent({ userId, companyId }: CompanyPageContentProp
     { id: 'general', label: t('company.general'), icon: Settings },
     { id: 'members', label: t('company.members'), icon: Users },
     { id: 'teams', label: t('company.teams'), icon: FolderKanban },
+    { id: 'sprints', label: t('kanban.sprint'), icon: CalendarRange },
     { id: 'invitations', label: t('company.invitations'), icon: Mail },
     { id: 'activity', label: t('company.activity'), icon: Activity },
   ]
@@ -92,6 +95,7 @@ export function CompanyPageContent({ userId, companyId }: CompanyPageContentProp
                 {tab.id === 'general' && <CompanySettings companyId={companyId} isAdmin={isAdmin} />}
                 {tab.id === 'members' && <MembersManager companyId={companyId} userId={userId} isAdmin={isAdmin} />}
                 {tab.id === 'teams' && <TeamsManager companyId={companyId} userId={userId} isAdmin={isAdmin} />}
+                {tab.id === 'sprints' && <SprintsManager companyId={companyId} userId={userId} isAdmin={isAdmin} />}
                 {tab.id === 'invitations' && <InvitationsManager companyId={companyId} userId={userId} isAdmin={isAdmin} />}
                 {tab.id === 'activity' && <ActivityLogs companyId={companyId} />}
               </div>
@@ -147,6 +151,13 @@ export function CompanyPageContent({ userId, companyId }: CompanyPageContentProp
               <div>
                 <h2 className="text-xl font-semibold mb-6">{t('company.teams')}</h2>
                 <TeamsManager companyId={companyId} userId={userId} isAdmin={isAdmin} />
+              </div>
+            )}
+
+            {activeTab === 'sprints' && (
+              <div>
+                <h2 className="text-xl font-semibold mb-6">{t('kanban.sprint')}</h2>
+                <SprintsManager companyId={companyId} userId={userId} isAdmin={isAdmin} />
               </div>
             )}
 

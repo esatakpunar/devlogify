@@ -30,6 +30,7 @@ import { Plus, Sparkles, ChevronDown, Filter, X, LayoutGrid, List } from 'lucide
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { updateTask, updateTaskStatus } from '@/lib/supabase/queries/tasks'
 import { logActivity } from '@/lib/supabase/queries/activities'
+import type { Sprint } from '@/lib/supabase/queries/sprints'
 import { usePremium } from '@/lib/hooks/usePremium'
 import { useCompanyStore } from '@/lib/store/companyStore'
 import { notifyTaskAssigned, notifyTaskStatusChanged, notifyReviewRequested } from '@/lib/notifications/triggers'
@@ -54,6 +55,8 @@ type MemberOption = {
   avatar_url: string | null
 }
 
+type SprintOption = Sprint
+
 type TaskItem = {
   id: string
   task_number: number
@@ -71,6 +74,7 @@ type TaskItem = {
   company_id?: string | null
   tags?: string[] | null
   completed_at?: string | null
+  sprint_id?: string | null
   assignee_id?: string | null
   responsible_id?: string | null
   review_status?: 'pending' | 'approved' | 'rejected' | 'changes_requested' | null
@@ -91,6 +95,7 @@ interface KanbanWorkspaceProps {
   initialTasks: TaskItem[]
   projects: ProjectOption[]
   teams: TeamOption[]
+  sprints: SprintOption[]
 }
 
 type ViewMode = 'kanban' | 'list'
@@ -100,7 +105,7 @@ type MultiSelectOption = {
   value: string
   label: string
 }
-type DesktopFilterKey = 'project' | 'team' | 'status' | 'priority' | 'assignee' | 'responsible'
+type DesktopFilterKey = 'sprint' | 'project' | 'team' | 'status' | 'priority' | 'assignee' | 'responsible'
 const LIST_PAGE_SIZE = 100
 
 function sortByUpdatedAtDesc(tasks: TaskItem[]): TaskItem[] {
@@ -187,7 +192,14 @@ function MultiSelectFilter({
   )
 }
 
-export function KanbanWorkspace({ userId, companyId, initialTasks, projects, teams }: KanbanWorkspaceProps) {
+export function KanbanWorkspace({
+  userId,
+  companyId,
+  initialTasks,
+  projects,
+  teams,
+  sprints,
+}: KanbanWorkspaceProps) {
   const t = useTranslation()
   const router = useRouter()
   const pathname = usePathname()
@@ -199,6 +211,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
   const [viewMode, setViewMode] = useState<ViewMode>('kanban')
   const [search, setSearch] = useState('')
   const [selectedProjectIds, setSelectedProjectIds] = useState<string[]>([])
+  const [selectedSprintFilter, setSelectedSprintFilter] = useState<string>('all')
   const [selectedTeamIds, setSelectedTeamIds] = useState<string[]>([])
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([])
   const [selectedPriorities, setSelectedPriorities] = useState<string[]>([])
@@ -210,6 +223,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
   const [desktopActiveFilter, setDesktopActiveFilter] = useState<DesktopFilterKey>('project')
   const [desktopFilterSearch, setDesktopFilterSearch] = useState('')
   const [draftProjectIds, setDraftProjectIds] = useState<string[]>([])
+  const [draftSprintFilter, setDraftSprintFilter] = useState<string>('all')
   const [draftTeamIds, setDraftTeamIds] = useState<string[]>([])
   const [draftStatuses, setDraftStatuses] = useState<string[]>([])
   const [draftPriorities, setDraftPriorities] = useState<string[]>([])
@@ -220,6 +234,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [isAICreateDialogOpen, setIsAICreateDialogOpen] = useState(false)
   const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
+  const [sprintOptions, setSprintOptions] = useState<SprintOption[]>(sprints)
 
   const [selectedTask, setSelectedTask] = useState<TaskItem | null>(null)
   const [activeTask, setActiveTask] = useState<TaskItem | null>(null)
@@ -230,6 +245,10 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
   useEffect(() => {
     setTasks(sortByUpdatedAtDesc(initialTasks))
   }, [initialTasks])
+
+  useEffect(() => {
+    setSprintOptions(sprints)
+  }, [sprints])
 
   useEffect(() => {
     fetchMembers(companyId)
@@ -317,10 +336,34 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
     return new Set<string>(getMemberIdsForTeamSelection(selectedTeamIds))
   }, [selectedTeamIds, getMemberIdsForTeamSelection])
 
+  const activeSprint = useMemo(
+    () => sprintOptions.find((sprint) => sprint.status === 'active') || null,
+    [sprintOptions]
+  )
+
+  const sprintFilterOptions = useMemo(
+    () => [
+      { value: 'all', label: t('kanban.allSprints') },
+      ...(activeSprint ? [{ value: '__active__', label: `${t('kanban.activeSprint')}: ${activeSprint.name}` }] : []),
+      { value: '__none__', label: t('kanban.noSprint') },
+      ...sprintOptions.map((sprint) => ({ value: sprint.id, label: sprint.name })),
+    ],
+    [activeSprint, sprintOptions, t]
+  )
+
   const filteredTasks = useMemo(() => {
     const searchLower = search.trim().toLowerCase()
 
     return tasks.filter((task) => {
+      if (selectedSprintFilter === '__active__') {
+        if (!activeSprint) return false
+        if (task.sprint_id !== activeSprint.id) return false
+      } else if (selectedSprintFilter === '__none__') {
+        if (task.sprint_id) return false
+      } else if (selectedSprintFilter !== 'all') {
+        if (task.sprint_id !== selectedSprintFilter) return false
+      }
+
       if (selectedProjectIds.length > 0 && !selectedProjectIds.includes(task.project_id)) return false
       if (selectedTeamIds.length > 0) {
         if (!task.assignee_id || !selectedTeamMemberIds?.has(task.assignee_id)) return false
@@ -351,6 +394,8 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
   }, [
     tasks,
     search,
+    selectedSprintFilter,
+    activeSprint,
     selectedProjectIds,
     selectedTeamIds,
     selectedTeamMemberIds,
@@ -806,6 +851,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
 
   const activeFilterGroupCount = useMemo(() => {
     return [
+      selectedSprintFilter !== 'all' ? 1 : 0,
       selectedProjectIds.length,
       selectedTeamIds.length,
       selectedStatuses.length,
@@ -814,6 +860,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
       selectedResponsibleIds.length,
     ].filter((count) => count > 0).length
   }, [
+    selectedSprintFilter,
     selectedProjectIds.length,
     selectedTeamIds.length,
     selectedStatuses.length,
@@ -823,6 +870,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
   ])
 
   const clearAllFilters = () => {
+    setSelectedSprintFilter('all')
     setSelectedProjectIds([])
     setSelectedTeamIds([])
     setSelectedStatuses([])
@@ -835,6 +883,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
     if (!desktopFiltersOpen) return
     setDesktopActiveFilter('project')
     setDesktopFilterSearch('')
+    setDraftSprintFilter(selectedSprintFilter)
     setDraftProjectIds(selectedProjectIds)
     setDraftTeamIds(selectedTeamIds)
     setDraftStatuses(selectedStatuses)
@@ -843,6 +892,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
     setDraftResponsibleIds(selectedResponsibleIds)
   }, [
     desktopFiltersOpen,
+    selectedSprintFilter,
     selectedProjectIds,
     selectedTeamIds,
     selectedStatuses,
@@ -853,6 +903,16 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
 
   const desktopFilterGroups = useMemo(
     () => [
+      {
+        key: 'sprint' as DesktopFilterKey,
+        label: t('kanban.sprint'),
+        options: sprintFilterOptions,
+        values: draftSprintFilter === 'all' ? [] : [draftSprintFilter],
+        onChange: (values: string[]) => {
+          const latest = values[values.length - 1]
+          setDraftSprintFilter(latest || 'all')
+        },
+      },
       {
         key: 'project' as DesktopFilterKey,
         label: t('tasks.project'),
@@ -898,6 +958,8 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
     ],
     [
       t,
+      sprintFilterOptions,
+      draftSprintFilter,
       projectFilterOptions,
       teamFilterOptions,
       statusFilterOptions,
@@ -927,6 +989,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
   }, [activeDesktopGroup, desktopFilterSearch])
 
   const clearAllDraftFilters = () => {
+    setDraftSprintFilter('all')
     setDraftProjectIds([])
     setDraftTeamIds([])
     setDraftStatuses([])
@@ -936,6 +999,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
   }
 
   const applyDesktopFilters = () => {
+    setSelectedSprintFilter(draftSprintFilter)
     setSelectedProjectIds(draftProjectIds)
     setSelectedTeamIds(draftTeamIds)
     setSelectedStatuses(draftStatuses)
@@ -1136,6 +1200,18 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
 
       <div className="grid grid-cols-1 gap-3 lg:hidden">
         <MultiSelectFilter
+          label={t('kanban.sprint')}
+          options={sprintFilterOptions}
+          selectedValues={selectedSprintFilter === 'all' ? [] : [selectedSprintFilter]}
+          onChange={(values) => {
+            const latest = values[values.length - 1]
+            setSelectedSprintFilter(latest || 'all')
+          }}
+          selectAllLabel={t('kanban.selectAll')}
+          clearLabel={t('kanban.deselectAll')}
+        />
+
+        <MultiSelectFilter
           label={t('tasks.project')}
           options={projectFilterOptions}
           selectedValues={selectedProjectIds}
@@ -1207,6 +1283,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
               userId={userId}
               companyId={companyId}
               projectOptions={projects}
+              sprintOptions={sprintOptions.map((sprint) => ({ id: sprint.id, name: sprint.name }))}
               onTaskUpdated={handleTaskUpdated}
               onTaskDeleted={handleTaskDeleted}
             />
@@ -1218,6 +1295,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
               userId={userId}
               companyId={companyId}
               projectOptions={projects}
+              sprintOptions={sprintOptions.map((sprint) => ({ id: sprint.id, name: sprint.name }))}
               onTaskUpdated={handleTaskUpdated}
               onTaskDeleted={handleTaskDeleted}
             />
@@ -1229,6 +1307,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
               userId={userId}
               companyId={companyId}
               projectOptions={projects}
+              sprintOptions={sprintOptions.map((sprint) => ({ id: sprint.id, name: sprint.name }))}
               onTaskUpdated={handleTaskUpdated}
               onTaskDeleted={handleTaskDeleted}
             />
@@ -1439,6 +1518,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
         userId={userId}
         companyId={companyId}
         projects={projects}
+        sprints={sprintOptions.map((sprint) => ({ id: sprint.id, name: sprint.name }))}
         onTaskCreated={handleTaskCreated}
       />
 
@@ -1502,8 +1582,10 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects, tea
           companyId={companyId}
           userId={userId}
           projects={projects}
+          sprints={sprintOptions.map((sprint) => ({ id: sprint.id, name: sprint.name }))}
         />
       )}
+
     </div>
   )
 }

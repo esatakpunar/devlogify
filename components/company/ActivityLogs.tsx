@@ -125,6 +125,10 @@ export function ActivityLogs({ companyId }: ActivityLogsProps) {
       case 'member_removed':
       case 'team_created':
       case 'team_updated':
+      case 'sprint_created':
+      case 'sprint_started':
+      case 'sprint_closed':
+      case 'task_added_to_sprint':
         return <Users className="w-4 h-4 text-pink-500" />
       default:
         return <Activity className="w-4 h-4 text-gray-400" />
@@ -229,6 +233,14 @@ export function ActivityLogs({ companyId }: ActivityLogsProps) {
           user: userName,
           task: formattedTask,
         })
+      case 'sprint_created':
+        return `${userName} created sprint "${metadata.sprint_name || ''}"`
+      case 'sprint_started':
+        return `${userName} started sprint "${metadata.sprint_name || ''}"`
+      case 'sprint_closed':
+        return `${userName} closed sprint "${metadata.sprint_name || ''}"`
+      case 'task_added_to_sprint':
+        return `${userName} added ${formattedTask || 'a task'} to a sprint`
       default:
         return t('company.activity_generic', {
           user: userName,
