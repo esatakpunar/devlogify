@@ -59,7 +59,7 @@ export function RichTextEditor({
   placeholder = 'Start writing...',
   className,
   readOnly = false,
-  minHeight = '420px'
+  minHeight = '505px'
 }: RichTextEditorProps) {
   return (
     <div className={cn('rich-text-editor w-full overflow-visible', className)}>

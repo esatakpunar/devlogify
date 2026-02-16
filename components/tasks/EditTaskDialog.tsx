@@ -313,7 +313,7 @@ export function EditTaskDialog({
                 </div>
               </div>
 
-              <div className="lg:col-span-1 space-y-3 sm:space-y-4 lg:pl-2">
+              <div className="lg:col-span-1 space-y-3 sm:space-y-4">
                 <div className="space-y-3">
                   <div className="space-y-2">
                     <Label htmlFor="edit-task-project" className="text-xs sm:text-sm">

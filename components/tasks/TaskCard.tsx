@@ -29,6 +29,7 @@ import { useTranslation } from '@/lib/i18n/useTranslation'
 import { useConfirmModal } from '@/lib/hooks/useConfirmModal'
 import { getPlainTextFromHTML } from '@/components/ui/HTMLContent'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
 type Task = {
   id: string
@@ -81,6 +82,8 @@ export function TaskCard({ task, userId, companyId, projectOptions = [], onTaskU
   const [localTask, setLocalTask] = useState(task)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
   const [isTimeDialogOpen, setIsTimeDialogOpen] = useState(false)
+  const [isAssigneeTooltipOpen, setIsAssigneeTooltipOpen] = useState(false)
+  const [isResponsibleTooltipOpen, setIsResponsibleTooltipOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const { taskId, isRunning, elapsed, startTimer, stopTimer, formatTime } = useTimer()
   const t = useTranslation()
@@ -506,24 +509,60 @@ export function TaskCard({ task, userId, companyId, projectOptions = [], onTaskU
               </Badge>
             )}
             {localTask.assignee && (
-              <div title={`${t('tasks.assignee')}: ${localTask.assignee.full_name || localTask.assignee.email}`}>
-                <Avatar className="h-5 w-5 border-2 border-blue-300 dark:border-blue-600">
-                  <AvatarImage src={localTask.assignee.avatar_url || undefined} />
-                  <AvatarFallback className="text-[8px] bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">
-                    {(localTask.assignee.full_name || localTask.assignee.email)[0].toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
+              <Popover open={isAssigneeTooltipOpen} onOpenChange={setIsAssigneeTooltipOpen}>
+                <PopoverTrigger asChild>
+                  <span
+                    className="inline-flex"
+                    onMouseEnter={() => setIsAssigneeTooltipOpen(true)}
+                    onMouseLeave={() => setIsAssigneeTooltipOpen(false)}
+                    onFocus={() => setIsAssigneeTooltipOpen(true)}
+                    onBlur={() => setIsAssigneeTooltipOpen(false)}
+                  >
+                    <Avatar className="h-5 w-5 border-2 border-blue-300 dark:border-blue-600">
+                      <AvatarImage src={localTask.assignee.avatar_url || undefined} />
+                      <AvatarFallback className="text-[8px] bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300">
+                        {(localTask.assignee.full_name || localTask.assignee.email)[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </span>
+                </PopoverTrigger>
+                <PopoverContent
+                  side="top"
+                  align="center"
+                  sideOffset={6}
+                  className="w-auto max-w-[220px] px-2 py-1 text-[11px] leading-tight pointer-events-none"
+                >
+                  {t('tasks.assignee')}: {localTask.assignee.full_name || localTask.assignee.email}
+                </PopoverContent>
+              </Popover>
             )}
             {localTask.responsible && (
-              <div title={`${t('tasks.responsible')}: ${localTask.responsible.full_name || localTask.responsible.email}`}>
-                <Avatar className="h-5 w-5 border-2 border-purple-300 dark:border-purple-600">
-                  <AvatarImage src={localTask.responsible.avatar_url || undefined} />
-                  <AvatarFallback className="text-[8px] bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300">
-                    {(localTask.responsible.full_name || localTask.responsible.email)[0].toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-              </div>
+              <Popover open={isResponsibleTooltipOpen} onOpenChange={setIsResponsibleTooltipOpen}>
+                <PopoverTrigger asChild>
+                  <span
+                    className="inline-flex"
+                    onMouseEnter={() => setIsResponsibleTooltipOpen(true)}
+                    onMouseLeave={() => setIsResponsibleTooltipOpen(false)}
+                    onFocus={() => setIsResponsibleTooltipOpen(true)}
+                    onBlur={() => setIsResponsibleTooltipOpen(false)}
+                  >
+                    <Avatar className="h-5 w-5 border-2 border-purple-300 dark:border-purple-600">
+                      <AvatarImage src={localTask.responsible.avatar_url || undefined} />
+                      <AvatarFallback className="text-[8px] bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300">
+                        {(localTask.responsible.full_name || localTask.responsible.email)[0].toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </span>
+                </PopoverTrigger>
+                <PopoverContent
+                  side="top"
+                  align="center"
+                  sideOffset={6}
+                  className="w-auto max-w-[220px] px-2 py-1 text-[11px] leading-tight pointer-events-none"
+                >
+                  {t('tasks.responsible')}: {localTask.responsible.full_name || localTask.responsible.email}
+                </PopoverContent>
+              </Popover>
             )}
             <span className="text-[10px] text-gray-400 dark:text-gray-500 whitespace-nowrap">
               {formatDistanceToNow(new Date(localTask.created_at), { addSuffix: true })}
