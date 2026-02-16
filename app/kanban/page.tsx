@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { getUserCompanyId } from '@/lib/supabase/queries/companyMembership'
 import { getProjectOptions } from '@/lib/supabase/queries/projects'
 import { getCompanyTasks } from '@/lib/supabase/queries/tasks'
+import { getTeamsWithMembers } from '@/lib/supabase/queries/teams'
 import { KanbanWorkspace } from '@/components/tasks/KanbanWorkspace'
 
 export default async function KanbanPage() {
@@ -21,9 +22,10 @@ export default async function KanbanPage() {
     redirect('/onboarding')
   }
 
-  const [projects, tasks] = await Promise.all([
+  const [projects, tasks, teams] = await Promise.all([
     getProjectOptions(companyId, 'active', supabase),
     getCompanyTasks(companyId, { limit: 300, offset: 0 }, supabase),
+    getTeamsWithMembers(companyId, supabase),
   ])
 
   return (
@@ -35,6 +37,12 @@ export default async function KanbanPage() {
         id: project.id,
         title: project.title,
         color: project.color,
+      }))}
+      teams={(teams || []).map((team) => ({
+        id: team.id,
+        name: team.name,
+        color: team.color,
+        memberUserIds: (team.team_members || []).map((member) => member.user_id),
       }))}
     />
   )

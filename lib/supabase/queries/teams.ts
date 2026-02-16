@@ -5,6 +5,9 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 export type Team = Database['public']['Tables']['teams']['Row']
 export type TeamInsert = Database['public']['Tables']['teams']['Insert']
 export type TeamUpdate = Database['public']['Tables']['teams']['Update']
+export type TeamWithMembers = Team & {
+  team_members: Pick<Database['public']['Tables']['team_members']['Row'], 'user_id'>[]
+}
 
 export async function createTeam(
   companyId: string,
@@ -45,6 +48,27 @@ export async function getTeams(companyId: string, supabaseClient?: SupabaseClien
 
   if (error) throw error
   return data
+}
+
+export async function getTeamsWithMembers(
+  companyId: string,
+  supabaseClient?: SupabaseClient<Database>
+): Promise<TeamWithMembers[]> {
+  const supabase = (supabaseClient || createBrowserClient()) as any
+
+  const { data, error } = await supabase
+    .from('teams')
+    .select(`
+      *,
+      team_members(
+        user_id
+      )
+    `)
+    .eq('company_id', companyId)
+    .order('created_at', { ascending: true })
+
+  if (error) throw error
+  return data as TeamWithMembers[]
 }
 
 export async function getTeam(teamId: string) {
