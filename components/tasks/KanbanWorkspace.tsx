@@ -26,7 +26,7 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Checkbox } from '@/components/ui/checkbox'
-import { Plus, Sparkles, ChevronDown, Filter, X } from 'lucide-react'
+import { Plus, Sparkles, ChevronDown, Filter, X, LayoutGrid, List } from 'lucide-react'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { updateTask, updateTaskStatus } from '@/lib/supabase/queries/tasks'
 import { logActivity } from '@/lib/supabase/queries/activities'
@@ -849,147 +849,161 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-        <div className="lg:flex-1">
+      <div className="flex flex-col lg:flex-row lg:items-center gap-3">
+        <div className="flex-1">
           <Input
             placeholder={t('common.search')}
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            className="w-full lg:max-w-md"
+            className="w-full"
           />
         </div>
-        <div className="hidden lg:ml-auto lg:flex lg:items-center lg:gap-2">
-          <Popover open={desktopFiltersOpen} onOpenChange={setDesktopFiltersOpen}>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="relative">
-                <Filter className="mr-2 h-4 w-4" />
-                {t('kanban.filters')}
-                {activeFilterGroupCount > 0 && (
-                  <span className="ml-2 rounded bg-primary/10 px-1.5 py-0.5 text-xs text-primary">
-                    {activeFilterGroupCount}
-                  </span>
-                )}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent
-              align="end"
-              className="w-[560px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-8rem)] overflow-hidden p-0"
-              sideOffset={8}
-            >
-              <div className="grid h-[400px] max-h-[calc(100vh-8rem)] grid-cols-[176px_1fr]">
-                <div className="border-r bg-muted/20 p-2">
-                  <div className="space-y-0.5">
-                    {desktopFilterGroups.map((group) => {
-                      const isActive = group.key === desktopActiveFilter
-                      return (
-                        <button
-                          key={group.key}
-                          type="button"
-                          onClick={() => {
-                            setDesktopActiveFilter(group.key)
-                            setDesktopFilterSearch('')
-                          }}
-                          className={`flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-[13px] transition-colors ${
-                            isActive
-                              ? 'bg-primary/10 text-primary font-medium'
-                              : 'text-muted-foreground hover:bg-muted'
-                          }`}
-                        >
-                          <span>{group.label}</span>
-                          {group.values.length > 0 && (
-                            <span className="rounded-full bg-primary px-1.5 py-0.5 text-[10px] leading-none text-primary-foreground">
-                              {group.values.length}
-                            </span>
-                          )}
-                        </button>
-                      )
-                    })}
-                  </div>
-                  <div className="mt-3 space-y-1.5 px-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="h-7 w-full text-xs"
-                      onClick={clearAllDraftFilters}
-                      disabled={desktopDraftGroupCount === 0}
-                    >
-                      {t('kanban.clearAll')}
-                    </Button>
-                    <Button size="sm" className="h-7 w-full text-xs" onClick={applyDesktopFilters}>
-                      {t('kanban.apply')}
-                    </Button>
-                  </div>
-                </div>
 
-                <div className="flex h-full min-h-0 flex-col">
-                  <div className="flex items-center justify-between border-b px-3 py-2">
-                    <p className="text-[13px] font-medium">{activeDesktopGroup?.label}</p>
-                    <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
+          <div className="hidden lg:block">
+            <Popover open={desktopFiltersOpen} onOpenChange={setDesktopFiltersOpen}>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="relative">
+                  <Filter className="mr-2 h-4 w-4" />
+                  {t('kanban.filters')}
+                  {activeFilterGroupCount > 0 && (
+                    <span className="ml-2 rounded bg-primary/10 px-1.5 py-0.5 text-xs text-primary">
+                      {activeFilterGroupCount}
+                    </span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                align="end"
+                className="w-[560px] max-w-[calc(100vw-2rem)] max-h-[calc(100vh-8rem)] overflow-hidden p-0"
+                sideOffset={8}
+              >
+                <div className="grid h-[400px] max-h-[calc(100vh-8rem)] grid-cols-[176px_1fr]">
+                  <div className="border-r bg-muted/20 p-2">
+                    <div className="space-y-0.5">
+                      {desktopFilterGroups.map((group) => {
+                        const isActive = group.key === desktopActiveFilter
+                        return (
+                          <button
+                            key={group.key}
+                            type="button"
+                            onClick={() => {
+                              setDesktopActiveFilter(group.key)
+                              setDesktopFilterSearch('')
+                            }}
+                            className={`flex w-full items-center justify-between rounded-md px-2.5 py-1.5 text-left text-[13px] transition-colors ${
+                              isActive
+                                ? 'bg-primary/10 text-primary font-medium'
+                                : 'text-muted-foreground hover:bg-muted'
+                            }`}
+                          >
+                            <span>{group.label}</span>
+                            {group.values.length > 0 && (
+                              <span className="rounded-full bg-primary px-1.5 py-0.5 text-[10px] leading-none text-primary-foreground">
+                                {group.values.length}
+                              </span>
+                            )}
+                          </button>
+                        )
+                      })}
+                    </div>
+                    <div className="mt-3 space-y-1.5 px-1">
                       <Button
-                        variant="ghost"
+                        variant="outline"
                         size="sm"
-                        className="h-6 px-1.5 text-[10px]"
-                        onClick={() => activeDesktopGroup?.onChange(activeDesktopGroup.options.map((option) => option.value))}
-                        disabled={!activeDesktopGroup || activeDesktopGroup.options.length === 0}
+                        className="h-7 w-full text-xs"
+                        onClick={clearAllDraftFilters}
+                        disabled={desktopDraftGroupCount === 0}
                       >
-                        {t('kanban.selectAll')}
+                        {t('kanban.clearAll')}
                       </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="h-6 px-1.5 text-[10px]"
-                        onClick={() => activeDesktopGroup?.onChange([])}
-                        disabled={!activeDesktopGroup || activeDesktopGroup.values.length === 0}
-                      >
-                        {t('kanban.deselectAll')}
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={() => setDesktopFiltersOpen(false)}
-                      >
-                        <X className="h-3.5 w-3.5" />
+                      <Button size="sm" className="h-7 w-full text-xs" onClick={applyDesktopFilters}>
+                        {t('kanban.apply')}
                       </Button>
                     </div>
                   </div>
-                  <div className="border-b px-3 py-2">
-                    <Input
-                      value={desktopFilterSearch}
-                      onChange={(event) => setDesktopFilterSearch(event.target.value)}
-                      placeholder={`${t('common.search')}...`}
-                      className="h-8 text-[13px]"
-                    />
-                  </div>
-                  <div className="flex-1 min-h-0 overflow-y-auto px-3 py-1.5">
-                    <div className="space-y-0.5">
-                      {filteredDesktopOptions.map((option) => (
-                        <label key={option.value} className="flex items-center gap-2 rounded px-2 py-1.5 text-[13px] hover:bg-muted/60 cursor-pointer">
-                          <Checkbox
-                            className="h-4 w-4"
-                            checked={activeDesktopGroup?.values.includes(option.value) || false}
-                            onCheckedChange={() => {
-                              if (!activeDesktopGroup) return
-                              const next = activeDesktopGroup.values.includes(option.value)
-                                ? activeDesktopGroup.values.filter((item) => item !== option.value)
-                                : [...activeDesktopGroup.values, option.value]
-                              activeDesktopGroup.onChange(next)
-                            }}
-                          />
-                          <span className="truncate">{option.label}</span>
-                        </label>
-                      ))}
-                      {filteredDesktopOptions.length === 0 && (
-                        <p className="px-2 py-4 text-center text-xs text-muted-foreground">
-                          {t('common.noResults')}
-                        </p>
-                      )}
+
+                  <div className="flex h-full min-h-0 flex-col">
+                    <div className="flex items-center justify-between border-b px-3 py-2">
+                      <p className="text-[13px] font-medium">{activeDesktopGroup?.label}</p>
+                      <div className="flex items-center gap-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-1.5 text-[10px]"
+                          onClick={() => activeDesktopGroup?.onChange(activeDesktopGroup.options.map((option) => option.value))}
+                          disabled={!activeDesktopGroup || activeDesktopGroup.options.length === 0}
+                        >
+                          {t('kanban.selectAll')}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 px-1.5 text-[10px]"
+                          onClick={() => activeDesktopGroup?.onChange([])}
+                          disabled={!activeDesktopGroup || activeDesktopGroup.values.length === 0}
+                        >
+                          {t('kanban.deselectAll')}
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-6 w-6"
+                          onClick={() => setDesktopFiltersOpen(false)}
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="border-b px-3 py-2">
+                      <Input
+                        value={desktopFilterSearch}
+                        onChange={(event) => setDesktopFilterSearch(event.target.value)}
+                        placeholder={`${t('common.search')}...`}
+                        className="h-8 text-[13px]"
+                      />
+                    </div>
+                    <div className="flex-1 min-h-0 overflow-y-auto px-3 py-1.5">
+                      <div className="space-y-0.5">
+                        {filteredDesktopOptions.map((option) => (
+                          <label key={option.value} className="flex items-center gap-2 rounded px-2 py-1.5 text-[13px] hover:bg-muted/60 cursor-pointer">
+                            <Checkbox
+                              className="h-4 w-4"
+                              checked={activeDesktopGroup?.values.includes(option.value) || false}
+                              onCheckedChange={() => {
+                                if (!activeDesktopGroup) return
+                                const next = activeDesktopGroup.values.includes(option.value)
+                                  ? activeDesktopGroup.values.filter((item) => item !== option.value)
+                                  : [...activeDesktopGroup.values, option.value]
+                                activeDesktopGroup.onChange(next)
+                              }}
+                            />
+                            <span className="truncate">{option.label}</span>
+                          </label>
+                        ))}
+                        {filteredDesktopOptions.length === 0 && (
+                          <p className="px-2 py-4 text-center text-xs text-muted-foreground">
+                            {t('common.noResults')}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            </PopoverContent>
-          </Popover>
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as ViewMode)}>
+            <TabsList className="h-10">
+              <TabsTrigger value="kanban" className="px-3">
+                <LayoutGrid className="h-4 w-4" />
+              </TabsTrigger>
+              <TabsTrigger value="list" className="px-3">
+                <List className="h-4 w-4" />
+              </TabsTrigger>
+            </TabsList>
+          </Tabs>
         </div>
       </div>
 
@@ -1039,13 +1053,6 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
           clearLabel={t('kanban.deselectAll')}
         />
       </div>
-
-      <Tabs value={viewMode} onValueChange={(value) => setViewMode(value as ViewMode)}>
-        <TabsList className="grid w-full grid-cols-2 sm:w-[320px]">
-          <TabsTrigger value="kanban">{t('nav.kanban')}</TabsTrigger>
-          <TabsTrigger value="list">{t('kanban.listView')}</TabsTrigger>
-        </TabsList>
-      </Tabs>
 
       {viewMode === 'kanban' ? (
         <DndContext
@@ -1108,7 +1115,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
           </DragOverlay>
         </DndContext>
       ) : (
-        <div className="rounded-lg border bg-white dark:bg-gray-900 overflow-hidden flex flex-col max-h-[calc(100vh-20rem)]">
+        <div className="rounded-lg border bg-white dark:bg-gray-900 overflow-hidden flex flex-col max-h-[calc(100vh-16rem)]">
           <div className="flex-1 min-h-0 overflow-auto">
             <table className="w-full text-sm">
               <thead className="sticky top-0 z-10 bg-gray-50 dark:bg-gray-800/50 border-b">

@@ -5,7 +5,6 @@ import { Circle, Clock, CheckCircle2 } from 'lucide-react'
 import { useDroppable } from '@dnd-kit/core'
 import { cn } from '@/lib/utils'
 import { useTranslation } from '@/lib/i18n/useTranslation'
-import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
 type Task = {
@@ -72,136 +71,16 @@ export function KanbanColumn({
   
   const taskCount = count !== undefined ? count : tasks.length
 
-  // Calculate average progress for this column
-  const averageProgress = tasks.length > 0 
-    ? Math.round(tasks.reduce((sum, task) => sum + task.progress, 0) / tasks.length)
-    : 0
-
-  // Animated progress value for smooth transitions
-  const [animatedProgress, setAnimatedProgress] = useState(averageProgress)
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setAnimatedProgress(averageProgress)
-    }, 50)
-    return () => clearTimeout(timer)
-  }, [averageProgress])
-
-  // Get progress color based on value
-  const getProgressColor = (progress: number) => {
-    if (progress <= 30) {
-      return {
-        stroke: 'stroke-red-500',
-        ring: 'ring-red-500',
-        bg: 'bg-red-50 dark:bg-red-950/20',
-        text: 'text-red-600 dark:text-red-400',
-        glow: 'drop-shadow-[0_0_4px_rgba(239,68,68,0.3)]'
-      }
-    } else if (progress <= 70) {
-      return {
-        stroke: 'stroke-amber-500',
-        ring: 'ring-amber-500',
-        bg: 'bg-amber-50 dark:bg-amber-950/20',
-        text: 'text-amber-600 dark:text-amber-400',
-        glow: 'drop-shadow-[0_0_4px_rgba(245,158,11,0.3)]'
-      }
-    } else {
-      return {
-        stroke: 'stroke-emerald-500',
-        ring: 'ring-emerald-500',
-        bg: 'bg-emerald-50 dark:bg-emerald-950/20',
-        text: 'text-emerald-600 dark:text-emerald-400',
-        glow: 'drop-shadow-[0_0_4px_rgba(16,185,129,0.3)]'
-      }
-    }
-  }
-
-  const progressColors = getProgressColor(animatedProgress)
-  const radius = 16
-  const circumference = 2 * Math.PI * radius
-  const strokeDashoffset = circumference * (1 - animatedProgress / 100)
-
   return (
-    <div className="flex flex-col h-full max-h-[calc(100vh-22rem)]">
-      <div className="flex items-center justify-between mb-4 px-2 flex-shrink-0">
-        <div className="flex items-center gap-2">
-          <div className={`p-1.5 rounded-lg ${statusColors[status]}`}>
-            <Icon className="w-4 h-4" />
-          </div>
-          <h3 className="font-semibold dark:text-gray-200">{title}</h3>
-          <span className="text-sm text-gray-500 bg-gray-100 dark:text-gray-300 dark:bg-gray-700 px-2 py-0.5 rounded-full">
-            {taskCount}
-          </span>
+    <div className="flex flex-col h-full max-h-[calc(100vh-18rem)]">
+      <div className="flex items-center gap-2 mb-4 px-2 flex-shrink-0">
+        <div className={`p-1.5 rounded-lg ${statusColors[status]}`}>
+          <Icon className="w-4 h-4" />
         </div>
-        {/* Progress indicator */}
-        {tasks.length > 0 && (
-          <div 
-            className={cn(
-              "relative group",
-              "flex items-center justify-center",
-              "w-10 h-10 rounded-full",
-              progressColors.bg,
-              "transition-all duration-300 ease-out",
-              "hover:scale-110 hover:shadow-md"
-            )}
-            title={`Average progress: ${averageProgress}%`}
-          >
-            <svg 
-              className="w-10 h-10 transform -rotate-90" 
-              viewBox="0 0 36 36"
-            >
-              {/* Background circle */}
-              <circle
-                cx="18"
-                cy="18"
-                r={radius}
-                stroke="currentColor"
-                strokeWidth="2.5"
-                fill="none"
-                className="text-gray-200/60 dark:text-gray-700/60"
-              />
-              {/* Progress circle with smooth animation */}
-              <circle
-                cx="18"
-                cy="18"
-                r={radius}
-                stroke="currentColor"
-                strokeWidth="2.5"
-                fill="none"
-                strokeDasharray={circumference}
-                strokeDashoffset={strokeDashoffset}
-                strokeLinecap="round"
-                className={cn(
-                  progressColors.stroke,
-                  "transition-all duration-500 ease-out",
-                  progressColors.glow
-                )}
-                style={{
-                  strokeDasharray: circumference,
-                  strokeDashoffset: strokeDashoffset,
-                }}
-              />
-            </svg>
-            {/* Percentage text */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className={cn(
-                "text-[10px] font-semibold leading-none",
-                progressColors.text,
-                "transition-colors duration-300"
-              )}>
-                {animatedProgress}%
-              </span>
-            </div>
-            {/* Subtle ring effect on hover */}
-            <div className={cn(
-              "absolute inset-0 rounded-full",
-              "opacity-0 group-hover:opacity-100",
-              "transition-opacity duration-300",
-              `ring-2 ${progressColors.ring}`,
-              "ring-offset-1 ring-offset-white dark:ring-offset-gray-900"
-            )} />
-          </div>
-        )}
+        <h3 className="font-semibold dark:text-gray-200">{title}</h3>
+        <span className="text-sm text-gray-500 bg-gray-100 dark:text-gray-300 dark:bg-gray-700 px-2 py-0.5 rounded-full">
+          {taskCount}
+        </span>
       </div>
 
       <div 
