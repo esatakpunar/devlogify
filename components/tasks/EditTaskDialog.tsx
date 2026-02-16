@@ -51,6 +51,12 @@ type Task = {
   review_note?: string | null
 }
 
+type ProjectOption = {
+  id: string
+  title: string
+  color: string
+}
+
 interface EditTaskDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
@@ -59,6 +65,7 @@ interface EditTaskDialogProps {
   readOnly?: boolean
   companyId?: string
   userId?: string
+  projects?: ProjectOption[]
 }
 
 export function EditTaskDialog({
@@ -69,6 +76,7 @@ export function EditTaskDialog({
   readOnly = false,
   companyId,
   userId,
+  projects = [],
 }: EditTaskDialogProps) {
   const [title, setTitle] = useState(task.title)
   const [description, setDescription] = useState(task.description || '')
@@ -79,6 +87,7 @@ export function EditTaskDialog({
   const [tags, setTags] = useState(task.tags?.join(', ') || '')
   const [assigneeId, setAssigneeId] = useState(task.assignee_id || '')
   const [responsibleId, setResponsibleId] = useState(task.responsible_id || '')
+  const [projectId, setProjectId] = useState(task.project_id)
   const [loading, setLoading] = useState(false)
   const t = useTranslation()
 
@@ -97,6 +106,7 @@ export function EditTaskDialog({
     setTags(task.tags?.join(', ') || '')
     setAssigneeId(task.assignee_id || '')
     setResponsibleId(task.responsible_id || '')
+    setProjectId(task.project_id)
   }, [task])
 
   useEffect(() => {
@@ -148,6 +158,7 @@ export function EditTaskDialog({
 
       const updatedTask = await updateTask(task.id, {
         title,
+        project_id: projectId,
         description: description || null,
         status,
         priority,
@@ -181,12 +192,12 @@ export function EditTaskDialog({
       const newAssigneeId = assigneeId || null
       const oldAssigneeId = task.assignee_id || null
 
-      if (newAssigneeId && newAssigneeId !== oldAssigneeId && userId && companyId) {
+      if (newAssigneeId && newAssigneeId !== oldAssigneeId && userId && resolvedCompanyId) {
         notifyTaskAssigned({
           taskId: task.id,
           taskTitle: title,
-          projectId: task.project_id,
-          companyId,
+          projectId,
+          companyId: resolvedCompanyId,
           actorId: userId,
           assigneeId: newAssigneeId,
         }).catch(err => {
@@ -199,14 +210,14 @@ export function EditTaskDialog({
       const oldStatus = task.status
       const newStatus = status
 
-      if (oldStatus !== newStatus && userId && companyId) {
+      if (oldStatus !== newStatus && userId && resolvedCompanyId) {
         // Notify about status change
         if (assigneeId || responsibleId) {
           notifyTaskStatusChanged({
             taskId: task.id,
             taskTitle: title,
-            projectId: task.project_id,
-            companyId,
+            projectId,
+            companyId: resolvedCompanyId,
             actorId: userId,
             assigneeId: assigneeId || null,
             responsibleId: responsibleId || null,
@@ -227,8 +238,8 @@ export function EditTaskDialog({
           notifyReviewRequested({
             taskId: task.id,
             taskTitle: title,
-            projectId: task.project_id,
-            companyId,
+            projectId,
+            companyId: resolvedCompanyId,
             actorId: userId,
             responsibleId: responsibleId,
           }).catch(err => {
@@ -304,6 +315,28 @@ export function EditTaskDialog({
 
               <div className="lg:col-span-1 space-y-3 sm:space-y-4 lg:pl-2">
                 <div className="space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor="edit-task-project" className="text-xs sm:text-sm">
+                      {t('tasks.project')}
+                    </Label>
+                    <Select
+                      value={projectId}
+                      onValueChange={setProjectId}
+                      disabled={loading || readOnly || projects.length === 0}
+                    >
+                      <SelectTrigger id="edit-task-project" className="w-full text-sm sm:text-base">
+                        <SelectValue placeholder={t('tasks.selectProject')} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {projects.map((project) => (
+                          <SelectItem key={project.id} value={project.id}>
+                            {project.title}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="edit-task-status" className="text-xs sm:text-sm">
                       {t('tasks.status')}

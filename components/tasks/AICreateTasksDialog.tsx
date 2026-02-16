@@ -33,6 +33,7 @@ import { Sparkles, Loader2, Trash2, Plus, CheckCircle2 } from 'lucide-react'
 import { toast } from 'sonner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useTranslation } from '@/lib/i18n/useTranslation'
+import { useCompanyStore } from '@/lib/store/companyStore'
 
 interface Project {
   id: string
@@ -84,6 +85,10 @@ export function AICreateTasksDialog({
   const [isCreating, setIsCreating] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<'input' | 'preview'>('input')
+  const [assigneeId, setAssigneeId] = useState<string>(userId)
+  const [responsibleId, setResponsibleId] = useState<string>(userId)
+  const [resolvedCompanyId, setResolvedCompanyId] = useState<string | null>(companyId || null)
+  const { members, fetchMembers } = useCompanyStore()
 
   // Load initial note or suggestion if provided and auto-select project
   useEffect(() => {
@@ -92,6 +97,9 @@ export function AICreateTasksDialog({
       if (projects.length === 1 && !selectedProjectId) {
         setSelectedProjectId(projects[0].id)
       }
+      setAssigneeId(userId)
+      setResponsibleId(userId)
+      setResolvedCompanyId(companyId || null)
 
       if (initialNote) {
         setNotesInput(initialNote.content)
@@ -118,8 +126,34 @@ export function AICreateTasksDialog({
       setTasks([])
       setError(null)
       setActiveTab('input')
+      setAssigneeId(userId)
+      setResponsibleId(userId)
+      setResolvedCompanyId(companyId || null)
     }
-  }, [open])
+  }, [open, companyId, userId])
+
+  useEffect(() => {
+    if (!open) return
+
+    const hydrateMembers = async () => {
+      let nextCompanyId = companyId || null
+      if (!nextCompanyId && selectedProjectId) {
+        try {
+          const project = (await getProject(selectedProjectId)) as DbProject
+          nextCompanyId = project?.company_id || null
+        } catch (err) {
+          console.error('Failed to resolve company from selected project:', err)
+        }
+      }
+
+      setResolvedCompanyId(nextCompanyId)
+      if (nextCompanyId) {
+        await fetchMembers(nextCompanyId)
+      }
+    }
+
+    hydrateMembers()
+  }, [open, companyId, selectedProjectId, fetchMembers])
 
   const handleGenerateTasks = async () => {
     if (!notesInput.trim()) {
@@ -219,11 +253,11 @@ export function AICreateTasksDialog({
     setError(null)
 
     try {
-      let resolvedCompanyId = companyId || null
-      if (!resolvedCompanyId && selectedProjectId) {
+      let taskCompanyId = resolvedCompanyId || companyId || null
+      if (!taskCompanyId && selectedProjectId) {
         try {
           const selectedProject = (await getProject(selectedProjectId)) as DbProject
-          resolvedCompanyId = selectedProject?.company_id || null
+          taskCompanyId = selectedProject?.company_id || null
         } catch (projectError) {
           console.error('Error resolving project company id:', projectError)
         }
@@ -233,13 +267,14 @@ export function AICreateTasksDialog({
       const tasksToInsert: TaskInsert[] = tasks.map((task, index) => ({
         project_id: selectedProjectId,
         user_id: userId,
-        company_id: resolvedCompanyId,
+        company_id: taskCompanyId,
         title: task.title.trim(),
         description: task.description.trim() || null, // Description is required but can be stored as null in DB if needed
         priority: task.priority,
         estimated_duration: task.estimated_duration || null,
         status: 'todo',
-        assignee_id: userId,
+        assignee_id: assigneeId || null,
+        responsible_id: responsibleId || null,
         order_index: index,
         progress: 0,
         actual_duration: 0,
@@ -256,7 +291,7 @@ export function AICreateTasksDialog({
           task.id,
           'task_created',
           { task_title: task.title, source: 'ai_generated' },
-          resolvedCompanyId
+          taskCompanyId
         )
       }
 
@@ -303,8 +338,7 @@ export function AICreateTasksDialog({
               </div>
             )}
 
-            {/* Project Selection - Only show if multiple projects available */}
-            {projects.length > 1 && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-2">
                 <Label htmlFor="project-select" className="text-xs sm:text-sm">
                   {t('tasks.aiCreateTasks.project')} <span className="text-red-500">*</span>
@@ -312,7 +346,7 @@ export function AICreateTasksDialog({
                 <Select
                   value={selectedProjectId}
                   onValueChange={setSelectedProjectId}
-                  disabled={isGenerating || isCreating}
+                  disabled={isGenerating || isCreating || projects.length === 0}
                 >
                   <SelectTrigger id="project-select" className="text-sm sm:text-base">
                     <SelectValue placeholder={t('tasks.aiCreateTasks.selectProject')} />
@@ -332,7 +366,51 @@ export function AICreateTasksDialog({
                   </SelectContent>
                 </Select>
               </div>
-            )}
+
+              <div className="space-y-2">
+                <Label htmlFor="assignee-select" className="text-xs sm:text-sm">
+                  {t('tasks.assignee')}
+                </Label>
+                <Select
+                  value={assigneeId}
+                  onValueChange={setAssigneeId}
+                  disabled={isGenerating || isCreating || members.length === 0}
+                >
+                  <SelectTrigger id="assignee-select" className="text-sm sm:text-base">
+                    <SelectValue placeholder={t('tasks.selectAssignee')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {members.map((member) => (
+                      <SelectItem key={member.user_id} value={member.user_id}>
+                        {member.profile.full_name || member.profile.email}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="responsible-select" className="text-xs sm:text-sm">
+                  {t('tasks.responsible')}
+                </Label>
+                <Select
+                  value={responsibleId}
+                  onValueChange={setResponsibleId}
+                  disabled={isGenerating || isCreating || members.length === 0}
+                >
+                  <SelectTrigger id="responsible-select" className="text-sm sm:text-base">
+                    <SelectValue placeholder={t('tasks.selectResponsible')} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {members.map((member) => (
+                      <SelectItem key={member.user_id} value={member.user_id}>
+                        {member.profile.full_name || member.profile.email}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
             <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as 'input' | 'preview')}>
               <TabsList className="grid w-full grid-cols-2 h-9 sm:h-10">

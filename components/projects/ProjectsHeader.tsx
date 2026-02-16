@@ -1,7 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Plus } from 'lucide-react'
 import { CreateProjectDialog } from './CreateProjectDialog'
@@ -13,8 +14,26 @@ interface ProjectsHeaderProps {
 
 export function ProjectsHeader({ userId }: ProjectsHeaderProps) {
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
   const [dialogOpen, setDialogOpen] = useState(false)
   const t = useTranslation()
+  const shouldOpenCreateProject = searchParams.get('createProject') === '1'
+
+  useEffect(() => {
+    if (!shouldOpenCreateProject) return
+    setDialogOpen(true)
+  }, [shouldOpenCreateProject])
+
+  const handleDialogOpenChange = (open: boolean) => {
+    setDialogOpen(open)
+    if (!open && shouldOpenCreateProject) {
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete('createProject')
+      const query = params.toString()
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+    }
+  }
 
   const handleProjectCreated = () => {
     // Force refresh the page to update the projects list
@@ -38,11 +57,10 @@ export function ProjectsHeader({ userId }: ProjectsHeaderProps) {
       </div>
       <CreateProjectDialog
         open={dialogOpen}
-        onOpenChange={setDialogOpen}
+        onOpenChange={handleDialogOpenChange}
         userId={userId}
         onProjectCreated={handleProjectCreated}
       />
     </>
   )
 }
-

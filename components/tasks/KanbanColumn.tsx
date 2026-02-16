@@ -31,6 +31,7 @@ interface KanbanColumnProps {
   projectId?: string
   userId: string
   companyId: string
+  projectOptions?: { id: string; title: string; color: string }[]
   onTaskUpdated?: (task: Task) => void
   onTaskDeleted?: (taskId: string) => void
   onTaskClick?: (task: Task) => void
@@ -57,6 +58,7 @@ export function KanbanColumn({
   projectId,
   userId,
   companyId,
+  projectOptions,
   onTaskUpdated,
   onTaskDeleted,
   onTaskClick,
@@ -123,6 +125,7 @@ export function KanbanColumn({
                   task={task}
                   userId={userId}
                   companyId={companyId}
+                  projectOptions={projectOptions}
                   onTaskUpdated={onTaskUpdated}
                   onTaskDeleted={onTaskDeleted}
                   onClick={onTaskClick ? () => onTaskClick(task) : undefined}

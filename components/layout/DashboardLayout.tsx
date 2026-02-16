@@ -99,14 +99,13 @@ export function DashboardLayout({
   // Keyboard shortcuts
   useKeyboardShortcuts({
     onCreateTask: () => {
-      // Navigate to projects page where user can create task
-      router.push('/projects')
+      router.push('/kanban?createTask=1')
     },
     onCreateNote: () => {
-      router.push('/notes')
+      router.push('/notes?createNote=1')
     },
     onCreateProject: () => {
-      router.push('/projects')
+      router.push('/projects?createProject=1')
     },
     onShowShortcuts: () => {
       setShortcutsHelpOpen(true)

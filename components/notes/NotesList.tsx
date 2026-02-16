@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { NoteCard } from './NoteCard'
 import { CreateNoteDialog } from './CreateNoteDialog'
@@ -46,7 +46,23 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
   const router = useRouter()
   const t = useTranslation()
   const openNoteId = searchParams.get('note')
+  const shouldOpenCreateNote = searchParams.get('createNote') === '1'
   const openNote = openNoteId ? notes.find((note) => note.id === openNoteId) : undefined
+
+  useEffect(() => {
+    if (!shouldOpenCreateNote) return
+    setIsCreateDialogOpen(true)
+  }, [shouldOpenCreateNote])
+
+  const handleCreateDialogOpenChange = (open: boolean) => {
+    setIsCreateDialogOpen(open)
+    if (!open && shouldOpenCreateNote) {
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete('createNote')
+      const query = params.toString()
+      router.replace(query ? `/notes?${query}` : '/notes', { scroll: false })
+    }
+  }
 
   const filteredNotes = notes.filter(note => {
     const searchLower = searchQuery.toLowerCase()
@@ -168,7 +184,7 @@ export function NotesList({ initialNotes, projects, userId }: NotesListProps) {
       {/* Create Note Dialog */}
       <CreateNoteDialog
         open={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
+        onOpenChange={handleCreateDialogOpenChange}
         projects={projects}
         userId={userId}
         onNoteCreated={handleNoteCreated}

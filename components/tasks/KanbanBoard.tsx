@@ -370,6 +370,7 @@ export function KanbanBoard({
             count={todoTasks.length}
             userId={userId}
             companyId={companyId}
+            projectOptions={project ? [project] : []}
             onTaskUpdated={handleTaskUpdated}
             onTaskDeleted={handleTaskDeleted}
           />
@@ -380,6 +381,7 @@ export function KanbanBoard({
             count={inProgressTasks.length}
             userId={userId}
             companyId={companyId}
+            projectOptions={project ? [project] : []}
             onTaskUpdated={handleTaskUpdated}
             onTaskDeleted={handleTaskDeleted}
           />
@@ -390,6 +392,7 @@ export function KanbanBoard({
             count={doneTasks.length}
             userId={userId}
             companyId={companyId}
+            projectOptions={project ? [project] : []}
             onTaskUpdated={handleTaskUpdated}
             onTaskDeleted={handleTaskDeleted}
           />

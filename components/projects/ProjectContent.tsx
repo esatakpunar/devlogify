@@ -109,6 +109,7 @@ export function ProjectContent({ projectId, initialTasks, userId, project }: Pro
           onTaskUpdated={handleTaskUpdated}
           userId={userId}
           companyId={openTask.company_id || undefined}
+          projects={project ? [project] : []}
         />
       )}
     </div>

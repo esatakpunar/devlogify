@@ -209,6 +209,8 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
   const [selectedTask, setSelectedTask] = useState<TaskItem | null>(null)
   const [activeTask, setActiveTask] = useState<TaskItem | null>(null)
   const openTaskId = searchParams.get('task')
+  const shouldOpenCreateTask = searchParams.get('createTask') === '1'
+  const shouldOpenCreateAiTask = searchParams.get('createAiTask') === '1'
 
   useEffect(() => {
     setTasks(sortByUpdatedAtDesc(initialTasks))
@@ -225,6 +227,38 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
       setSelectedTask(taskToOpen)
     }
   }, [openTaskId, tasks])
+
+  useEffect(() => {
+    if (!shouldOpenCreateTask) return
+    setIsCreateDialogOpen(true)
+  }, [shouldOpenCreateTask])
+
+  useEffect(() => {
+    if (!shouldOpenCreateAiTask) return
+    if (isPremium) {
+      setIsAICreateDialogOpen(true)
+    } else {
+      setUpgradeDialogOpen(true)
+    }
+  }, [shouldOpenCreateAiTask, isPremium])
+
+  const handleCreateDialogOpenChange = (open: boolean) => {
+    setIsCreateDialogOpen(open)
+    if (!open && shouldOpenCreateTask) {
+      const params = new URLSearchParams(searchParams.toString())
+      params.delete('createTask')
+      const query = params.toString()
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+    }
+  }
+
+  const clearCreateAiTaskQueryParam = () => {
+    if (!shouldOpenCreateAiTask) return
+    const params = new URLSearchParams(searchParams.toString())
+    params.delete('createAiTask')
+    const query = params.toString()
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false })
+  }
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -1080,6 +1114,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
               count={todoTasks.length}
               userId={userId}
               companyId={companyId}
+              projectOptions={projects}
               onTaskUpdated={handleTaskUpdated}
               onTaskDeleted={handleTaskDeleted}
             />
@@ -1090,6 +1125,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
               count={inProgressTasks.length}
               userId={userId}
               companyId={companyId}
+              projectOptions={projects}
               onTaskUpdated={handleTaskUpdated}
               onTaskDeleted={handleTaskDeleted}
             />
@@ -1100,6 +1136,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
               count={doneTasks.length}
               userId={userId}
               companyId={companyId}
+              projectOptions={projects}
               onTaskUpdated={handleTaskUpdated}
               onTaskDeleted={handleTaskDeleted}
             />
@@ -1306,7 +1343,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
 
       <CreateTaskDialog
         open={isCreateDialogOpen}
-        onOpenChange={setIsCreateDialogOpen}
+        onOpenChange={handleCreateDialogOpenChange}
         userId={userId}
         companyId={companyId}
         projects={projects}
@@ -1315,7 +1352,12 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
 
       <AICreateTasksDialog
         open={isAICreateDialogOpen}
-        onOpenChange={setIsAICreateDialogOpen}
+        onOpenChange={(open) => {
+          setIsAICreateDialogOpen(open)
+          if (!open) {
+            clearCreateAiTaskQueryParam()
+          }
+        }}
         projects={projects}
         userId={userId}
         companyId={companyId}
@@ -1337,7 +1379,16 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
         }}
       />
 
-      <UpgradeDialog open={upgradeDialogOpen} onOpenChange={setUpgradeDialogOpen} feature={t('kanban.aiTaskFeatures')} />
+      <UpgradeDialog
+        open={upgradeDialogOpen}
+        onOpenChange={(open) => {
+          setUpgradeDialogOpen(open)
+          if (!open) {
+            clearCreateAiTaskQueryParam()
+          }
+        }}
+        feature={t('kanban.aiTaskFeatures')}
+      />
 
       {selectedTask && (
         <EditTaskDialog
@@ -1358,6 +1409,7 @@ export function KanbanWorkspace({ userId, companyId, initialTasks, projects }: K
           }}
           companyId={companyId}
           userId={userId}
+          projects={projects}
         />
       )}
     </div>

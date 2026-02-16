@@ -56,6 +56,7 @@ interface TaskCardProps {
   task: Task
   userId: string
   companyId: string
+  projectOptions?: { id: string; title: string; color: string }[]
   onTaskUpdated?: (task: Task) => void
   onTaskDeleted?: (taskId: string) => void
   onClick?: () => void
@@ -74,7 +75,7 @@ const statusStyles = {
   done: 'border-green-200 bg-green-50/30 dark:border-green-800 dark:bg-green-900/20'
 }
 
-export function TaskCard({ task, userId, companyId, onTaskUpdated, onTaskDeleted, onClick, readOnly = false }: TaskCardProps) {
+export function TaskCard({ task, userId, companyId, projectOptions = [], onTaskUpdated, onTaskDeleted, onClick, readOnly = false }: TaskCardProps) {
   const [loading, setLoading] = useState(false)
   const [timerLoading, setTimerLoading] = useState(false)
   const [localTask, setLocalTask] = useState(task)
@@ -540,6 +541,7 @@ export function TaskCard({ task, userId, companyId, onTaskUpdated, onTaskDeleted
         readOnly={readOnly}
         userId={userId}
         companyId={resolvedCompanyId}
+        projects={projectOptions}
       />
 
       {/* Add Manual Time Dialog - Only show if not read-only */}

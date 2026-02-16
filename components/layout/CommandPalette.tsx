@@ -14,10 +14,7 @@ import {
 import { getProjectOptions } from '@/lib/supabase/queries/projects'
 import { getRecentIncompleteTasks } from '@/lib/supabase/queries/tasks'
 import { getNotes } from '@/lib/supabase/queries/notes'
-import { AICreateTasksDialog } from '@/components/tasks/AICreateTasksDialog'
-import { UpgradeDialog } from '@/components/premium/UpgradeDialog'
 import { FolderKanban, FileText, CheckSquare, Sparkles, Plus, Search, KanbanSquare } from 'lucide-react'
-import { usePremium } from '@/lib/hooks/usePremium'
 import { useUserProfileStore } from '@/lib/store/userProfileStore'
 import { staleWhileRevalidate, cacheKey, CACHE_TTL } from '@/lib/utils/cache'
 import { KeyboardHint } from '@/components/ui/KeyboardHint'
@@ -30,15 +27,12 @@ interface CommandPaletteProps {
 }
 
 export function CommandPalette({ open, onOpenChange, userId }: CommandPaletteProps) {
-  const { isPremium } = usePremium(userId)
   const router = useRouter()
   const t = useTranslation()
   const [projects, setProjects] = useState<any[]>([])
   const [tasks, setTasks] = useState<any[]>([])
   const [notes, setNotes] = useState<any[]>([])
   const [loading, setLoading] = useState(false)
-  const [aiDialogOpen, setAiDialogOpen] = useState(false)
-  const [upgradeDialogOpen, setUpgradeDialogOpen] = useState(false)
   const { profile, fetchProfile } = useUserProfileStore()
 
   const resolveCompanyId = useCallback(async () => {
@@ -106,20 +100,13 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
     if (value.startsWith('create:')) {
       const type = value.replace('create:', '')
       if (type === 'task') {
-        // Open task creation - need project context
-        router.push('/projects')
+        router.push('/kanban?createTask=1')
       } else if (type === 'note') {
-        router.push('/notes')
+        router.push('/notes?createNote=1')
       } else if (type === 'project') {
-        router.push('/projects')
+        router.push('/projects?createProject=1')
       } else if (type === 'ai-task') {
-        // Open AI Create Tasks Dialog or Upgrade Dialog
-        onOpenChange(false) // Close command palette first
-        if (isPremium) {
-          setAiDialogOpen(true)
-        } else {
-          setUpgradeDialogOpen(true)
-        }
+        router.push('/kanban?createAiTask=1')
       }
       return
     }
@@ -288,26 +275,7 @@ export function CommandPalette({ open, onOpenChange, userId }: CommandPalettePro
       </CommandList>
     </CommandDialog>
     
-    {/* AI Create Tasks Dialog - Outside CommandDialog to avoid nested dialogs */}
-    {isPremium && (
-      <AICreateTasksDialog
-        open={aiDialogOpen}
-        onOpenChange={setAiDialogOpen}
-        projects={projects}
-        userId={userId}
-        onTasksCreated={() => {
-          // Reload data after tasks are created
-          loadData()
-        }}
-      />
-    )}
-
-    {/* Upgrade Dialog */}
-    <UpgradeDialog
-      open={upgradeDialogOpen}
-      onOpenChange={setUpgradeDialogOpen}
-      feature="AI Task Creation"
-    />
+    {/* AI and upgrade dialogs are opened on destination pages via URL state. */}
   </>
   )
 }
