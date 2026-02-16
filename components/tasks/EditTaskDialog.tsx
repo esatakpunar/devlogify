@@ -27,6 +27,7 @@ import { Slider } from '@/components/ui/slider'
 import { RichTextEditor } from '@/components/notes/RichTextEditor'
 import { UserPicker } from '@/components/shared/UserPicker'
 import { ReviewPanel } from '@/components/tasks/ReviewPanel'
+import { TaskCommentsSection } from '@/components/tasks/TaskCommentsSection'
 import { useCompanyStore } from '@/lib/store/companyStore'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/useTranslation'
@@ -142,11 +143,14 @@ export function EditTaskDialog({
         return
       }
 
-      const tagsArray = tags
-        .split(',')
-        .map(t => t.trim())
-        .filter(t => t.length > 0)
-      const normalizedTags = Array.from(new Set(tagsArray))
+      const normalizedTags = Array.from(
+        new Set(
+          tags
+            .split(',')
+            .map((item) => item.trim())
+            .filter((item) => item.length > 0)
+        )
+      )
       if (normalizedTags.length > 20) {
         toast.error('You can add at most 20 tags')
         setLoading(false)
@@ -379,6 +383,26 @@ export function EditTaskDialog({
                   </div>
 
                   <div className="space-y-2">
+                    <Label htmlFor="edit-task-priority" className="text-xs sm:text-sm">
+                      {t('tasks.priority')}
+                    </Label>
+                    <Select
+                      value={priority}
+                      onValueChange={(value: 'low' | 'medium' | 'high') => setPriority(value)}
+                      disabled={loading || readOnly}
+                    >
+                      <SelectTrigger id="edit-task-priority" className="w-full text-sm sm:text-base">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="low">{t('common.low')}</SelectItem>
+                        <SelectItem value="medium">{t('common.medium')}</SelectItem>
+                        <SelectItem value="high">{t('common.high')}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="edit-task-sprint" className="text-xs sm:text-sm">
                       {t('kanban.sprint')}
                     </Label>
@@ -397,26 +421,6 @@ export function EditTaskDialog({
                             {sprint.name}
                           </SelectItem>
                         ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="edit-task-priority" className="text-xs sm:text-sm">
-                      {t('tasks.priority')}
-                    </Label>
-                    <Select
-                      value={priority}
-                      onValueChange={(value: 'low' | 'medium' | 'high') => setPriority(value)}
-                      disabled={loading || readOnly}
-                    >
-                      <SelectTrigger id="edit-task-priority" className="w-full text-sm sm:text-base">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="low">{t('common.low')}</SelectItem>
-                        <SelectItem value="medium">{t('common.medium')}</SelectItem>
-                        <SelectItem value="high">{t('common.high')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -541,6 +545,23 @@ export function EditTaskDialog({
                 )}
               </div>
             </div>
+
+            {userId && resolvedCompanyId ? (
+              <section className="mt-4" aria-labelledby="task-comments-heading">
+                <h2 id="task-comments-heading" className="sr-only">
+                  {t('tasks.comments') || 'Comments'}
+                </h2>
+                <TaskCommentsSection
+                  taskId={task.id}
+                  taskTitle={title}
+                  projectId={projectId}
+                  companyId={resolvedCompanyId}
+                  userId={userId}
+                  members={members}
+                  readOnly={readOnly}
+                />
+              </section>
+            ) : null}
           </div>
 
           <div className="px-4 sm:px-6 pb-4 sm:pb-6 pt-3 sm:pt-4 border-t border-gray-200 dark:border-gray-800 flex-shrink-0 bg-background sticky bottom-0 z-10">

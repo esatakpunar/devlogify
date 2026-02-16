@@ -143,3 +143,48 @@ export async function notifyReviewRequested(params: {
     { task_id: taskId, project_id: projectId }
   )
 }
+
+/**
+ * Send notifications when users are mentioned in a task comment.
+ */
+export async function notifyTaskCommentMentions(params: {
+  taskId: string
+  taskTitle: string
+  projectId: string
+  companyId: string
+  actorId: string
+  mentionedUserIds: string[]
+  commentPreview: string
+}) {
+  const { taskId, taskTitle, projectId, companyId, actorId, mentionedUserIds, commentPreview } = params
+
+  if (!mentionedUserIds || mentionedUserIds.length === 0) return
+
+  const uniqueTargets = Array.from(new Set(mentionedUserIds)).filter((id) => id !== actorId)
+  if (uniqueTargets.length === 0) return
+
+  const metadata = {
+    task_id: taskId,
+    project_id: projectId,
+  }
+
+  const snippet = commentPreview.trim().slice(0, 140)
+  const message = snippet
+    ? `You were mentioned in "${taskTitle}": ${snippet}`
+    : `You were mentioned in "${taskTitle}"`
+
+  const jobs = uniqueTargets.map((targetUserId) =>
+    createNotificationWithEmail(
+      targetUserId,
+      companyId,
+      'task_mentioned',
+      'You were mentioned in a comment',
+      message,
+      metadata
+    ).catch((error) => {
+      console.error('[Notification] Failed to send mention notification:', error)
+    })
+  )
+
+  await Promise.allSettled(jobs)
+}

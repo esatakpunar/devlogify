@@ -343,6 +343,38 @@ export type Database = {
           updated_at?: string
         }
       }
+      task_comments: {
+        Row: {
+          id: string
+          task_id: string
+          company_id: string
+          user_id: string
+          content: string
+          mentioned_user_ids: string[]
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          task_id: string
+          company_id: string
+          user_id: string
+          content: string
+          mentioned_user_ids?: string[]
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          task_id?: string
+          company_id?: string
+          user_id?: string
+          content?: string
+          mentioned_user_ids?: string[]
+          created_at?: string
+          updated_at?: string
+        }
+      }
       sprints: {
         Row: {
           id: string
@@ -618,6 +650,10 @@ export type Notification = Database['public']['Tables']['notifications']['Row']
 export type NotificationInsert = Database['public']['Tables']['notifications']['Insert']
 export type NotificationUpdate = Database['public']['Tables']['notifications']['Update']
 
+export type TaskComment = Database['public']['Tables']['task_comments']['Row']
+export type TaskCommentInsert = Database['public']['Tables']['task_comments']['Insert']
+export type TaskCommentUpdate = Database['public']['Tables']['task_comments']['Update']
+
 export type Profile = Database['public']['Tables']['profiles']['Row']
 
 // Extended types with relations
@@ -639,6 +675,7 @@ export type NotificationType =
   | 'task_assigned'
   | 'task_status_changed'
   | 'task_review_requested'
+  | 'task_mentioned'
   | 'task_approved'
   | 'task_rejected'
   | 'task_changes_requested'

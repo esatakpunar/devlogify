@@ -121,6 +121,10 @@ export function ActivityLogs({ companyId }: ActivityLogsProps) {
         return <Folder className="w-4 h-4 text-orange-500" />
       case 'note_created':
         return <FileText className="w-4 h-4 text-cyan-500" />
+      case 'comment_added':
+      case 'comment_edited':
+      case 'comment_deleted':
+        return <FileText className="w-4 h-4 text-sky-500" />
       case 'member_joined':
       case 'member_removed':
       case 'team_created':
@@ -241,6 +245,12 @@ export function ActivityLogs({ companyId }: ActivityLogsProps) {
         return `${userName} closed sprint "${metadata.sprint_name || ''}"`
       case 'task_added_to_sprint':
         return `${userName} added ${formattedTask || 'a task'} to a sprint`
+      case 'comment_added':
+        return `${userName} added a comment on ${formattedTask || 'a task'}`
+      case 'comment_edited':
+        return `${userName} edited a comment on ${formattedTask || 'a task'}`
+      case 'comment_deleted':
+        return `${userName} deleted a comment on ${formattedTask || 'a task'}`
       default:
         return t('company.activity_generic', {
           user: userName,
