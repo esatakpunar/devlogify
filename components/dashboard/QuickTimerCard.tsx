@@ -5,6 +5,7 @@ import { Play, Square, Clock, CheckCircle2 } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Tooltip } from '@/components/ui/tooltip'
 import { useTimerStore } from '@/lib/store/timerStore'
 import { getRecentIncompleteTasks } from '@/lib/supabase/queries/tasks'
 import { toast } from 'sonner'
@@ -165,16 +166,17 @@ export function QuickTimerCard({ userId }: QuickTimerCardProps) {
                 </div>
               </div>
               
-              <Button
-                size="sm"
-                onClick={() => handleStartTimer(task)}
-                disabled={loading}
-                className="ml-2 sm:ml-3 hover:bg-blue-600 hover:text-white transition-colors cursor-pointer text-xs sm:text-sm flex-shrink-0"
-                title={t('timerCard.startTimerForTask')}
-              >
-                <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-1" />
-                <span className="hidden sm:inline">{t('timer.start')}</span>
-              </Button>
+              <Tooltip content={t('timerCard.startTimerForTask')}>
+                <Button
+                  size="sm"
+                  onClick={() => handleStartTimer(task)}
+                  disabled={loading}
+                  className="ml-2 sm:ml-3 hover:bg-blue-600 hover:text-white transition-colors cursor-pointer text-xs sm:text-sm flex-shrink-0"
+                >
+                  <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('timer.start')}</span>
+                </Button>
+              </Tooltip>
             </div>
           ))}
           

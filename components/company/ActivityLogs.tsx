@@ -7,6 +7,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
+import { Tooltip } from '@/components/ui/tooltip'
 import { toast } from 'sonner'
 import {
   Activity,
@@ -279,16 +280,18 @@ export function ActivityLogs({ companyId }: ActivityLogsProps) {
         <div key={activity.id}>
           <div className="flex items-start gap-3 py-3">
             {/* User Avatar */}
-            <Avatar className="w-8 h-8 flex-shrink-0 mt-0.5">
-              {activity.user?.avatar_url ? (
-                <AvatarImage src={activity.user.avatar_url} alt={activity.user.full_name || ''} />
-              ) : null}
-              <AvatarFallback className="text-xs">
-                {activity.user
-                  ? getInitials(activity.user.full_name, activity.user.email)
-                  : '?'}
-              </AvatarFallback>
-            </Avatar>
+            <Tooltip content={activity.user?.full_name || activity.user?.email || '?'}>
+              <Avatar className="w-8 h-8 flex-shrink-0 mt-0.5">
+                {activity.user?.avatar_url ? (
+                  <AvatarImage src={activity.user.avatar_url} alt={activity.user.full_name || ''} />
+                ) : null}
+                <AvatarFallback className="text-xs">
+                  {activity.user
+                    ? getInitials(activity.user.full_name, activity.user.email)
+                    : '?'}
+                </AvatarFallback>
+              </Avatar>
+            </Tooltip>
 
             {/* Content */}
             <div className="flex-1 min-w-0">

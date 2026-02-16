@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { ConfirmModal } from '@/components/ui/confirm-modal'
+import { Tooltip } from '@/components/ui/tooltip'
 import { toast } from 'sonner'
 import {
   Send,
@@ -275,15 +276,16 @@ export function InvitationsManager({ companyId, userId, isAdmin }: InvitationsMa
                   </div>
 
                   {isAdmin && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => setCancellingInvitation(inv)}
-                      className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex-shrink-0"
-                      title={t('company.cancelInvitation')}
-                    >
-                      <X className="w-4 h-4" />
-                    </Button>
+                    <Tooltip content={t('company.cancelInvitation')}>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setCancellingInvitation(inv)}
+                        className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex-shrink-0"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </Tooltip>
                   )}
                 </div>
                 {index < pendingInvitations.length - 1 && <Separator />}

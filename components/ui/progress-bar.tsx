@@ -69,7 +69,6 @@ export function ProgressBar({
         aria-valuemax={100}
         aria-label={`Progress: ${clampedValue}%`}
         onClick={handleClick}
-        title={interactive ? 'Click to set progress' : undefined}
       >
         <div
           className={cn(

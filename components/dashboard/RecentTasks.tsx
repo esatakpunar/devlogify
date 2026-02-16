@@ -6,6 +6,7 @@ import { Play, Check, Clock, MoreHorizontal } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
+import { Tooltip } from '@/components/ui/tooltip'
 import { useTimerStore } from '@/lib/store/timerStore'
 import { updateTaskStatus } from '@/lib/supabase/queries/tasks'
 import { toast } from 'sonner'
@@ -175,26 +176,28 @@ export function RecentTasks({ tasks, userId, onTaskCompleted }: RecentTasksProps
                 </Badge>
               ) : (
                 <>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleStartTimer(task)}
-                    disabled={isRunning || loadingTasks.has(task.id)}
-                    className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
-                    title={t('timer.start')}
-                  >
-                    <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => handleMarkComplete(task.id)}
-                    disabled={loadingTasks.has(task.id)}
-                    className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-green-100 dark:hover:bg-green-900/30 hover:text-green-600 dark:hover:text-green-400 transition-colors cursor-pointer"
-                    title={t('tasks.taskMarkedAsComplete')}
-                  >
-                    <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                  </Button>
+                  <Tooltip content={t('timer.start')}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleStartTimer(task)}
+                      disabled={isRunning || loadingTasks.has(task.id)}
+                      className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 transition-colors cursor-pointer"
+                    >
+                      <Play className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    </Button>
+                  </Tooltip>
+                  <Tooltip content={t('tasks.taskMarkedAsComplete')}>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleMarkComplete(task.id)}
+                      disabled={loadingTasks.has(task.id)}
+                      className="h-7 w-7 sm:h-8 sm:w-8 p-0 hover:bg-green-100 dark:hover:bg-green-900/30 hover:text-green-600 dark:hover:text-green-400 transition-colors cursor-pointer"
+                    >
+                      <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                    </Button>
+                  </Tooltip>
                 </>
               )}
             </div>

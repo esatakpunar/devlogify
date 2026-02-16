@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/popover'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Input } from '@/components/ui/input'
+import { Tooltip } from '@/components/ui/tooltip'
 import { cn } from '@/lib/utils'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import type { CompanyMemberWithProfile } from '@/types/supabase'
@@ -68,12 +69,14 @@ export function UserPicker({
         >
           {selectedMember ? (
             <div className="flex items-center gap-2 min-w-0">
-              <Avatar className="h-5 w-5">
-                <AvatarImage src={selectedMember.profile.avatar_url || undefined} />
-                <AvatarFallback className="text-[10px]">
-                  {getInitials(selectedMember.profile.full_name, selectedMember.profile.email)}
-                </AvatarFallback>
-              </Avatar>
+              <Tooltip content={selectedMember.profile.full_name || selectedMember.profile.email}>
+                <Avatar className="h-5 w-5">
+                  <AvatarImage src={selectedMember.profile.avatar_url || undefined} />
+                  <AvatarFallback className="text-[10px]">
+                    {getInitials(selectedMember.profile.full_name, selectedMember.profile.email)}
+                  </AvatarFallback>
+                </Avatar>
+              </Tooltip>
               <span className="truncate">
                 {selectedMember.profile.full_name || selectedMember.profile.email}
               </span>
@@ -122,12 +125,14 @@ export function UserPicker({
                 setSearch('')
               }}
             >
-              <Avatar className="h-6 w-6">
-                <AvatarImage src={member.profile.avatar_url || undefined} />
-                <AvatarFallback className="text-[10px]">
-                  {getInitials(member.profile.full_name, member.profile.email)}
-                </AvatarFallback>
-              </Avatar>
+              <Tooltip content={member.profile.full_name || member.profile.email}>
+                <Avatar className="h-6 w-6">
+                  <AvatarImage src={member.profile.avatar_url || undefined} />
+                  <AvatarFallback className="text-[10px]">
+                    {getInitials(member.profile.full_name, member.profile.email)}
+                  </AvatarFallback>
+                </Avatar>
+              </Tooltip>
               <div className="flex-1 text-left min-w-0">
                 <div className="truncate font-medium">
                   {member.profile.full_name || member.profile.email}

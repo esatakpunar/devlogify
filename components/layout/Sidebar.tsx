@@ -126,7 +126,6 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
                   ? 'bg-blue-50 text-blue-700'
                   : 'text-gray-700 hover:bg-gray-50 hover:text-gray-900'
               )}
-              title={isCollapsed ? t(`nav.${item.key}`) : undefined}
             >
               <item.icon className="w-5 h-5 shrink-0 transition-transform duration-300" />
               <AnimatePresence mode="wait" initial={false}>
@@ -168,7 +167,6 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
             'flex items-center rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 hover:text-gray-900 transition-colors group relative overflow-hidden',
             isCollapsed ? 'justify-center px-3 py-2' : 'space-x-3 px-3 py-2'
           )}
-          title={isCollapsed ? t('common.settings') : undefined}
         >
           <Settings className="w-5 h-5 shrink-0 transition-transform duration-300" />
           <AnimatePresence mode="wait" initial={false}>
@@ -206,7 +204,6 @@ export function Sidebar({ onLinkClick }: SidebarProps = {}) {
             isCollapsed ? 'justify-center px-3 py-2' : 'space-x-3 px-3 py-2'
           )}
           aria-label={isCollapsed ? t('common.expand') || 'Expand sidebar' : t('common.collapse') || 'Collapse sidebar'}
-          title={isCollapsed ? t('common.expand') || 'Expand sidebar' : t('common.collapse') || 'Collapse sidebar'}
         >
           <motion.div
             animate={{ rotate: isCollapsed ? 180 : 0 }}

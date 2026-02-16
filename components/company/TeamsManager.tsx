@@ -34,6 +34,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { ConfirmModal } from '@/components/ui/confirm-modal'
+import { Tooltip } from '@/components/ui/tooltip'
 import { toast } from 'sonner'
 import {
   Plus,
@@ -494,14 +495,16 @@ export function TeamsManager({ companyId, userId, isAdmin }: TeamsManagerProps) 
               teamMembers.map((tm, index) => (
                 <div key={tm.id}>
                   <div className="flex items-center gap-3 py-2.5">
-                    <Avatar className="w-8 h-8">
-                      {tm.profile.avatar_url ? (
-                        <AvatarImage src={tm.profile.avatar_url} alt={tm.profile.full_name || ''} />
-                      ) : null}
-                      <AvatarFallback className="text-xs">
-                        {getInitials(tm.profile.full_name, tm.profile.email)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <Tooltip content={tm.profile.full_name || tm.profile.email}>
+                      <Avatar className="w-8 h-8">
+                        {tm.profile.avatar_url ? (
+                          <AvatarImage src={tm.profile.avatar_url} alt={tm.profile.full_name || ''} />
+                        ) : null}
+                        <AvatarFallback className="text-xs">
+                          {getInitials(tm.profile.full_name, tm.profile.email)}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Tooltip>
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium truncate">
                         {tm.profile.full_name || tm.profile.email}

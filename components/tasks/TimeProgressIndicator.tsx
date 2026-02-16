@@ -3,6 +3,7 @@
 import { Clock, TrendingUp, TrendingDown, Minus } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
+import { Tooltip } from '@/components/ui/tooltip'
 
 interface TimeProgressIndicatorProps {
   estimatedDuration: number | null
@@ -52,18 +53,19 @@ export function TimeProgressIndicator({
   return (
     <div className={cn('flex items-center gap-1', className)}>
       {showIcon && <Clock className="w-3 h-3 text-gray-500" />}
-      <Badge 
-        variant="outline" 
-        className={cn(
-          'font-medium border',
-          color,
-          sizeClasses[size]
-        )}
-        title={`${actualDuration}m / ${estimatedDuration}m estimated (${timeDifference > 0 ? '+' : ''}${timeDifference}m)`}
-      >
-        <Icon className="w-3 h-3 mr-1" />
-        {status}
-      </Badge>
+      <Tooltip content={`${actualDuration}m / ${estimatedDuration}m estimated (${timeDifference > 0 ? '+' : ''}${timeDifference}m)`}>
+        <Badge 
+          variant="outline" 
+          className={cn(
+            'font-medium border',
+            color,
+            sizeClasses[size]
+          )}
+        >
+          <Icon className="w-3 h-3 mr-1" />
+          {status}
+        </Badge>
+      </Tooltip>
     </div>
   )
 }

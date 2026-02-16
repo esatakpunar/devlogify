@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { Tooltip } from '@/components/ui/tooltip'
 import { Flame, Calendar } from 'lucide-react'
 import { format, startOfWeek, eachDayOfInterval, isSameDay } from 'date-fns'
 import { useTranslation } from '@/lib/i18n/useTranslation'
@@ -185,18 +186,19 @@ export function HabitTracker({ userId }: HabitTrackerProps) {
                 key={index}
                 className="flex-1 flex flex-col items-center gap-1"
               >
-                <div
-                  className={`
-                    w-full h-8 sm:h-10 rounded flex items-center justify-center text-xs font-semibold
-                    ${day.hasActivity 
-                      ? 'bg-green-500 dark:bg-green-600 text-white' 
-                      : 'bg-gray-200 dark:bg-gray-800 text-gray-400'
-                    }
-                  `}
-                  title={`${format(day.date, 'EEEE')}: ${day.tasksCompleted} tasks, ${day.minutesSpent} min`}
-                >
-                  {day.hasActivity ? '✓' : ''}
-                </div>
+                <Tooltip content={`${format(day.date, 'EEEE')}: ${day.tasksCompleted} tasks, ${day.minutesSpent} min`}>
+                  <div
+                    className={`
+                      w-full h-8 sm:h-10 rounded flex items-center justify-center text-xs font-semibold
+                      ${day.hasActivity 
+                        ? 'bg-green-500 dark:bg-green-600 text-white' 
+                        : 'bg-gray-200 dark:bg-gray-800 text-gray-400'
+                      }
+                    `}
+                  >
+                    {day.hasActivity ? '✓' : ''}
+                  </div>
+                </Tooltip>
                 <span className="text-xs text-gray-500 dark:text-gray-400">
                   {format(day.date, 'EEE')}
                 </span>

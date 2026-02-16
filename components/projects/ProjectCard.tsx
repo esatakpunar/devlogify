@@ -19,6 +19,7 @@ import {
 import { formatDistanceToNow } from 'date-fns'
 import { AnimatedCard } from '@/components/ui/AnimatedCard'
 import { getPlainTextFromHTML } from '@/components/ui/HTMLContent'
+import { Tooltip } from '@/components/ui/tooltip'
 import { EditProjectDialog } from './EditProjectDialog'
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { useConfirmModal } from '@/lib/hooks/useConfirmModal'
@@ -147,20 +148,21 @@ export function ProjectCard({ project, index = 0, userId }: ProjectCardProps) {
               </h3>
             </div>
             <div className="flex items-center gap-1 flex-shrink-0">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handlePinToggle}
-                disabled={pinLoading}
-                className="h-7 w-7 sm:h-8 sm:w-8 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer"
-                title={isPinned ? t('projects.unpinProject') : t('projects.pinProject')}
-              >
-                {isPinned ? (
-                  <PinOff className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600 dark:text-blue-400" />
-                ) : (
-                  <Pin className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" />
-                )}
-              </Button>
+              <Tooltip content={isPinned ? t('projects.unpinProject') : t('projects.pinProject')}>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handlePinToggle}
+                  disabled={pinLoading}
+                  className="h-7 w-7 sm:h-8 sm:w-8 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:bg-blue-100 dark:hover:bg-blue-900/30 cursor-pointer"
+                >
+                  {isPinned ? (
+                    <PinOff className="h-3 w-3 sm:h-4 sm:w-4 text-blue-600 dark:text-blue-400" />
+                  ) : (
+                    <Pin className="h-3 w-3 sm:h-4 sm:w-4 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400" />
+                  )}
+                </Button>
+              </Tooltip>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild onClick={(e) => e.preventDefault()}>
                   <Button 

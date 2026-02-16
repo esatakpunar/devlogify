@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { ConfirmModal } from '@/components/ui/confirm-modal'
+import { Tooltip } from '@/components/ui/tooltip'
 import { toast } from 'sonner'
 import { Copy, RefreshCw, Save, Loader2 } from 'lucide-react'
 
@@ -138,28 +139,30 @@ export function CompanySettings({ companyId, isAdmin }: CompanySettingsProps) {
           <div className="flex-1 flex items-center gap-2 px-4 py-2.5 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 font-mono text-lg tracking-widest select-all">
             {company?.join_code || '--------'}
           </div>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={handleCopyJoinCode}
-            title={t('company.copyJoinCode')}
-          >
-            <Copy className="w-4 h-4" />
-          </Button>
-          {isAdmin && (
+          <Tooltip content={t('company.copyJoinCode')}>
             <Button
               variant="outline"
               size="icon"
-              onClick={() => setShowRegenerateConfirm(true)}
-              disabled={isRegenerating}
-              title={t('company.regenerateJoinCode')}
+              onClick={handleCopyJoinCode}
             >
-              {isRegenerating ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <RefreshCw className="w-4 h-4" />
-              )}
+              <Copy className="w-4 h-4" />
             </Button>
+          </Tooltip>
+          {isAdmin && (
+            <Tooltip content={t('company.regenerateJoinCode')}>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setShowRegenerateConfirm(true)}
+                disabled={isRegenerating}
+              >
+                {isRegenerating ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-4 h-4" />
+                )}
+              </Button>
+            </Tooltip>
           )}
         </div>
       </div>

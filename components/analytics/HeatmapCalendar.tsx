@@ -7,6 +7,7 @@ import { format, startOfYear, endOfYear, eachDayOfInterval, isSameDay, subDays }
 import { useTranslation } from '@/lib/i18n/useTranslation'
 import { createClient } from '@/lib/supabase/client'
 import { cn } from '@/lib/utils'
+import { Tooltip } from '@/components/ui/tooltip'
 import type { Database } from '@/types/supabase'
 
 interface HeatmapCalendarProps {
@@ -165,15 +166,18 @@ export function HeatmapCalendar({ userId }: HeatmapCalendarProps) {
             {weeks.map((week, weekIndex) => (
               <div key={weekIndex} className="flex flex-col gap-0.5 sm:gap-1">
                 {week.map((day, dayIndex) => (
-                  <div
+                  <Tooltip
                     key={`${weekIndex}-${dayIndex}`}
-                    className={cn(
-                      'w-2.5 h-2.5 sm:w-3 sm:h-3 rounded cursor-pointer transition-all hover:scale-125',
-                      getColor(day.level)
-                    )}
-                    title={`${format(day.date, 'MMM dd, yyyy')}: ${day.value.toFixed(1)} ${t('analytics.activityPoints')}`}
-                    onClick={() => setSelectedDay(day)}
-                  />
+                    content={`${format(day.date, 'MMM dd, yyyy')}: ${day.value.toFixed(1)} ${t('analytics.activityPoints')}`}
+                  >
+                    <div
+                      className={cn(
+                        'w-2.5 h-2.5 sm:w-3 sm:h-3 rounded cursor-pointer transition-all hover:scale-125',
+                        getColor(day.level)
+                      )}
+                      onClick={() => setSelectedDay(day)}
+                    />
+                  </Tooltip>
                 ))}
               </div>
             ))}

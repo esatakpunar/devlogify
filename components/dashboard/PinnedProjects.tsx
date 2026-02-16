@@ -6,6 +6,7 @@ import { Pin, PinOff, FolderKanban } from 'lucide-react'
 import { Card } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Tooltip } from '@/components/ui/tooltip'
 import { toggleProjectPin } from '@/lib/supabase/queries/projects'
 import { toast } from 'sonner'
 import { useTranslation } from '@/lib/i18n/useTranslation'
@@ -75,16 +76,17 @@ export function PinnedProjects({ projects, userId }: PinnedProjectsProps) {
                   </p>
                 )}
               </div>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => handleTogglePin(project.id)}
-                disabled={loadingProjects.has(project.id)}
-                className="h-6 w-6 sm:h-7 sm:w-7 p-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 cursor-pointer flex-shrink-0"
-                title={t('pinnedProjects.unpinProject')}
-              >
-                <PinOff className="w-3 h-3" />
-              </Button>
+              <Tooltip content={t('pinnedProjects.unpinProject')}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => handleTogglePin(project.id)}
+                  disabled={loadingProjects.has(project.id)}
+                  className="h-6 w-6 sm:h-7 sm:w-7 p-0 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 dark:hover:text-red-400 cursor-pointer flex-shrink-0"
+                >
+                  <PinOff className="w-3 h-3" />
+                </Button>
+              </Tooltip>
             </div>
             
             <div className="flex items-center justify-between gap-2">

@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/select'
 import { ConfirmModal } from '@/components/ui/confirm-modal'
 import { Separator } from '@/components/ui/separator'
+import { Tooltip } from '@/components/ui/tooltip'
 import { toast } from 'sonner'
 import { UserMinus, Shield, Loader2, Crown } from 'lucide-react'
 import type { CompanyMemberWithProfile } from '@/types/supabase'
@@ -99,14 +100,16 @@ export function MembersManager({ companyId, userId, isAdmin }: MembersManagerPro
           <div key={member.id}>
             <div className="flex items-center gap-4 py-3">
               {/* Avatar */}
-              <Avatar className="w-10 h-10">
-                {member.profile.avatar_url ? (
-                  <AvatarImage src={member.profile.avatar_url} alt={member.profile.full_name || ''} />
-                ) : null}
-                <AvatarFallback className="text-sm font-medium">
-                  {getInitials(member.profile.full_name, member.profile.email)}
-                </AvatarFallback>
-              </Avatar>
+              <Tooltip content={member.profile.full_name || member.profile.email}>
+                <Avatar className="w-10 h-10">
+                  {member.profile.avatar_url ? (
+                    <AvatarImage src={member.profile.avatar_url} alt={member.profile.full_name || ''} />
+                  ) : null}
+                  <AvatarFallback className="text-sm font-medium">
+                    {getInitials(member.profile.full_name, member.profile.email)}
+                  </AvatarFallback>
+                </Avatar>
+              </Tooltip>
 
               {/* Info */}
               <div className="flex-1 min-w-0">
@@ -156,15 +159,16 @@ export function MembersManager({ companyId, userId, isAdmin }: MembersManagerPro
 
                 {/* Remove button */}
                 {isAdmin && !isOwner(member.user_id) && member.user_id !== userId && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setRemovingMember(member)}
-                    className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                    title={t('company.removeMember')}
-                  >
-                    <UserMinus className="w-4 h-4" />
-                  </Button>
+                  <Tooltip content={t('company.removeMember')}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => setRemovingMember(member)}
+                      className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    >
+                      <UserMinus className="w-4 h-4" />
+                    </Button>
+                  </Tooltip>
                 )}
               </div>
             </div>
